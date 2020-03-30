@@ -1,12 +1,8 @@
-# template-project
+# thoth-unresolved-package-handler
 
-This is a Template for any Python based project, it contains what Project Thoth and the AI CoE need:
+This repo contains two jobs:
 
-1. GitHub defaults and Templates for issues
-2. configuration for Coala and Black (code formating)
-3. basic configuration for Zuul
-4. configuration for Thoth (stage environment, Red Hat VPN only)
-5. if you are writing a Python module, Kebechet could manage releases of your packages for you
-6. if credentials are provided, Python module releases could be published to PyPI
+    PRODUCER: Query the database for unresolved packages that need to be solved with priorities for a user. (Run in Argo workflow task through Python S2I)
+    It sends a message to Kafka with information relative to package and runtime environment to use for the solver to be scheduled.
 
-Dependencies should be managed using `pipenv` (`Pipfile`, and the `Pipfile.lock` could be created by `thamos advise`), `pip3` and a `requirements.txt` files could be used.
+    CONSUMER: Take messages from Kafka relative to package that need to be solved with priority and schedule solver for it.
