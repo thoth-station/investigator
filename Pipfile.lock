@@ -477,11 +477,11 @@
         },
         "thoth-messaging": {
             "hashes": [
-                "sha256:11337eb4ba1f5b4009d70042aa4736426d01edc20be24ff5f3c615b10ebdf737",
-                "sha256:7f224ab556db49a37bec0747028fba3d1bbdd5d2de2c804539e06b0c54c8d6f2"
+                "sha256:2864fe7e0c63b618c8ea175414a07cc05113e8b76d956631c5d4aa6458710b60",
+                "sha256:616d517538ce488407c0cb90e227b8a6c1833d575bc6a6938e874212b0ca4af9"
             ],
             "index": "pypi",
-            "version": "==0.3.2"
+            "version": "==0.3.4"
         },
         "typing-extensions": {
             "hashes": [
