@@ -53,7 +53,7 @@ async def main():
                 )
             )
             _LOGGER.info(
-                "Unresolved package:\npackage name:%r\npackage version:%r\nindex_url:%r\nruntime_environment:%r\n",
+                "Unresolved package (package name:%r, package version:%r, index_url:%r, runtime_environment:%r)",
                 package_name,
                 package_version,
                 sources,
