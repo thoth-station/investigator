@@ -37,8 +37,6 @@ def unresolved_package_handler(file_test_path: Optional[Path] = None):
     else:
         adviser_run_path = os.environ["FILE_PATH"]
 
-    sources_json_path = "result.parameters.project.requirements.source"
-
     if not Path(adviser_run_path).exists():
         raise FileNotFoundError(f"Cannot find the file on this path: {adviser_run_path}")
 
