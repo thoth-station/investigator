@@ -34,6 +34,6 @@ class TestProducer:
             file_test_path=file_test_path
         )
         assert unresolved_packages == ["black"]
-        assert package_version == None
+        assert package_version is None
         assert sources == ["https://pypi.python.org/simple"]
         assert solver == "solver-rhel-8-py36"
