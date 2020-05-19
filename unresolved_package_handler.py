@@ -30,7 +30,7 @@ _LOGGER = logging.getLogger("thoth.unresolved_package_handler")
 
 
 def unresolved_package_handler(file_test_path: Optional[Path] = None):
-    """Run Unresolved Package Handler"""
+    """Run Unresolved Package Handler."""
     if file_test_path:
         _LOGGER.debug("Dry run..")
         adviser_run_path = file_test_path
@@ -68,13 +68,22 @@ def unresolved_package_handler(file_test_path: Optional[Path] = None):
     operating_system = runtime_environment.get("operating_system", {})
     if operating_system:
         os_name = runtime_environment["operating_system"].get("name")
-        os_version=GraphDatabase().normalize_os_version(operating_system.get("name"), operating_system.get("version"))
+        os_version = GraphDatabase().normalize_os_version(operating_system.get("name"), operating_system.get("version"))
         python_version = runtime_environment.get("python_version")
-        solver = "solver" + "-" + os_name + "-" + os_version + "-" + "py" + "".join(runtime_environment["python_version"].split("."))
+        solver = (
+            "solver"
+            + "-"
+            + os_name
+            + "-"
+            + os_version
+            + "-"
+            + "py"
+            + "".join(runtime_environment["python_version"].split("."))
+        )
 
         GraphDatabase().parse_python_solver_name(solver)
 
-    package_version  = None
+    package_version = None
 
     _LOGGER.info(f"Unresolved packages identified.. {unresolved_packages}")
     _LOGGER.info(f"package versions identified.. {package_version}")

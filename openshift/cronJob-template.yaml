@@ -12,7 +12,7 @@ metadata:
       This template defines resources needed to deploy Thoth Unresolved
       Package Handler to OpenShift.
     template.openshift.io/provider-display-name: "Red Hat, Inc."
-    thoth-station.ninja/template-version: 0.1.0 
+    thoth-station.ninja/template-version: 0.1.0
   labels:
     template: unresolved-package-handler-cronjob
     app: thoth
@@ -76,7 +76,9 @@ objects:
                 component: unresolved-package-handler
             spec:
               containers:
-                - image: "${IMAGE_STREAM_REGISTRY}/${IMAGE_STREAM_NAMESPACE}/unresolved-package-handler:${IMAGE_STREAM_TAG}"
+                - image: "{{inputs.parameters.IMAGE_STREAM_REGISTRY}}/\
+                {{inputs.parameters.IMAGE_STREAM_NAMESPACE}}/\
+                unresolved-package-handler:{{inputs.parameters.IMAGE_STREAM_TAG}}"
                   name: unresolved-package-handler
                   env:
                     - name: SUBCOMMAND
