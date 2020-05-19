@@ -35,8 +35,6 @@ parameters:
     displayName: ImageStream Project
     required: true
     name: IMAGE_STREAM_NAMESPACE
-    # TODO adjust ansible role so that we dont need a default here
-    value: "thoth-infra-stage"
 
   - description: Tag of the ImageStream to be use
     displayName: ImageStream Tag
@@ -71,6 +69,7 @@ objects:
         spec:
           template:
             metadata:
+              name: unresolved-package-handler
               labels:
                 app: thoth
                 component: unresolved-package-handler
@@ -83,43 +82,32 @@ objects:
                   env:
                     - name: SUBCOMMAND
                       value: ${{SUBCOMMAND}}
+                    - name: DEBUG_LEVEL
+                      value: ${{DEBUG_LEVEL}}
                     - name: APP_SCRIPT
                       value: "app.sh"
                     - name: KAFKA_BOOTSTRAP_SERVERS
-                      value: "stage-kafka-bootstrap-dh-stage-message-bus.cloud.paas.stage.psi.redhat.com:443"
+                      valueFrom:
+                        configMapKeyRef:
+                          key: kafka-bootstrap-servers
+                          name: thoth
+                    - name: KAFKA_CLIENT_ID
+                      valueFrom:
+                        configMapKeyRef:
+                          key: kafka-client-id
+                          name: thoth
+                    - name: KAFKA_SSL_AUTH
+                      valueFrom:
+                        configMapKeyRef:
+                          key: kafka-ssl-auth
+                          name: thoth
+                    - name: KAFKA_RETENTION_TIME_SECONDS
+                      valueFrom:
+                        configMapKeyRef:
+                          key: kafka-topic-retention-time
+                          name: thoth
                     - name: KAFKA_CAFILE
                       value: "/mnt/secrets/kafka_ca.crt"
-                    - name: KAFKA_TOPIC_RETENTION_TIME_SECONDS
-                      value: 60*60*24
-                    - name: THOTH_DEPLOYMENT_NAME
-                      valueFrom:
-                        configMapKeyRef:
-                          key: storage-bucket-name
-                          name: thoth
-                    - name: KNOWLEDGE_GRAPH_HOST
-                      valueFrom:
-                        configMapKeyRef:
-                          key: postgresql-host
-                          name: thoth
-                    - name: KNOWLEDGE_GRAPH_PORT
-                      value: "5432"
-                    - name: KNOWLEDGE_GRAPH_SSL_DISABLED
-                      value: "1"
-                    - name: KNOWLEDGE_GRAPH_USER
-                      valueFrom:
-                        secretKeyRef:
-                          name: postgresql
-                          key: database-user
-                    - name: KNOWLEDGE_GRAPH_PASSWORD
-                      valueFrom:
-                        secretKeyRef:
-                          name: postgresql
-                          key: database-password
-                    - name: KNOWLEDGE_GRAPH_DATABASE
-                      valueFrom:
-                        secretKeyRef:
-                          name: postgresql
-                          key: database-name
                   volumeMounts:
                     - name: secrets
                       mountPath: /mnt/secrets

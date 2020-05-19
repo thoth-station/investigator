@@ -23,14 +23,17 @@ from pathlib import Path
 
 from unresolved_package_handler import unresolved_package_handler
 
+
 class TestProducer:
     """Test producer of unresolved package handler."""
 
     def test_unresolved_package_handler(self) -> None:
         """Test extraction of inputs for Kafka."""
         file_test_path = Path().cwd().joinpath("tests", "adviser-04ab56d6.json")
-        unresolved_packages, package_version, sources, solver = unresolved_package_handler(file_test_path=file_test_path)
+        unresolved_packages, package_version, sources, solver = unresolved_package_handler(
+            file_test_path=file_test_path
+        )
         assert unresolved_packages == ["black"]
         assert package_version == None
-        assert sources == ['https://pypi.python.org/simple']
+        assert sources == ["https://pypi.python.org/simple"]
         assert solver == "solver-rhel-8-py36"

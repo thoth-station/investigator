@@ -36,6 +36,7 @@ app = MessageBase.app
 
 _LOGGER = logging.getLogger("thoth.unresolved_package_handler")
 
+
 @app.command()
 async def main():
     """Run advise-reporter."""
@@ -46,10 +47,7 @@ async def main():
         try:
             await unresolved_package.publish_to_topic(
                 unresolved_package.MessageContents(
-                    package_name=package_name,
-                    package_version=package_version,
-                    index_url=sources,
-                    solver=solver,
+                    package_name=package_name, package_version=package_version, index_url=sources, solver=solver
                 )
             )
             _LOGGER.info(
