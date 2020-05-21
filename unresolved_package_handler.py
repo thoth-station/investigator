@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""This is run to send messages regarding unresolved packages that need to be solved with priority."""
+"""This file contains methods used in unresolved_package_handler to send/receieve messages."""
 
 import logging
 import json
@@ -64,22 +64,21 @@ def unresolved_package_handler(file_test_path: Optional[Path] = None):
 
     solver = None
     operating_system = runtime_environment.get("operating_system", {})
+
     if operating_system:
         os_name = runtime_environment["operating_system"].get("name")
         os_version = GraphDatabase().normalize_os_version(operating_system.get("name"), operating_system.get("version"))
         python_version = runtime_environment.get("python_version")
-        solver = (
-            "solver"
-            + "-"
-            + os_name
-            + "-"
-            + os_version
-            + "-"
-            + "py"
-            + "".join(runtime_environment["python_version"].split("."))
-        )
 
-        GraphDatabase().parse_python_solver_name(solver)
+        if os_name and os_version:
+            solver = f"solver-{os_name}-{os_version}-py{runtime_environment["python_version"].replace(".", "")}"
+
+        if solver:
+            GraphDatabase().parse_python_solver_name(solver)
+
+    if not solver:
+        _LOGGER.warning("No solver identified.")
+        sys.exit(2)
 
     package_version = None
 
