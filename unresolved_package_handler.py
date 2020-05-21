@@ -35,7 +35,7 @@ def unresolved_package_handler(file_test_path: Optional[Path] = None):
         _LOGGER.debug("Dry run..")
         adviser_run_path = file_test_path
     else:
-        adviser_run_path = os.environ["FILE_PATH"]
+        adviser_run_path = os.environ["JSON_FILE_PATH"]
 
     if not Path(adviser_run_path).exists():
         raise FileNotFoundError(f"Cannot find the file on this path: {adviser_run_path}")
@@ -71,7 +71,7 @@ def unresolved_package_handler(file_test_path: Optional[Path] = None):
         python_version = runtime_environment.get("python_version")
 
         if os_name and os_version:
-            solver = f"solver-{os_name}-{os_version}-py{runtime_environment["python_version"].replace(".", "")}"
+            solver = f"solver-{os_name}-{os_version}-py{python_version.replace('.', '')}"
 
         if solver:
             GraphDatabase().parse_python_solver_name(solver)

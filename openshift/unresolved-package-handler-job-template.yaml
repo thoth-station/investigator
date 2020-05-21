@@ -19,6 +19,11 @@ metadata:
     component: unresolved-package-handler
 
 parameters:
+  - name: UNRESOLVED_PACKAGE_HANDLER_ID
+    required: true
+    description: A unique dentifier of unresolved package handler.
+    displayName: Unresolved package handler id
+
   - description: Registry the ImageStream to be used
     displayName: ImageStream Registry
     required: true
@@ -48,7 +53,13 @@ parameters:
     name: SUBCOMMAND
     value: "producer"
 
-  - name: FILE_PATH
+  - description: Debug level if set to 1
+    displayName: Debug level
+    required: true
+    name: DEBUG_LEVEL
+    value: "0"
+
+  - name: JSON_FILE_PATH
     description: "Path to Git repo"
     displayName: "Path to Git repo"
     required: false
@@ -58,14 +69,13 @@ objects:
   - apiVersion: batch/v1
     kind: Job
     metadata:
-      name: unresolved-package-handler
+      name: ${UNRESOLVED_PACKAGE_HANDLER_ID}
       annotations:
         thoth-station.ninja/template-version: 0.1.0
       labels:
         app: thoth
         component: unresolved-package-handler
     spec:
-      backoffLimit: 1
       template:
         metadata:
           labels:
@@ -73,19 +83,17 @@ objects:
             component: unresolved-package-handler
         spec:
           containers:
-            - image: "{{inputs.parameters.IMAGE_STREAM_REGISTRY}}/\
-                {{inputs.parameters.IMAGE_STREAM_NAMESPACE}}/\
-                unresolved-package-handler:{{inputs.parameters.IMAGE_STREAM_TAG}}"
+            - image: "${IMAGE_STREAM_REGISTRY}/${IMAGE_STREAM_NAMESPACE}/unresolved-package-handler:${IMAGE_STREAM_TAG}"
               name: unresolved-package-handler
               env:
                 - name: SUBCOMMAND
-                  value: ${{SUBCOMMAND}}
+                  value: "${{SUBCOMMAND}}"
                 - name: DEBUG_LEVEL
-                  value: ${{DEBUG_LEVEL}}
+                  value: "${DEBUG_LEVEL}"
                 - name: APP_SCRIPT
                   value: "app.sh"
-                - name: FILE_PATH
-                  value: ${{FILE_PATH}}
+                - name: JSON_FILE_PATH
+                  value: ${JSON_FILE_PATH}
                 - name: KAFKA_BOOTSTRAP_SERVERS
                   valueFrom:
                     configMapKeyRef:

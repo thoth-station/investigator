@@ -26,6 +26,13 @@ from unresolved_package_handler import unresolved_package_handler
 
 app = MessageBase.app
 
+DEBUG_LEVEL = bool(int(os.getenv("DEBUG_LEVEL", 0)))
+
+if DEBUG_LEVEL:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.INFO)
+
 _LOGGER = logging.getLogger("thoth.unresolved_package_handler")
 
 
