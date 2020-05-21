@@ -8,16 +8,16 @@ if [ "$SUBCOMMAND" = "producer" ]
 then
     if [ "$DEBUG_LEVEL" -eq 1]
     then
-        exec faust --debug --loglevel debug -A producer main
+        exec pipenv run faust --debug --loglevel debug -A producer main
     else
-        exec faust -A producer main
+        exec pipenv run faust -A producer main
     fi
 elif [ "$SUBCOMMAND" = "consumer" ]
 then
     if [ "$DEBUG_LEVEL" -eq 1]
     then
-        exec faust --debug --loglevel debug -A consumer worker
+        exec pipenv run faust --debug --loglevel debug -A consumer worker
     else
-        exec faust -A consumer worker
+        exec pipenv run faust -A consumer worker
     fi
 fi

@@ -17,12 +17,12 @@
 
 """This is run to send messages regarding unresolved packages that need to be solved with priority."""
 
-import asyncio
 import logging
+import os
 
 from thoth.messaging import MessageBase
 from thoth.messaging.unresolved_package import UnresolvedPackageMessage
-from unresolved_package_handler import unresolved_package_handler
+from thoth.unresolved_package_handler.unresolved_package_handler import unresolved_package_handler
 
 app = MessageBase.app
 
