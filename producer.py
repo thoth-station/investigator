@@ -50,11 +50,11 @@ async def main():
                 )
             )
             _LOGGER.info(
-                "Unresolved package (package name:%r, package version:%r, index_url:%r, runtime_environment:%r)",
+                "Unresolved package (package name:%r, package version:%r, index_url:%r, solver:%r)",
                 package_name,
                 package_version,
                 sources,
-                runtime_environment,
+                solver,
             )
 
         except Exception as identifier:
