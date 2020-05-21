@@ -19,14 +19,6 @@
 
 import asyncio
 import logging
-import faust
-import os
-import ssl
-import json
-import sys
-
-from typing import Optional
-from pathlib import Path
 
 from thoth.messaging import MessageBase
 from thoth.messaging.unresolved_package import UnresolvedPackageMessage
