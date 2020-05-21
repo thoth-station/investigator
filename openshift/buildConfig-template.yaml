@@ -94,6 +94,7 @@ parameters:
     required: true
     name: IMAGE_STREAM_TAG
     value: 'latest'
+
   - description: Thamos Advise setup tag value
     displayName: THOTH_ADVISE
     required: true
