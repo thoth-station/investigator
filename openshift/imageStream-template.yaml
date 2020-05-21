@@ -16,7 +16,7 @@ metadata:
   labels:
     template: unresolved-package-handler-imagestream
     app: thoth
-    component: package-releases
+    component: unresolved-package-handler
 
 objects:
   - kind: ImageStream
