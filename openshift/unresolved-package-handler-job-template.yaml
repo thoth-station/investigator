@@ -1,0 +1,144 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: unresolved-package-handler-job
+  annotations:
+    description: "Thoth: Unresolved Package Handler"
+    openshift.io/display-name: "Thoth: Unresolved Package Handler"
+    version: 0.1.0
+    tags: thoth,ai-stacks,aistacks,unresolved-package-handler
+    template.openshift.io/documentation-url: https://github.com/Thoth-Station/
+    template.openshift.io/long-description: >
+      This template defines resources needed to deploy Thoth Unresolved
+      Package Handler to OpenShift.
+    template.openshift.io/provider-display-name: "Red Hat, Inc."
+    thoth-station.ninja/template-version: 0.1.0
+  labels:
+    template: unresolved-package-handler-job
+    app: thoth
+    component: unresolved-package-handler
+
+parameters:
+  - name: UNRESOLVED_PACKAGE_HANDLER_ID
+    required: true
+    description: A unique dentifier of unresolved package handler.
+    displayName: Unresolved package handler id
+
+  - description: Registry the ImageStream to be used
+    displayName: ImageStream Registry
+    required: true
+    name: IMAGE_STREAM_REGISTRY
+    value: "docker-registry.default.svc:5000"
+
+  - displayName: Suspend CronJob run
+    description: Suspend CronJob run
+    required: true
+    name: THOTH_SUSPEND_JOB
+    value: "true"
+
+  - description: Project the ImageStream to be use lives in
+    displayName: ImageStream Project
+    required: true
+    name: IMAGE_STREAM_NAMESPACE
+
+  - description: Tag of the ImageStream to be use
+    displayName: ImageStream Tag
+    required: true
+    name: IMAGE_STREAM_TAG
+    value: "latest"
+
+  - description: Subcommand to be run
+    displayName: Subcommand
+    required: true
+    name: SUBCOMMAND
+    value: "producer"
+
+  - description: Debug level if set to 1
+    displayName: Debug level
+    required: true
+    name: DEBUG_LEVEL
+    value: "0"
+
+  - name: JSON_FILE_PATH
+    description: "Path to Git repo"
+    displayName: "Path to Git repo"
+    required: false
+    value: "/mnt/inputs/artifacts/repository"
+
+objects:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: ${UNRESOLVED_PACKAGE_HANDLER_ID}
+      annotations:
+        thoth-station.ninja/template-version: 0.1.0
+      labels:
+        app: thoth
+        component: unresolved-package-handler
+    spec:
+      template:
+        metadata:
+          labels:
+            app: thoth
+            component: unresolved-package-handler
+        spec:
+          containers:
+            - image: "${IMAGE_STREAM_REGISTRY}/${IMAGE_STREAM_NAMESPACE}/unresolved-package-handler:${IMAGE_STREAM_TAG}"
+              name: unresolved-package-handler
+              env:
+                - name: SUBCOMMAND
+                  value: "${{SUBCOMMAND}}"
+                - name: DEBUG_LEVEL
+                  value: "${DEBUG_LEVEL}"
+                - name: APP_SCRIPT
+                  value: "app.sh"
+                - name: JSON_FILE_PATH
+                  value: ${JSON_FILE_PATH}
+                - name: KAFKA_BOOTSTRAP_SERVERS
+                  valueFrom:
+                    configMapKeyRef:
+                      key: kafka-bootstrap-servers
+                      name: thoth
+                - name: KAFKA_CLIENT_ID
+                  valueFrom:
+                    configMapKeyRef:
+                      key: kafka-client-id
+                      name: thoth
+                - name: KAFKA_SSL_AUTH
+                  valueFrom:
+                    configMapKeyRef:
+                      key: kafka-ssl-auth
+                      name: thoth
+                - name: KAFKA_RETENTION_TIME_SECONDS
+                  valueFrom:
+                    configMapKeyRef:
+                      key: kafka-topic-retention-time
+                      name: thoth
+                - name: KAFKA_CAFILE
+                  value: "/mnt/secrets/kafka_ca.crt"
+              volumeMounts:
+                - name: secrets
+                  mountPath: /mnt/secrets
+                  readOnly: true
+              resources:
+                requests:
+                  memory: "256Mi"
+                  cpu: "500m"
+                limits:
+                  memory: "512Mi"
+                  cpu: "500m"
+              livenessProbe:
+                failureThreshold: 1
+                # Give this job 2 hours to finish
+                initialDelaySeconds: 7200
+                periodSeconds: 10
+                tcpSocket:
+                  port: 80
+          volumes:
+            - name: secrets
+              secret:
+                secretName: "kafka-secret"
+                items:
+                  - key: kafka_ca.crt
+                    path: kafka_ca.crt
+          restartPolicy: OnFailure
