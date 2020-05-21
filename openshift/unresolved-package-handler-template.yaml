@@ -48,6 +48,12 @@ parameters:
     name: SUBCOMMAND
     value: "producer"
 
+  - name: FILE_PATH
+    description: "Path to Git repo"
+    displayName: "Path to Git repo"
+    required: false
+    value: "/mnt/inputs/artifacts/repository"
+
 objects:
   - apiVersion: batch/v1
     kind: Job
@@ -78,6 +84,8 @@ objects:
                   value: ${{DEBUG_LEVEL}}
                 - name: APP_SCRIPT
                   value: "app.sh"
+                - name: FILE_PATH
+                  value: ${{FILE_PATH}}
                 - name: KAFKA_BOOTSTRAP_SERVERS
                   valueFrom:
                     configMapKeyRef:
