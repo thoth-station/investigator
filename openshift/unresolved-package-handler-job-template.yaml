@@ -30,12 +30,6 @@ parameters:
     name: IMAGE_STREAM_REGISTRY
     value: "docker-registry.default.svc:5000"
 
-  - displayName: Suspend CronJob run
-    description: Suspend CronJob run
-    required: true
-    name: THOTH_SUSPEND_JOB
-    value: "true"
-
   - description: Project the ImageStream to be use lives in
     displayName: ImageStream Project
     required: true
