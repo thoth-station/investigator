@@ -4,7 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-thoth-common = "==0.13.5"
+thoth-common = "*"
 thoth-messaging= "*"
 thoth-storages= "*"
 prometheus-client = "<0.7.0"

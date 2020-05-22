@@ -77,7 +77,7 @@ def unresolved_package_handler(file_test_path: Optional[Path] = None):
     parameters = content["result"]["parameters"]
     runtime_environment = parameters["project"].get("runtime_environment")
 
-    solver = OpenShift.define_solver_from_runtime_environment(runtime_environment=runtime_environment)
+    solver = OpenShift.obtain_solver_from_runtime_environment(runtime_environment=runtime_environment)
 
     requirements = parameters["project"].get("requirements")
 
@@ -116,34 +116,10 @@ def parse_unresolved_package_message(unresolved_package: Dict[str, Any]):
     else:
         packages = f"{package_name}==={package_version}"
 
-    if not solver:
-        _schedule_solvers_with_priority(packages=packages, indexes=registered_indexes)
-    else:
-        _schedule_solver_with_priority(packages=packages, indexes=registered_indexes, solver=solver)
+    _schedule_solver_with_priority(packages=packages, indexes=registered_indexes, solver=solver)
 
     # TODO: Expose metrics instead of sending to Pushgateway
     send_metrics_to_pushgateway(unresolved_package=unresolved_package, is_scheduled=is_scheduled)
-
-
-def _schedule_solvers_with_priority(packages: str, indexes: List[str]):
-    """Schedule solvers with priority."""
-    try:
-        analysis_id = _OPENSHIFT.schedule_all_solvers(
-            packages=packages, indexes=indexes, output=_SOLVER_OUTPUT, debug=_LOG_SOLVER
-        )
-        _LOGGER.info(
-            "Scheduled solver %r for package %r from indexes %r, analysis is %r",
-            solver,
-            packages,
-            indexes,
-            analysis_id,
-        )
-        is_scheduled = 1
-    except Exception:
-        _LOGGER.warning(
-            f"Failed to schedule solvers for package {packages} from {indexes}"
-        )
-        is_scheduled = 0
 
 
 def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: Optional[str]):
@@ -166,13 +142,8 @@ def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: Op
         )
         is_scheduled = 1
     except Exception:
-        _LOGGER.warning(
-            f"Failed to schedule solver for package {packages} from {indexes}"
-        )
+        _LOGGER.warning(f"Failed to schedule solver for package {packages} from {indexes}")
         is_scheduled = 0
-
-    # TODO: Expose metrics instead of sending to Pushgateway
-    send_metrics_to_pushgateway(unresolved_package=unresolved_package, is_scheduled=is_scheduled)
 
 
 def send_metrics_to_pushgateway(unresolved_package: Dict[str, Any], is_scheduled: int):
