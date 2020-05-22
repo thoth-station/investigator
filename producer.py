@@ -40,9 +40,13 @@ _LOGGER = logging.getLogger("thoth.unresolved_package_handler")
 async def main():
     """Run advise-reporter."""
     unresolved_package = UnresolvedPackageMessage()
-    unresolved_packages, package_version, sources, solver = unresolved_package_handler()
+    unresolved_packages, solver = unresolved_package_handler()
 
-    for package_name in unresolved_packages:
+    for package in unresolved_packages:
+        package_name = unresolved_packages[package].name
+        package_version = unresolved_packages[package].version
+        sources = [unresolved_packages[package].index]
+
         try:
             await unresolved_package.publish_to_topic(
                 unresolved_package.MessageContents(
