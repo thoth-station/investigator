@@ -99,17 +99,17 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:703157e8f16c57133fde0082a2d8b99ca6d36120ca4479df1464df80dd148a87",
-                "sha256:74d78ca0fd706f447a5f787d88214b298b213b1eddf2e8197051a0844df45146"
+                "sha256:397b7abee7af6477798dcebe5a2c5abe2c61e5bf175248adee3156a627ec117c",
+                "sha256:d9958f08b54493d0fe63d56db202a9f1fff55b87c20e86443638890d7a5fd0e5"
             ],
-            "version": "==1.13.14"
+            "version": "==1.13.15"
         },
         "botocore": {
             "hashes": [
-                "sha256:a8e4cb8ed5a7e59fce935c9a550ccf616e9d5a053d02c374832610c2e377ca92",
-                "sha256:c8a5647069f978ae664987ebdeffaef0eb2910e88a52fcc8d52c9eb014fed8cc"
+                "sha256:0ad0bf4f38948e8dcc9a615ce37e6b170f34992a50ae3d134e7a225fcbdc0cd4",
+                "sha256:97127ad663502ea519870a10688a0a809d7012a621ab0bbc2bc2052ff0a794ea"
             ],
-            "version": "==1.16.14"
+            "version": "==1.16.15"
         },
         "cachetools": {
             "hashes": [
@@ -733,11 +733,11 @@
         },
         "thoth-storages": {
             "hashes": [
-                "sha256:1ebb9668f686cdd1432d8c793c17b83b41cfb0f3b1e88e5d83ea86ce9445b04b",
-                "sha256:7912c6ec277648a5c355557a70e351aab225424161a03eab2e431c508603718e"
+                "sha256:2a21fea4b70817b78e2e250094b17731b0bf56e3a87778f6a77e08696ff054bb",
+                "sha256:fdc4e78c329cce5ac56f622f12713022a1d4db090f1b3e99dfcb9852ea0082ea"
             ],
             "index": "pypi",
-            "version": "==0.22.10"
+            "version": "==0.22.11"
         },
         "toml": {
             "hashes": [
@@ -752,7 +752,7 @@
                 "sha256:79ee589a3caca649a9bfd2a8de4709837400dfa00b6cc81962a1e6a1815969ae",
                 "sha256:f8d2bd89d25bc39dabe7d23df520442fa1d8969b82544370e03d88b5a591c392"
             ],
-            "markers": "python_version < '3.7'",
+            "markers": "python_version < '3.8'",
             "version": "==3.7.4.2"
         },
         "tzlocal": {
@@ -1058,7 +1058,7 @@
                 "sha256:79ee589a3caca649a9bfd2a8de4709837400dfa00b6cc81962a1e6a1815969ae",
                 "sha256:f8d2bd89d25bc39dabe7d23df520442fa1d8969b82544370e03d88b5a591c392"
             ],
-            "markers": "python_version < '3.7'",
+            "markers": "python_version < '3.8'",
             "version": "==3.7.4.2"
         },
         "wcwidth": {
