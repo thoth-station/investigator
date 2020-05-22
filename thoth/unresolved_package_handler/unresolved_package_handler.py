@@ -134,7 +134,7 @@ def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: Op
             transitive=False,
         )
         _LOGGER.info(
-            "Scheduled solver %r for package %r in version %r from indexes %r, analysis is %r",
+            "Scheduled solver %r for packages %r from indexes %r, analysis is %r",
             solver,
             packages,
             indexes,
