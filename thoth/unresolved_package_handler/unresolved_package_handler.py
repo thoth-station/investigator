@@ -21,15 +21,35 @@ import logging
 import json
 import os
 
-from typing import Optional
+from typing import Optional, Dict, Any, List
 from pathlib import Path
 
 from thoth.storages.graph import GraphDatabase
+from thoth.common import OpenShift
+from thoth.python import Pipfile
+from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
+
+prometheus_registry = CollectorRegistry()
 
 _LOGGER = logging.getLogger("thoth.unresolved_package_handler")
 
+_OPENSHIFT = OpenShift()
 
-def unresolved_package_handler(file_test_path: Optional[Path] = None):
+_GRAPH = GraphDatabase()
+
+_SOLVER_OUTPUT = os.getenv("THOTH_SOLVER_OUTPUT", "http://result-api/api/v1/solver-result")
+_LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
+
+_METRIC_UNRESOLVED_TYPE = Gauge(
+    "thoth_unresolved_package", "Unresolved package scheduled info.", ["package_name"], registry=prometheus_registry
+)
+
+_THOTH_METRICS_PUSHGATEWAY_URL = os.getenv(
+    "PROMETHEUS_PUSHGATEWAY_URL", "pushgateway-dh-prod-monitoring.cloud.datahub.psi.redhat.com:80"
+)
+
+
+def unresolved_package_handler(file_test_path: Optional[Path] = None) -> Union[Dict[str, Any], str]:
     """Run Unresolved Package Handler."""
     if file_test_path:
         _LOGGER.debug("Dry run..")
@@ -54,37 +74,90 @@ def unresolved_package_handler(file_test_path: Optional[Path] = None):
         _LOGGER.warning("No packages to be solved with priority identified.")
         sys.exit(2)
 
-    sources = []
     parameters = content["result"]["parameters"]
-    requirements = parameters["project"].get("requirements")
-    if requirements:
-        sources = [source["url"] for source in requirements["source"]]
-
     runtime_environment = parameters["project"].get("runtime_environment")
 
-    solver = None
-    operating_system = runtime_environment.get("operating_system", {})
+    solver = _OPENSHIFT.obtain_solver_from_runtime_environment(runtime_environment=runtime_environment)
 
-    if operating_system:
-        os_name = runtime_environment["operating_system"].get("name")
-        os_version = GraphDatabase().normalize_os_version(operating_system.get("name"), operating_system.get("version"))
-        python_version = runtime_environment.get("python_version")
+    requirements = parameters["project"].get("requirements")
 
-        if os_name and os_version:
-            solver = f"solver-{os_name}-{os_version}-py{python_version.replace('.', '')}"
+    pipfile = Pipfile.from_dict(requirements)
+    packages = pipfile.packages.packages
+    dev_packages = pipfile.dev_packages.packages
 
-        if solver:
-            GraphDatabase().parse_python_solver_name(solver)
+    packages_to_solve = {}
+    for package_name in unresolved_packages:
 
-    if not solver:
-        _LOGGER.warning("No solver identified.")
-        sys.exit(2)
+        if package_name in packages:
+            packages_to_solve[package_name] = packages[package_name]
 
-    package_version = None
+        if package_name in dev_packages:
+            packages_to_solve[package_name] = dev_packages[package_name]
 
-    _LOGGER.info(f"Unresolved packages identified.. {unresolved_packages}")
-    _LOGGER.info(f"package versions identified.. {package_version}")
-    _LOGGER.info(f"Sources identified.. {sources}")
-    _LOGGER.info(f"Solver identified.. {solver}")
+    _LOGGER.info(f"Unresolved packages identified.. {packages_to_solve}")
 
-    return unresolved_packages, package_version, sources, solver
+    return packages_to_solve, solver
+
+
+def parse_unresolved_package_message(unresolved_package: Dict[str, Any]) -> None:
+    """Parse unresolved package message."""
+    package_name = unresolved_package.package_name
+    package_version = unresolved_package.package_version
+    indexes = unresolved_package.sources
+    solver = unresolved_package.solver
+
+    registered_indexes = _GRAPH.get_python_package_index_urls_all()
+
+    if any(index_url for index_url in indexes not in registered_indexes):
+        _LOGGER.warning("User requested index that is not registered in Thoth.")
+
+    if not package_version:
+        packages = package_name
+    else:
+        packages = f"{package_name}==={package_version}"
+
+    is_scheduled = _schedule_solver_with_priority(packages=packages, indexes=registered_indexes, solver=solver)
+
+    # TODO: Expose metrics instead of sending to Pushgateway
+    send_metrics_to_pushgateway(unresolved_package=unresolved_package, is_scheduled=is_scheduled)
+
+
+def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: str) -> int:
+    """Schedule solver with priority."""
+    try:
+        analysis_id = _OPENSHIFT.schedule_solver(
+            solver=solver,
+            debug=_LOG_SOLVER,
+            packages=packages,
+            indexes=indexes,
+            output=_SOLVER_OUTPUT,
+            transitive=False,
+        )
+        _LOGGER.info(
+            "Scheduled solver %r for packages %r from indexes %r, analysis is %r",
+            solver,
+            packages,
+            indexes,
+            analysis_id,
+        )
+        is_scheduled = 1
+    except Exception:
+        _LOGGER.warning(f"Failed to schedule solver for package {packages} from {indexes}")
+        is_scheduled = 0
+
+    return is_scheduled
+
+
+def send_metrics_to_pushgateway(unresolved_package: Dict[str, Any], is_scheduled: int) -> None:
+    """Send metrics to Pushgateway."""
+    _METRIC_UNSOLVED_TYPE.labels(package_name=unresolved_package.package_name).set(is_scheduled)
+    _LOGGER.info("unresolved_package(%r)=%r", unresolved_package.package_name, is_scheduled)
+
+    if _THOTH_METRICS_PUSHGATEWAY_URL:
+        try:
+            _LOGGER.info(f"Submitting metrics to Prometheus pushgateway {_THOTH_METRICS_PUSHGATEWAY_URL}")
+            push_to_gateway(
+                _THOTH_METRICS_PUSHGATEWAY_URL, job="unresolved-package-priority", registry=prometheus_registry
+            )
+        except Exception as e:
+            _LOGGER.info(f"An error occurred pushing the metrics: {str(e)}")

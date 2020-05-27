@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f512b1578dd78086e613ac0d06cfcf41233eee8851628a14cf16ec7e540dde46"
+            "sha256": "4bd95b946ff3b29fbaf63f34c11a20fe59e5185282b36a9822f7935fff6e5f93"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -436,6 +436,13 @@
             ],
             "version": "==4.8.0"
         },
+        "prometheus-client": {
+            "hashes": [
+                "sha256:1b38b958750f66f208bcd9ab92a633c0c994d8859c831f7abc1f46724fcee490"
+            ],
+            "index": "pypi",
+            "version": "==0.6.0"
+        },
         "psycopg2-binary": {
             "hashes": [
                 "sha256:008da3ab51adc70a5f1cfbbe5db3a22607ab030eb44bcecf517ad11a0c2b3cac",
@@ -728,6 +735,7 @@
                 "sha256:7c36312fe6eadbef069eddc338374be37f01da8902d9d53a9f6e77b4746086dd",
                 "sha256:93805aa8ccfc00f09297f233323f0645f3f89cbbbd00dc3c2e7c07ff7a967c3a"
             ],
+            "index": "pypi",
             "version": "==0.9.2"
         },
         "thoth-storages": {
