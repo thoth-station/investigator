@@ -33,7 +33,7 @@ prometheus_registry = CollectorRegistry()
 
 _LOGGER = logging.getLogger("thoth.unresolved_package_handler")
 
-_OPENSHIFT = OpenShift(kubernetes_verify_tls=False)
+_OPENSHIFT = OpenShift()
 
 _GRAPH = GraphDatabase()
 
@@ -77,7 +77,7 @@ def unresolved_package_handler(file_test_path: Optional[Path] = None):
     parameters = content["result"]["parameters"]
     runtime_environment = parameters["project"].get("runtime_environment")
 
-    solver = OpenShift.obtain_solver_from_runtime_environment(runtime_environment=runtime_environment)
+    solver = _OPENSHIFT.obtain_solver_from_runtime_environment(runtime_environment=runtime_environment)
 
     requirements = parameters["project"].get("requirements")
 
@@ -116,13 +116,13 @@ def parse_unresolved_package_message(unresolved_package: Dict[str, Any]):
     else:
         packages = f"{package_name}==={package_version}"
 
-    _schedule_solver_with_priority(packages=packages, indexes=registered_indexes, solver=solver)
+    is_scheduled = _schedule_solver_with_priority(packages=packages, indexes=registered_indexes, solver=solver)
 
     # TODO: Expose metrics instead of sending to Pushgateway
     send_metrics_to_pushgateway(unresolved_package=unresolved_package, is_scheduled=is_scheduled)
 
 
-def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: Optional[str]):
+def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: str) -> int:
     """Schedule solver with priority."""
     try:
         analysis_id = _OPENSHIFT.schedule_solver(
@@ -144,6 +144,8 @@ def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: Op
     except Exception:
         _LOGGER.warning(f"Failed to schedule solver for package {packages} from {indexes}")
         is_scheduled = 0
+
+    return is_scheduled
 
 
 def send_metrics_to_pushgateway(unresolved_package: Dict[str, Any], is_scheduled: int):
