@@ -38,7 +38,7 @@ unresolved_package_message_topic = UnresolvedPackageMessage().topic
 
 
 @app.agent(unresolved_package_message_topic)
-async def consume_unresolved_package(unresolved_packages):
+async def consume_unresolved_package(unresolved_packages) -> None:
     """Loop when an unresolved package message is received."""
     async for unresolved_package in unresolved_packages:
         parse_unresolved_package_message(unresolved_package=unresolved_package)

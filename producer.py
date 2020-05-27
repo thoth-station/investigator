@@ -37,7 +37,7 @@ _LOGGER = logging.getLogger("thoth.unresolved_package_handler")
 
 
 @app.command()
-async def main():
+async def main() -> None:
     """Run advise-reporter."""
     unresolved_package = UnresolvedPackageMessage()
     unresolved_packages, solver = unresolved_package_handler()

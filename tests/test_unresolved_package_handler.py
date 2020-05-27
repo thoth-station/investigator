@@ -37,5 +37,5 @@ class TestProducer:
         unresolved_package = unresolved_packages["black"]
         assert unresolved_package.name == "black"
         assert unresolved_package.version is '*'
-        assert unresolved_package.index == None
+        assert unresolved_package.index is None
         assert solver == "solver-rhel-8-py36"
