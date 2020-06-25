@@ -24,7 +24,7 @@ from thoth.messaging import __version__ as __messaging__version__
 from thoth.storages import __version__ as __storage__version__
 from thoth.python import __version__ as __python__version__
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __service_version__ = f"{__version__}+\
     messaging.{__messaging__version__}.\
         storage.{__storage__version__}.\
