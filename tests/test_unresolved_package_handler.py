@@ -31,11 +31,9 @@ class TestProducer:
     def test_unresolved_package_handler(self) -> None:
         """Test extraction of inputs for Kafka."""
         file_test_path = Path().cwd().joinpath("tests", "adviser-04ab56d6.json")
-        unresolved_packages, solver = unresolved_package_handler(
-            file_test_path=file_test_path
-        )
+        unresolved_packages, solver = unresolved_package_handler(file_test_path=file_test_path)
         unresolved_package = unresolved_packages["black"]
         assert unresolved_package.name == "black"
-        assert unresolved_package.version is '*'
+        assert unresolved_package.version is "*"
         assert unresolved_package.index is None
         assert solver == "solver-rhel-8-py36"
