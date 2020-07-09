@@ -22,3 +22,11 @@ all the things that you see...
 * added a 'tekton trigger tag_release pipeline issue'
 * :pushpin: Automatic update of dependency thoth-common from 0.13.7 to 0.13.8
 * :pushpin: Automatic update of dependency thoth-storages from 0.22.11 to 0.22.12
+
+## Release 0.1.2 (2020-07-09T15:17:41)
+* :pushpin: Automatic update of dependency thoth-storages from 0.24.0 to 0.24.2 (#52)
+* Remove not required parameters (#54)
+* :pushpin: Automatic update of dependency thoth-common from 0.13.13 to 0.14.1 (#51)
+* :pushpin: Automatic update of dependency hypothesis from 5.18.1 to 5.18.3 (#49)
+* setup.py is not required if this isnt a package (#47)
+* Create OWNERS
