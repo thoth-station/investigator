@@ -37,9 +37,6 @@ _OPENSHIFT = OpenShift()
 
 _GRAPH = GraphDatabase()
 
-_SOLVER_OUTPUT = os.getenv("THOTH_SOLVER_OUTPUT", "http://result-api/api/v1/solver-result")
-_LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
-
 _METRIC_UNRESOLVED_TYPE = Gauge(
     "thoth_unresolved_package", "Unresolved package scheduled info.", ["package_name"], registry=prometheus_registry
 )
@@ -125,14 +122,7 @@ def parse_unresolved_package_message(unresolved_package: Dict[str, Any]) -> None
 def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: str) -> int:
     """Schedule solver with priority."""
     try:
-        analysis_id = _OPENSHIFT.schedule_solver(
-            solver=solver,
-            debug=_LOG_SOLVER,
-            packages=packages,
-            indexes=indexes,
-            output=_SOLVER_OUTPUT,
-            transitive=False,
-        )
+        analysis_id = _OPENSHIFT.schedule_solver(solver=solver, packages=packages, indexes=indexes, transitive=False)
         _LOGGER.info(
             "Scheduled solver %r for packages %r from indexes %r, analysis is %r",
             solver,
