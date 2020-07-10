@@ -24,10 +24,11 @@ import logging
 import json
 import os
 
-from typing import Optional, Dict, Any, List, Union
+from typing import Optional, Dict, Any, List, Tuple
 from pathlib import Path
 
 from thoth.storages.graph import GraphDatabase
+from thoth.messaging import MessageBase
 from thoth.common import OpenShift
 from thoth.python import Pipfile
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
@@ -36,7 +37,7 @@ prometheus_registry = CollectorRegistry()
 
 _LOGGER = logging.getLogger(__name__)
 
-_OPENSHIFT = OpenShift()
+OPENSHIFT = OpenShift()
 
 _GRAPH = GraphDatabase()
 
@@ -49,7 +50,7 @@ _THOTH_METRICS_PUSHGATEWAY_URL = os.getenv(
 )
 
 
-def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Union[Dict[str, Any], str]:
+def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tuple[Dict[Any, Any], Optional[str]]:
     """Investigate on possible unresolved packages."""
     if file_test_path:
         _LOGGER.debug("Dry run..")
@@ -77,7 +78,7 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Uni
     parameters = content["result"]["parameters"]
     runtime_environment = parameters["project"].get("runtime_environment")
 
-    solver = str(_OPENSHIFT.obtain_solver_from_runtime_environment(runtime_environment=runtime_environment))
+    solver = OPENSHIFT.obtain_solver_from_runtime_environment(runtime_environment=runtime_environment)
 
     requirements = parameters["project"].get("requirements")
 
@@ -96,19 +97,22 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Uni
 
     _LOGGER.info(f"Unresolved packages identified.. {packages_to_solve}")
 
-    return (packages_to_solve, solver)
+    if solver:
+        return (packages_to_solve, solver)
+
+    return (packages_to_solve, None)
 
 
-def parse_unresolved_package_message(unresolved_package: Dict[str, Any]) -> None:
+def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     """Parse unresolved package message."""
     package_name = unresolved_package.package_name
     package_version = unresolved_package.package_version
-    indexes = unresolved_package.sources
+    indexes: List[Any] = unresolved_package.sources
     solver = unresolved_package.solver
 
-    registered_indexes = _GRAPH.get_python_package_index_urls_all()
+    registered_indexes: List[Any] = _GRAPH.get_python_package_index_urls_all()
 
-    if any(index_url for index_url in indexes not in registered_indexes):
+    if set(indexes) & set(registered_indexes):
         _LOGGER.warning("User requested index that is not registered in Thoth.")
 
     if not package_version:
@@ -125,7 +129,7 @@ def parse_unresolved_package_message(unresolved_package: Dict[str, Any]) -> None
 def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: str) -> int:
     """Schedule solver with priority."""
     try:
-        analysis_id = _OPENSHIFT.schedule_solver(solver=solver, packages=packages, indexes=indexes, transitive=False)
+        analysis_id = OPENSHIFT.schedule_solver(solver=solver, packages=packages, indexes=indexes, transitive=False)
         _LOGGER.info(
             "Scheduled solver %r for packages %r from indexes %r, analysis is %r",
             solver,
@@ -141,7 +145,7 @@ def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: st
     return is_scheduled
 
 
-def send_metrics_to_pushgateway(unresolved_package: Dict[str, Any], is_scheduled: int) -> None:
+def send_metrics_to_pushgateway(unresolved_package: MessageBase, is_scheduled: int) -> None:
     """Send metrics to Pushgateway."""
     _METRIC_UNRESOLVED_TYPE.labels(package_name=unresolved_package.package_name).set(is_scheduled)
     _LOGGER.info("unresolved_package(%r)=%r", unresolved_package.package_name, is_scheduled)
