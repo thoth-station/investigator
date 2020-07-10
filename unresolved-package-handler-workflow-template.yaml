@@ -1,0 +1,46 @@
+
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: "unresolved-package-handler-"
+  annotations:
+    thoth-station.ninja/template-version: 0.1.0
+  labels:
+    app: thoth
+    component: test-unresolved-package-handler
+spec:
+  serviceAccountName: argo
+  entrypoint: unresolved-package-handler
+
+  volumes:
+    - name: workdir
+      emptyDir: {}
+    - name: output
+      emptyDir: {}
+    - name: secrets
+      secret:
+        secretName: "kafka-secret"
+        items:
+          - key: kafka_ca.crt
+            path: kafka_ca.crt
+
+  templates:
+    - name: "unresolved-package-handler"
+      archiveLocation:
+        archiveLogs: true
+      dag:
+        tasks:
+          - name: "unresolved-package-handler"
+            templateRef:
+              name: "unresolved-package-handler"
+              template: "unresolved-package-handler"
+            arguments:
+              parameters:
+                - name: THOTH_DOCUMENT_ID
+                  value: "adviser-04ab56d6"
+                - name: IMAGE_STREAM_REGISTRY
+                  value: "docker-registry.default.svc:5000"
+                - name: IMAGE_STREAM_NAMESPACE
+                  value: "thoth-test-core"
+                - name: IMAGE_STREAM_TAG
+                  value: "latest"
