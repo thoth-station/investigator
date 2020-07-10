@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
 """Consume messages to schedule workflows to learn something about a package."""
+
 
 import logging
 import os
@@ -23,8 +25,8 @@ import os
 from thoth.unkown_package_handler import __service_version__
 
 from thoth.messaging import MessageBase, UnresolvedPackageMessage
-from thoth.investigator.investigate_unresolved_package import send_metrics_to_pushgateway
 from thoth.investigator.investigate_unresolved_package import parse_unresolved_package_message
+
 
 DEBUG_LEVEL = bool(int(os.getenv("DEBUG_LEVEL", 0)))
 
@@ -34,7 +36,7 @@ else:
     logging.basicConfig(level=logging.INFO)
 
 _LOGGER = logging.getLogger(__name__)
-_LOGGER.info(f"Thoth Investigator consumer v%s", __service_version__)
+_LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
 
 app = MessageBase.app
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
