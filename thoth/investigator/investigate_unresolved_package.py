@@ -51,12 +51,12 @@ _THOTH_METRICS_PUSHGATEWAY_URL = os.getenv(
 
 
 def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tuple[Dict[Any, Any], Optional[str]]:
-    """Investigate on possible unresolved packages."""
+    """Investigate on unresolved packages."""
     if file_test_path:
         _LOGGER.debug("Dry run..")
         adviser_run_path = file_test_path
     else:
-        adviser_run_path = Path(os.environ["JSON_FILE_PATH"])
+        adviser_run_path = os.environ["JSON_FILE_PATH"]
 
     if not Path(adviser_run_path).exists():
         raise FileNotFoundError(f"Cannot find the file on this path: {adviser_run_path}")
