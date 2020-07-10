@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# thoth-unresolved-package-handler-consumer
+# thoth-investigator-consumer
 # Copyright(C) 2020 Francesco Murdaca
 #
 # This program is free software: you can redistribute it and / or modify
@@ -15,14 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""Consume messages to schedule solver with priority."""
+"""Consume messages to schedule workflows to learn something about a package."""
 
 import logging
 import os
 
+from thoth.unkown_package_handler import __service_version__
+
 from thoth.messaging import MessageBase, UnresolvedPackageMessage
-from thoth.unresolved_package_handler.unresolved_package_handler import send_metrics_to_pushgateway
-from thoth.unresolved_package_handler.unresolved_package_handler import parse_unresolved_package_message
+from thoth.investigator.investigate_unresolved_package import send_metrics_to_pushgateway
+from thoth.investigator.investigate_unresolved_package import parse_unresolved_package_message
 
 DEBUG_LEVEL = bool(int(os.getenv("DEBUG_LEVEL", 0)))
 
@@ -31,7 +33,8 @@ if DEBUG_LEVEL:
 else:
     logging.basicConfig(level=logging.INFO)
 
-_LOGGER = logging.getLogger("thoth.unresolved_package_handler")
+_LOGGER = logging.getLogger(__name__)
+_LOGGER.info(f"Thoth Investigator consumer v%s", __service_version__)
 
 app = MessageBase.app
 unresolved_package_message_topic = UnresolvedPackageMessage().topic

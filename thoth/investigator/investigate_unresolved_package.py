@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# thoth-unresolved-package-handler
+# thoth-investigator
 # Copyright(C) 2020 Francesco Murdaca
 #
 # This program is free software: you can redistribute it and / or modify
@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""This file contains methods used in unresolved_package_handler to send/receieve messages."""
+"""This file contains methods used by Thoth investigator to investigate on unresolved packages."""
 
 import logging
 import json
@@ -31,7 +31,7 @@ from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
 prometheus_registry = CollectorRegistry()
 
-_LOGGER = logging.getLogger("thoth.unresolved_package_handler")
+_LOGGER = logging.getLogger(__name__)
 
 _OPENSHIFT = OpenShift()
 
@@ -46,8 +46,8 @@ _THOTH_METRICS_PUSHGATEWAY_URL = os.getenv(
 )
 
 
-def unresolved_package_handler(file_test_path: Optional[Path] = None) -> Union[Dict[str, Any], str]:
-    """Run Unresolved Package Handler."""
+def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Union[Dict[str, Any], str]:
+    """Investigate on possible unresolved packages."""
     if file_test_path:
         _LOGGER.debug("Dry run..")
         adviser_run_path = file_test_path
