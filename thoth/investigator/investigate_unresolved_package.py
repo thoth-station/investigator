@@ -15,13 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
 """This file contains methods used by Thoth investigator to investigate on unresolved packages."""
 
+
+import sys
 import logging
 import json
 import os
 
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 from pathlib import Path
 
 from thoth.storages.graph import GraphDatabase
@@ -140,7 +143,7 @@ def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: st
 
 def send_metrics_to_pushgateway(unresolved_package: Dict[str, Any], is_scheduled: int) -> None:
     """Send metrics to Pushgateway."""
-    _METRIC_UNSOLVED_TYPE.labels(package_name=unresolved_package.package_name).set(is_scheduled)
+    _METRIC_UNRESOLVED_TYPE.labels(package_name=unresolved_package.package_name).set(is_scheduled)
     _LOGGER.info("unresolved_package(%r)=%r", unresolved_package.package_name, is_scheduled)
 
     if _THOTH_METRICS_PUSHGATEWAY_URL:
