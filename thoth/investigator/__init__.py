@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# thoth-unresolved-package-handler
+# thoth-investigator
 # Copyright(C) 2020 Francesco Murdaca
 #
 # This program is free software: you can redistribute it and / or modify
@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-"""This is unresolved package handler."""
+"""This is Thoth investigator."""
 
 from thoth.common import __version__ as __common__version__
 from thoth.common import init_logging

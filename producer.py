@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# thoth-unresolved-package-handler
+# thoth-investigator-producer
 # Copyright(C) 2020 Francesco Murdaca
 #
 # This program is free software: you can redistribute it and / or modify
@@ -15,14 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""This is run to send messages regarding unresolved packages that need to be solved with priority."""
+"""Produces messages regarding package depending on the component in which is used."""
 
 import logging
 import os
 
+from thoth.investigator import __service_version__
 from thoth.messaging import MessageBase
 from thoth.messaging.unresolved_package import UnresolvedPackageMessage
-from thoth.unresolved_package_handler.unresolved_package_handler import unresolved_package_handler
+from thoth.investigator.investigate_unresolved_package import investigate_unresolved_package
 
 app = MessageBase.app
 
@@ -33,14 +34,14 @@ if DEBUG_LEVEL:
 else:
     logging.basicConfig(level=logging.INFO)
 
-_LOGGER = logging.getLogger("thoth.unresolved_package_handler")
-
+_LOGGER = logging.getLogger(__name__)
+_LOGGER.info(f"Thoth unknown-package-handler producer v%s", __service_version__)
 
 @app.command()
 async def main() -> None:
-    """Run advise-reporter."""
+    """Produce Kafka messages for package release in different Thoth components."""
     unresolved_package = UnresolvedPackageMessage()
-    unresolved_packages, solver = unresolved_package_handler()
+    unresolved_packages, solver = investigate_unresolved_package()
 
     for package in unresolved_packages:
         package_name = unresolved_packages[package].name
