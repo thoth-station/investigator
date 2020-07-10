@@ -22,7 +22,7 @@
 import logging
 import os
 
-from thoth.unkown_package_handler import __service_version__
+from thoth.investigator import __service_version__
 
 from thoth.messaging import MessageBase, UnresolvedPackageMessage
 from thoth.investigator.investigate_unresolved_package import parse_unresolved_package_message
