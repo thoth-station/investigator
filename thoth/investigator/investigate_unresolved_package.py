@@ -39,7 +39,7 @@ _LOGGER = logging.getLogger(__name__)
 
 OPENSHIFT = OpenShift()
 
-_GRAPH = GraphDatabase()
+GRAPH = GraphDatabase()
 
 _METRIC_UNRESOLVED_TYPE = Gauge(
     "thoth_unresolved_package", "Unresolved package scheduled info.", ["package_name"], registry=prometheus_registry
@@ -51,14 +51,14 @@ _THOTH_METRICS_PUSHGATEWAY_URL = os.getenv(
 
 
 def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tuple[Dict[Any, Any], Optional[str]]:
-    """Investigate on possible unresolved packages."""
+    """Investigate on unresolved packages."""
     if file_test_path:
         _LOGGER.debug("Dry run..")
         adviser_run_path = file_test_path
     else:
         adviser_run_path = Path(os.environ["JSON_FILE_PATH"])
 
-    if not Path(adviser_run_path).exists():
+    if not adviser_run_path.exists():
         raise FileNotFoundError(f"Cannot find the file on this path: {adviser_run_path}")
 
     with open(adviser_run_path, "r") as f:
@@ -110,7 +110,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     indexes: List[Any] = unresolved_package.sources
     solver = unresolved_package.solver
 
-    registered_indexes: List[Any] = _GRAPH.get_python_package_index_urls_all()
+    registered_indexes: List[Any] = GRAPH.get_python_package_index_urls_all()
 
     if set(indexes) & set(registered_indexes):
         _LOGGER.warning("User requested index that is not registered in Thoth.")

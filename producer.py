@@ -15,9 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 """Produces messages regarding package depending on the component in which is used."""
-
 
 import logging
 import os
@@ -37,12 +35,12 @@ else:
     logging.basicConfig(level=logging.INFO)
 
 _LOGGER = logging.getLogger(__name__)
-_LOGGER.info("Thoth unknown-package-handler producer v%s", __service_version__)
+_LOGGER.info("Thoth Investigator producer v%s", __service_version__)
 
 
 @app.command()
 async def main() -> None:
-    """Produce Kafka messages for package release in different Thoth components."""
+    """Produce Kafka messages for unresolved package identified."""
     unresolved_package = UnresolvedPackageMessage()
     unresolved_packages, solver = investigate_unresolved_package()
 
