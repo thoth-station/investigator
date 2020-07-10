@@ -30,3 +30,14 @@ all the things that you see...
 * :pushpin: Automatic update of dependency hypothesis from 5.18.1 to 5.18.3 (#49)
 * setup.py is not required if this isnt a package (#47)
 * Create OWNERS
+
+## Release 0.2.0 (2020-07-10T12:40:21)
+* Correct mypy
+* fixed some mypy errors
+* fixed some flake8 errors
+* :arrow_up: did a 'pre-commit autoupdate'
+* removed setup.py, see https://github.com/thoth-station/unknown-package-handler/pull/47\#issuecomment-650215895
+* :sparkles: using pre-commit now, removed coala config
+* Modify code and update README after renaming the component
+* :pushpin: Automatic update of dependency thoth-storages from 0.24.2 to 0.24.3 (#57)
+* :pushpin: Automatic update of dependency hypothesis from 5.18.3 to 5.19.0 (#53)
