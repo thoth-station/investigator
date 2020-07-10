@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
 """Produces messages regarding package depending on the component in which is used."""
+
 
 import logging
 import os
@@ -35,7 +37,8 @@ else:
     logging.basicConfig(level=logging.INFO)
 
 _LOGGER = logging.getLogger(__name__)
-_LOGGER.info(f"Thoth unknown-package-handler producer v%s", __service_version__)
+_LOGGER.info("Thoth unknown-package-handler producer v%s", __service_version__)
+
 
 @app.command()
 async def main() -> None:

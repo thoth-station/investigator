@@ -55,7 +55,7 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Uni
         _LOGGER.debug("Dry run..")
         adviser_run_path = file_test_path
     else:
-        adviser_run_path = os.environ["JSON_FILE_PATH"]
+        adviser_run_path = Path(os.environ["JSON_FILE_PATH"])
 
     if not Path(adviser_run_path).exists():
         raise FileNotFoundError(f"Cannot find the file on this path: {adviser_run_path}")
@@ -77,7 +77,7 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Uni
     parameters = content["result"]["parameters"]
     runtime_environment = parameters["project"].get("runtime_environment")
 
-    solver = _OPENSHIFT.obtain_solver_from_runtime_environment(runtime_environment=runtime_environment)
+    solver = str(_OPENSHIFT.obtain_solver_from_runtime_environment(runtime_environment=runtime_environment))
 
     requirements = parameters["project"].get("requirements")
 
@@ -96,7 +96,7 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Uni
 
     _LOGGER.info(f"Unresolved packages identified.. {packages_to_solve}")
 
-    return packages_to_solve, solver
+    return (packages_to_solve, solver)
 
 
 def parse_unresolved_package_message(unresolved_package: Dict[str, Any]) -> None:

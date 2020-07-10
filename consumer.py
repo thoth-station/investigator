@@ -36,7 +36,7 @@ else:
     logging.basicConfig(level=logging.INFO)
 
 _LOGGER = logging.getLogger(__name__)
-_LOGGER.info(f"Thoth Investigator consumer v%s", __service_version__)
+_LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
 
 app = MessageBase.app
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
