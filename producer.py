@@ -35,7 +35,7 @@ else:
     logging.basicConfig(level=logging.INFO)
 
 _LOGGER = logging.getLogger(__name__)
-_LOGGER.info(f"Thoth Investigator producer v%s", __service_version__)
+_LOGGER.info("Thoth Investigator producer v%s", __service_version__)
 
 
 @app.command()
