@@ -41,3 +41,7 @@ all the things that you see...
 * Modify code and update README after renaming the component
 * :pushpin: Automatic update of dependency thoth-storages from 0.24.2 to 0.24.3 (#57)
 * :pushpin: Automatic update of dependency hypothesis from 5.18.3 to 5.19.0 (#53)
+
+## Release 0.2.1 (2020-07-10T17:03:41)
+* minor missing piece (#67)
+* Remove templates (#66)
