@@ -45,3 +45,6 @@ all the things that you see...
 ## Release 0.2.1 (2020-07-10T17:03:41)
 * minor missing piece (#67)
 * Remove templates (#66)
+
+## Release 0.2.2 (2020-07-11T13:14:44)
+* Correct parameter from Kafka message
