@@ -107,7 +107,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     """Parse unresolved package message."""
     package_name = unresolved_package.package_name
     package_version = unresolved_package.package_version
-    indexes: List[Any] = unresolved_package.sources
+    indexes: List[Any] = unresolved_package.index_url
     solver = unresolved_package.solver
 
     registered_indexes: List[Any] = GRAPH.get_python_package_index_urls_all()
