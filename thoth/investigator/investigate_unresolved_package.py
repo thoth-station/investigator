@@ -31,7 +31,17 @@ from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
 from thoth.common import OpenShift
 from thoth.python import Pipfile
-from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
+from prometheus_client import CollectorRegistry, Gauge, push_to_gateway, Counter
+
+IN_PROGRESS_GAUGE = Gauge(
+    "investigators_in_progress", "Total number of investigation messages currently being processed."
+)
+EXCEPTIONS_COUNTER = Counter(
+    "investigator_exceptions", "Number of investigation messages which failed to be processed."
+)
+SUCCESSES_COUNTER = Counter(
+    "investigators_processed", "Number of investigation messages which were successfully processed."
+)
 
 prometheus_registry = CollectorRegistry()
 
@@ -103,6 +113,8 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
     return (packages_to_solve, None)
 
 
+@EXCEPTIONS_COUNTER.count_exceptions()
+@IN_PROGRESS_GAUGE.track_inprogress()
 def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     """Parse unresolved package message."""
     package_name = unresolved_package.package_name
@@ -124,6 +136,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
 
     # TODO: Expose metrics instead of sending to Pushgateway
     send_metrics_to_pushgateway(unresolved_package=unresolved_package, is_scheduled=is_scheduled)
+    SUCCESSES_COUNTER.inc()
 
 
 def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: str) -> int:

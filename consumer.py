@@ -28,6 +28,10 @@ from thoth.messaging import MessageBase, UnresolvedPackageMessage
 from thoth.investigator.investigate_unresolved_package import parse_unresolved_package_message
 
 
+from prometheus_client import start_http_server
+
+start_http_server(9090)
+
 DEBUG_LEVEL = bool(int(os.getenv("DEBUG_LEVEL", 0)))
 
 if DEBUG_LEVEL:
