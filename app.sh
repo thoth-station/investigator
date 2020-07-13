@@ -4,20 +4,32 @@
 # command and debug level
 #
 
-if [ "$SUBCOMMAND" = "producer" ]
+set -o nounset
+set -o errexit
+set -o errtrace
+set -o pipefail
+trap 'echo "Aborting due to errexit on line $LINENO. Exit code: $?" >&2' ERR
+
+# TODO(pacospace) maybe this is a good inspiration: https://github.com/xwmx/bash-boilerplate/blob/master/bash-commands
+
+FAUST_COMMAND="faust --web-host 0.0.0.0"
+SUBCOMMAND=${SUBCOMMAND:-producer}
+DEBUG_LEVEL=${DEBUG_LEVEL:-0}
+
+if [ "$SUBCOMMAND" == "producer" ]
 then
-    if [ "$DEBUG_LEVEL" -eq 1]
+    if [ "$DEBUG_LEVEL" -eq 1 ]
     then
-        exec faust --debug --loglevel debug -A producer main
+        exec ${FAUST_COMMAND} --debug --loglevel debug -A producer main
     else
-        exec faust -A producer main
+        exec ${FAUST_COMMAND} -A producer main
     fi
 elif [ "$SUBCOMMAND" = "consumer" ]
 then
-    if [ "$DEBUG_LEVEL" -eq 1]
+    if [ "$DEBUG_LEVEL" -eq 1 ]
     then
-        exec faust --debug --loglevel debug -A consumer worker
+        exec ${FAUST_COMMAND} --debug --loglevel debug -A consumer worker
     else
-        exec faust -A consumer worker
+        exec ${FAUST_COMMAND} -A consumer worker
     fi
 fi
