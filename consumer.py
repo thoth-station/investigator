@@ -22,16 +22,19 @@
 import logging
 import os
 
+
 from thoth.investigator import __service_version__
 
 from thoth.messaging import MessageBase, UnresolvedPackageMessage
 from thoth.investigator.investigate_unresolved_package import parse_unresolved_package_message
+from thoth.investigator.metrics import prometheus_registry
 
 
-from prometheus_client import start_http_server
+from aiohttp import web
+from prometheus_client import generate_latest
 
-start_http_server(9090)
 
+# set up logging
 DEBUG_LEVEL = bool(int(os.getenv("DEBUG_LEVEL", 0)))
 
 if DEBUG_LEVEL:
@@ -42,8 +45,16 @@ else:
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
 
+
+# initialize the application
 app = MessageBase.app
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
+
+
+@app.page("/metrics")
+async def get_metrics(self, request):
+    """Serve the metrics from the consumer registry."""
+    return web.Response(text=generate_latest(prometheus_registry).decode("utf-8"))
 
 
 @app.agent(unresolved_package_message_topic)

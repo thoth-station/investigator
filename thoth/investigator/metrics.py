@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # thoth-investigator
-# Copyright(C) 2020 Francesco Murdaca
+# Copyright(C) 2020 Christoph Görn
 #
 # This program is free software: you can redistribute it and / or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,21 +16,19 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-"""This is Thoth investigator."""
+"""This is Thoth investigator consumer metrics."""
 
-from thoth.common import __version__ as __common__version__
-from thoth.common import init_logging
 
-from thoth.messaging import __version__ as __messaging__version__
-from thoth.storages import __version__ as __storages__version__
-from thoth.python import __version__ as __python__version__
+from . import __service_version__
 
-__version__ = "0.2.2"
-__service_version__ = (
-    f"{__version__}+"
-    f"messaging.{__messaging__version__}.storages.{__storages__version__}."
-    f"common.{__common__version__}.python.{__python__version__}"
+from prometheus_client import CollectorRegistry, Gauge
+
+
+# A registry for the consumer metrics...
+prometheus_registry = CollectorRegistry()
+
+# add the application version info metric
+_API_GAUGE_METRIC = Gauge(
+    "investigator_consumer_info", "Investigator Version Info", labelnames=["version"], registry=prometheus_registry,
 )
-
-# Init logging here when gunicorn import this application.
-init_logging()
+_API_GAUGE_METRIC.labels(version=__service_version__).inc()

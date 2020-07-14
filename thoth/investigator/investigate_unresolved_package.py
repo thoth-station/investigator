@@ -27,11 +27,14 @@ import os
 from typing import Optional, Dict, Any, List, Tuple
 from pathlib import Path
 
+from prometheus_client import Gauge, Counter
+
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
 from thoth.common import OpenShift
 from thoth.python import Pipfile
-from prometheus_client import CollectorRegistry, Gauge, push_to_gateway, Counter
+from thoth.investigator.metrics import prometheus_registry
+
 
 IN_PROGRESS_GAUGE = Gauge(
     "investigators_in_progress", "Total number of investigation messages currently being processed."
@@ -43,20 +46,15 @@ SUCCESSES_COUNTER = Counter(
     "investigators_processed", "Number of investigation messages which were successfully processed."
 )
 
-prometheus_registry = CollectorRegistry()
 
 _LOGGER = logging.getLogger(__name__)
 
+
 OPENSHIFT = OpenShift()
 
-GRAPH = GraphDatabase()
 
 _METRIC_UNRESOLVED_TYPE = Gauge(
     "thoth_unresolved_package", "Unresolved package scheduled info.", ["package_name"], registry=prometheus_registry
-)
-
-_THOTH_METRICS_PUSHGATEWAY_URL = os.getenv(
-    "PROMETHEUS_PUSHGATEWAY_URL", "pushgateway-dh-prod-monitoring.cloud.datahub.psi.redhat.com:80"
 )
 
 
@@ -122,7 +120,8 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     indexes: List[Any] = unresolved_package.index_url
     solver = unresolved_package.solver
 
-    registered_indexes: List[Any] = GRAPH.get_python_package_index_urls_all()
+    _graph = GraphDatabase()
+    registered_indexes: List[Any] = _graph.get_python_package_index_urls_all()
 
     if set(indexes) & set(registered_indexes):
         _LOGGER.warning("User requested index that is not registered in Thoth.")
@@ -132,14 +131,11 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     else:
         packages = f"{package_name}==={package_version}"
 
-    is_scheduled = _schedule_solver_with_priority(packages=packages, indexes=registered_indexes, solver=solver)
-
-    # TODO: Expose metrics instead of sending to Pushgateway
-    send_metrics_to_pushgateway(unresolved_package=unresolved_package, is_scheduled=is_scheduled)
-    SUCCESSES_COUNTER.inc()
+    if _schedule_solver_with_priority(packages=packages, indexes=registered_indexes, solver=solver):
+        SUCCESSES_COUNTER.inc()
 
 
-def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: str) -> int:
+def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: str) -> bool:
     """Schedule solver with priority."""
     try:
         analysis_id = OPENSHIFT.schedule_solver(solver=solver, packages=packages, indexes=indexes, transitive=False)
@@ -150,24 +146,9 @@ def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: st
             indexes,
             analysis_id,
         )
-        is_scheduled = 1
+        return True
+
     except Exception:
         _LOGGER.warning(f"Failed to schedule solver for package {packages} from {indexes}")
-        is_scheduled = 0
 
-    return is_scheduled
-
-
-def send_metrics_to_pushgateway(unresolved_package: MessageBase, is_scheduled: int) -> None:
-    """Send metrics to Pushgateway."""
-    _METRIC_UNRESOLVED_TYPE.labels(package_name=unresolved_package.package_name).set(is_scheduled)
-    _LOGGER.info("unresolved_package(%r)=%r", unresolved_package.package_name, is_scheduled)
-
-    if _THOTH_METRICS_PUSHGATEWAY_URL:
-        try:
-            _LOGGER.info(f"Submitting metrics to Prometheus pushgateway {_THOTH_METRICS_PUSHGATEWAY_URL}")
-            push_to_gateway(
-                _THOTH_METRICS_PUSHGATEWAY_URL, job="unresolved-package-priority", registry=prometheus_registry
-            )
-        except Exception as e:
-            _LOGGER.info(f"An error occurred pushing the metrics: {str(e)}")
+    return False
