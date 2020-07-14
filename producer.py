@@ -25,6 +25,8 @@ from thoth.messaging import MessageBase
 from thoth.messaging.unresolved_package import UnresolvedPackageMessage
 from thoth.investigator.investigate_unresolved_package import investigate_unresolved_package
 
+import asyncio
+
 app = MessageBase.app
 
 DEBUG_LEVEL = bool(int(os.getenv("DEBUG_LEVEL", 0)))
@@ -43,16 +45,18 @@ async def main() -> None:
     """Produce Kafka messages for unresolved package identified."""
     unresolved_package = UnresolvedPackageMessage()
     unresolved_packages, solver = investigate_unresolved_package()
-
+    async_tasks = []
     for package in unresolved_packages:
         package_name = unresolved_packages[package].name
         package_version = unresolved_packages[package].version
         sources = [unresolved_packages[package].index]
 
         try:
-            await unresolved_package.publish_to_topic(
-                unresolved_package.MessageContents(
-                    package_name=package_name, package_version=package_version, index_url=sources, solver=solver
+            async_tasks.append(
+                unresolved_package.publish_to_topic(
+                    unresolved_package.MessageContents(
+                        package_name=package_name, package_version=package_version, index_url=sources, solver=solver
+                    )
                 )
             )
             _LOGGER.info(
@@ -66,6 +70,9 @@ async def main() -> None:
         except Exception as identifier:
             _LOGGER.exception("Failed to publish with the following error message: %r", identifier)
 
+    await asyncio.gather(*async_tasks)
+
 
 if __name__ == "__main__":
-    app.main()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
