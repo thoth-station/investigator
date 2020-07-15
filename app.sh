@@ -10,26 +10,16 @@ set -o errtrace
 set -o pipefail
 trap 'echo "Aborting due to errexit on line $LINENO. Exit code: $?" >&2' ERR
 
-# TODO(pacospace) maybe this is a good inspiration: https://github.com/xwmx/bash-boilerplate/blob/master/bash-commands
-
-FAUST_COMMAND="faust --web-host 0.0.0.0"
 SUBCOMMAND=${SUBCOMMAND:-producer}
 DEBUG_LEVEL=${DEBUG_LEVEL:-0}
+DEBUG_FLAGS=""
 
-if [ "$SUBCOMMAND" == "producer" ]
-then
-    if [ "$DEBUG_LEVEL" -eq 1 ]
-    then
-        exec ${FAUST_COMMAND} --debug --loglevel debug -A producer main
-    else
-        exec ${FAUST_COMMAND} -A producer main
-    fi
-elif [ "$SUBCOMMAND" = "consumer" ]
-then
-    if [ "$DEBUG_LEVEL" -eq 1 ]
-    then
-        exec ${FAUST_COMMAND} --debug --loglevel debug -A consumer worker
-    else
-        exec ${FAUST_COMMAND} -A consumer worker
-    fi
+if [ "$DEBUG_LEVEL" -eq 1 ]; then
+    DEBUG_FLAGS="--debug --loglevel debug"
+fi
+
+if [ "$SUBCOMMAND" == "producer" ]; then
+    exec faust ${DEBUG_FLAGS} -A producer main
+elif [ "$SUBCOMMAND" = "consumer" ]; then
+    exec faust ${DEBUG_FLAGS} -A consumer --web-host 0.0.0.0 worker
 fi
