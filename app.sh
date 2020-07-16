@@ -21,5 +21,5 @@ fi
 if [ "$SUBCOMMAND" == "producer" ]; then
     exec faust ${DEBUG_FLAGS} -A producer main
 elif [ "$SUBCOMMAND" = "consumer" ]; then
-    exec faust ${DEBUG_FLAGS} -A consumer --web-host 0.0.0.0 worker
+    exec faust ${DEBUG_FLAGS} -A consumer worker --web-host 0.0.0.0
 fi
