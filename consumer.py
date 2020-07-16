@@ -57,6 +57,12 @@ async def get_metrics(self, request):
     return web.Response(text=generate_latest(prometheus_registry).decode("utf-8"))
 
 
+@app.page("/_healthz")
+async def get_healthz(self, request):
+    """Serve a readiness/liveness probe endpoint."""
+    return web.Response({"status": "I am doing good..."})  # TODO(pacospace) do it for real!
+
+
 @app.agent(unresolved_package_message_topic)
 async def consume_unresolved_package(unresolved_packages) -> None:
     """Loop when an unresolved package message is received."""

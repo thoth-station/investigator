@@ -37,13 +37,22 @@ from thoth.investigator.metrics import prometheus_registry
 
 
 IN_PROGRESS_GAUGE = Gauge(
-    "investigators_in_progress", "Total number of investigation messages currently being processed."
+    "investigators_in_progress",
+    "Total number of investigation messages currently being processed.",
+    registry=prometheus_registry,
 )
 EXCEPTIONS_COUNTER = Counter(
-    "investigator_exceptions", "Number of investigation messages which failed to be processed."
+    "investigator_exceptions",
+    "Number of investigation messages which failed to be processed.",
+    registry=prometheus_registry,
 )
 SUCCESSES_COUNTER = Counter(
-    "investigators_processed", "Number of investigation messages which were successfully processed."
+    "investigators_processed",
+    "Number of investigation messages which were successfully processed.",
+    registry=prometheus_registry,
+)
+_METRIC_UNRESOLVED_TYPE = Gauge(
+    "thoth_unresolved_package", "Unresolved package scheduled info.", ["package_name"], registry=prometheus_registry
 )
 
 
@@ -51,11 +60,6 @@ _LOGGER = logging.getLogger(__name__)
 
 
 OPENSHIFT = OpenShift()
-
-
-_METRIC_UNRESOLVED_TYPE = Gauge(
-    "thoth_unresolved_package", "Unresolved package scheduled info.", ["package_name"], registry=prometheus_registry
-)
 
 
 def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tuple[Dict[Any, Any], Optional[str]]:
