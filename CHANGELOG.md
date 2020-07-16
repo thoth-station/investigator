@@ -59,3 +59,7 @@ all the things that you see...
 ## Release 0.2.4 (2020-07-16T11:43:20)
 * :pushpin: Automatic update of dependency thoth-common from 0.14.1 to 0.14.2 (#84)
 * a little more roubust app.sh (#76)
+
+## Release 0.2.5 (2020-07-16T20:42:24)
+* Add Missing connection to database (#90)
+* point to the right context path (#88)
