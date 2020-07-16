@@ -55,3 +55,7 @@ all the things that you see...
 * :pushpin: Automatic update of dependency hypothesis from 5.19.0 to 5.19.2 (#77)
 * Make producer more asynchronous by creating all futures before awaiting (#75)
 * include aicoe-ci configuration file
+
+## Release 0.2.4 (2020-07-16T11:43:20)
+* :pushpin: Automatic update of dependency thoth-common from 0.14.1 to 0.14.2 (#84)
+* a little more roubust app.sh (#76)
