@@ -123,11 +123,8 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
 
     registered_indexes: List[str] = graph.get_python_package_index_urls_all()
 
-    if not indexes:
-        indexes = []
-
-    if set(indexes) & set(registered_indexes):
-        _LOGGER.warning("User requested index that is not registered in Thoth.")
+    if indexes:
+        _LOGGER.warning(f"User requested indexes are: {indexes}")
 
     if not package_version:
         packages = package_name
