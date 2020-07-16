@@ -47,10 +47,6 @@ prometheus_registry = CollectorRegistry()
 
 _LOGGER = logging.getLogger(__name__)
 
-OPENSHIFT = OpenShift()
-
-GRAPH = GraphDatabase()
-
 _METRIC_UNRESOLVED_TYPE = Gauge(
     "thoth_unresolved_package", "Unresolved package scheduled info.", ["package_name"], registry=prometheus_registry
 )
@@ -88,7 +84,7 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
     parameters = content["result"]["parameters"]
     runtime_environment = parameters["project"].get("runtime_environment")
 
-    solver = OPENSHIFT.obtain_solver_from_runtime_environment(runtime_environment=runtime_environment)
+    solver = OpenShift.obtain_solver_from_runtime_environment(runtime_environment=runtime_environment)
 
     requirements = parameters["project"].get("requirements")
 
@@ -119,13 +115,16 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     """Parse unresolved package message."""
     package_name = unresolved_package.package_name
     package_version = unresolved_package.package_version
-    indexes: List[Any] = unresolved_package.index_url
+    indexes: Optional[List[str]] = unresolved_package.index_url
     solver = unresolved_package.solver
 
-    registered_indexes: List[Any] = GRAPH.get_python_package_index_urls_all()
+    graph = GraphDatabase()
+    graph.connect()
 
-    if set(indexes) & set(registered_indexes):
-        _LOGGER.warning("User requested index that is not registered in Thoth.")
+    registered_indexes: List[str] = graph.get_python_package_index_urls_all()
+
+    if indexes:
+        _LOGGER.warning(f"User requested indexes are: {indexes}")
 
     if not package_version:
         packages = package_name
@@ -141,8 +140,9 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
 
 def _schedule_solver_with_priority(packages: str, indexes: List[str], solver: str) -> int:
     """Schedule solver with priority."""
+    openshift = OpenShift()
     try:
-        analysis_id = OPENSHIFT.schedule_solver(solver=solver, packages=packages, indexes=indexes, transitive=False)
+        analysis_id = openshift.schedule_solver(solver=solver, packages=packages, indexes=indexes, transitive=False)
         _LOGGER.info(
             "Scheduled solver %r for packages %r from indexes %r, analysis is %r",
             solver,
