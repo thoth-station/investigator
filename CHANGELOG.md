@@ -48,3 +48,10 @@ all the things that you see...
 
 ## Release 0.2.2 (2020-07-11T13:14:44)
 * Correct parameter from Kafka message
+
+## Release 0.2.3 (2020-07-15T14:48:28)
+* :pushpin: Automatic update of dependency hypothesis from 5.19.2 to 5.19.3 (#80)
+* Add a few persistent metrics (#74)
+* :pushpin: Automatic update of dependency hypothesis from 5.19.0 to 5.19.2 (#77)
+* Make producer more asynchronous by creating all futures before awaiting (#75)
+* include aicoe-ci configuration file
