@@ -127,14 +127,14 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
 
     indexes = registered_indexes
 
-    if requested_indexes and all(index_url in registered_indexes for index_url in requested_indexes):
-        indexes = requested_indexes
-        _LOGGER.info(f"Using requested indexes...")
+    if not requested_indexes:
+        _LOGGER.info("Scheduling Thoth registered indexes...")
     else:
-        indexes_not_registered = set(requested_indexes) - set(registered_indexes)
-        if indexes_not_registered:
-            _LOGGER.warning(f"User requested indexes not registered: {indexes_not_registered}")
-        _LOGGER.info(f"Scheduling Thoth registered indexes...")
+        if all(index_url in registered_indexes for index_url in requested_indexes):
+            indexes = requested_indexes
+            _LOGGER.info("Using requested indexes...")
+        else:
+            _LOGGER.info("Scheduling Thoth registered indexes...")
 
     is_scheduled = _schedule_solver(
         package_name=package_name, package_version=package_version, indexes=indexes, solver=solver
