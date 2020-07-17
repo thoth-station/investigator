@@ -63,3 +63,6 @@ all the things that you see...
 ## Release 0.2.5 (2020-07-16T20:42:24)
 * Add Missing connection to database (#90)
 * point to the right context path (#88)
+
+## Release 0.2.6 (2020-07-17T15:20:36)
+* Add more logging (#94)
