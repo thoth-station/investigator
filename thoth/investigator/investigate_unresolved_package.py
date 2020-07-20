@@ -126,6 +126,11 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     graph = GraphDatabase()
     graph.connect()
 
+    if not package_version:
+        version="*"
+    else:
+        version = package_version
+
     # Select indexes
     registered_indexes: List[str] = graph.get_python_package_index_urls_all()
 
@@ -146,12 +151,12 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     else:
         solvers = [solver]
 
-    # Check package version for each index
-
+    # Parse package version for each index
     for index_url in indexes:
 
+        # Check if package version index exists in Thoth Knowledge Graph
         is_present = graph.python_package_version_exists(
-            package_name=package_name, package_version=package_version, index_url=index_url
+            package_name=package_name, package_version=version, index_url=index_url
         )
 
         if is_present:
@@ -195,9 +200,8 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
 
     SUCCESSES_COUNTER.inc()
 
-
 def _schedule_solver(
-    openshift: Openshift, package_name: str, package_version: str, indexes: List[str], solver_name: str
+    openshift: Openshift, package_name: str, package_version: Optional[str], indexes: List[str], solver_name: str
 ) -> int:
     """Schedule solver."""
     try:
@@ -224,12 +228,17 @@ def _schedule_solver(
     return is_scheduled
 
 
-def _schedule_all_solvers(openshift: OpenShift, package_name: str, package_version: str, indexes: List[str]) -> int:
+def _schedule_all_solvers(openshift: OpenShift, package_name: str, package_version: Optional[str], indexes: List[str]) -> int:
     """Schedule all solvers."""
     try:
-        analysis_ids = openshift.schedule_all_solvers(packages=f"{package_name}==={package_version}", indexes=indexes)
+        if not package_version:
+            packages = package_name
+        else:
+            packages = f"{package_name}==={package_version}"
+
+        analysis_ids = openshift.schedule_all_solvers(packages=packages, indexes=indexes)
         _LOGGER.info(
-            "Scheduled solver %r for packages %r from indexes %r, analysis is %r", packages, indexes, analysis_ids
+            "Scheduled solvers %r for packages %r from indexes %r, analysis ids are %r", packages, indexes, analysis_ids
         )
         are_scheduled = len(analysis_ids)
     except Exception:
