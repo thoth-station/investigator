@@ -148,45 +148,44 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
         else:
             versions.append(package_version)
 
-        if versions:
-            for package_version in versions:
+        for version in versions:
 
-                # Check if package version index exists in Thoth Knowledge Graph
-                is_present = graph.python_package_version_exists(
-                    package_name=package_name, package_version=package_version, index_url=index_url
-                )
+            # Check if package version index exists in Thoth Knowledge Graph
+            is_present = graph.python_package_version_exists(
+                package_name=package_name, package_version=version, index_url=index_url
+            )
 
-                learn_about_solver(
-                    openshift=openshift,
-                    graph=graph,
-                    is_present=is_present,
-                    package_name=package_name,
-                    package_version=package_version,
-                    index_url=index_url,
-                    solver=solver,
-                )
+            learn_about_solver(
+                openshift=openshift,
+                graph=graph,
+                is_present=is_present,
+                package_name=package_name,
+                package_version=version,
+                index_url=index_url,
+                solver=solver,
+            )
 
-                learn_about_revsolver(
-                    openshift=openshift,
-                    is_present=is_present,
-                    package_name=package_name,
-                    package_version=package_version,
-                )
+            learn_about_revsolver(
+                openshift=openshift,
+                is_present=is_present,
+                package_name=package_name,
+                package_version=version,
+            )
 
-                learn_about_security(
-                    openshift=openshift,
-                    graph=graph,
-                    is_present=is_present,
-                    package_name=package_name,
-                    package_version=package_version,
-                    index_url=index_url,
-                )
+            learn_about_security(
+                openshift=openshift,
+                graph=graph,
+                is_present=is_present,
+                package_name=package_name,
+                package_version=version,
+                index_url=index_url,
+            )
 
     SUCCESSES_COUNTER.inc()
 
 
 def learn_about_solver(
-    openshift: Openshift,
+    openshift: OpenShift,
     graph: GraphDatabase,
     is_present: bool,
     package_name: str,
@@ -231,8 +230,8 @@ def learn_about_solver(
     return are_solvers_scheduled
 
 
-def learn_about_revsolver(openshift: Openshift, is_present: bool, package_name: str, package_version: str):
-    """Learn about revsolver for Package Version Index."""
+def learn_about_revsolver(openshift: OpenShift, is_present: bool, package_name: str, package_version: str):
+    """Learn about revsolver for Package Version."""
     if not is_present:
         # Package never seen (schedule revsolver workflow to collect knowledge for Thoth)
         is_revsolver_scheduled = _schedule_revsolver(
@@ -242,7 +241,7 @@ def learn_about_revsolver(openshift: Openshift, is_present: bool, package_name: 
 
 
 def learn_about_security(
-    openshift: Openshift,
+    openshift: OpenshOpenShiftift,
     graph: GraphDatabase,
     is_present: bool,
     package_name: str,
@@ -267,7 +266,7 @@ def learn_about_security(
 
 
 def _schedule_solver(
-    openshift: Openshift, package_name: str, package_version: str, indexes: List[str], solver_name: str
+    openshift: OpenShift, package_name: str, package_version: str, indexes: List[str], solver_name: str
 ) -> int:
     """Schedule solver."""
     try:
