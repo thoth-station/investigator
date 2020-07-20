@@ -172,8 +172,17 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                         indexes=[index_url],
                         solver_name=solver_name,
                     )
+            is_si_analyzed = si_aggregated_python_package_version_exists(
+                package_name=package_name,
+                package_version=package_version,
+                index_url=index_url,
+            )
+            
+            if not is_si_analyzed:
+                is_si_analyzer_scheduled = _schedule_security_indicator(package_name=package_name, package_version=package_version, index_url=index_url)  
 
         else:
+            # Package never seen (schedule workflows to collect all knowledge for Thoth)
             are_scheduled = _schedule_all_solvers(
                 package_name=package_name, package_version=package_version, indexes=[index_url]
             )
