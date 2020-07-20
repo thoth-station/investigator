@@ -135,7 +135,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     for index_url in indexes:
 
         versions = []
-        revsolver_packages_seen = []
+        revsolver_packages_seen: List[Tuple[str, str]] = []
 
         if not package_version:
             _LOGGER.debug("consider index %r", index_url)
@@ -171,7 +171,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                 is_present=is_present,
                 package_name=package_name,
                 package_version=version,
-                revsolver_packages_seen=revsolver_packages_seen
+                revsolver_packages_seen=revsolver_packages_seen,
             )
 
             learn_about_security(
@@ -194,7 +194,7 @@ def learn_about_solver(
     index_url: str,
     package_version: str,
     solver: Optional[str],
-):
+) -> int:
     """Learn about solvers for Package Version Index."""
     if not is_present:
         # Package never seen (schedule all solver workflows to collect all knowledge for Thoth)
@@ -232,15 +232,21 @@ def learn_about_solver(
     return are_solvers_scheduled
 
 
-def learn_about_revsolver(openshift: OpenShift, is_present: bool, package_name: str, package_version: str):
+def learn_about_revsolver(
+    openshift: OpenShift,
+    is_present: bool,
+    package_name: str,
+    package_version: str,
+    revsolver_packages_seen: List[Tuple[str, str]],
+) -> Tuple[int, List[Tuple[str, str]]]:
     """Learn about revsolver for Package Version."""
     # TODO: Create query in the database for package version revsolved
-    if not is_present and (package_name, package_version) not in revsolver_packages_seen::
+    if not is_present and (package_name, package_version) not in revsolver_packages_seen:
         # Package never seen (schedule revsolver workflow to collect knowledge for Thoth)
         is_revsolver_scheduled = _schedule_revsolver(
             openshift=openshift, package_name=package_name, package_version=package_version
         )
-        revsolver_packages_seen.add((package_name, package_version))
+        revsolver_packages_seen.append((package_name, package_version))
 
         return is_revsolver_scheduled, revsolver_packages_seen
 
@@ -248,13 +254,13 @@ def learn_about_revsolver(openshift: OpenShift, is_present: bool, package_name: 
 
 
 def learn_about_security(
-    openshift: OpenshOpenShiftift,
+    openshift: OpenShift,
     graph: GraphDatabase,
     is_present: bool,
     package_name: str,
     index_url: str,
     package_version: str,
-):
+) -> int:
     """Learn about security for Package Version Index."""
     if is_present:
         is_si_analyzer_scheduled = graph.si_aggregated_python_package_version_exists(
