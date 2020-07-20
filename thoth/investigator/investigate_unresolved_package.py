@@ -147,7 +147,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                 package_name=package_name, package_version=version, index_url=index_url
             )
 
-            learn_about_solver(
+            learn_using_solver(
                 openshift=openshift,
                 graph=graph,
                 is_present=is_present,
@@ -157,7 +157,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                 solver=solver,
             )
 
-            learn_about_revsolver(
+            learn_using_revsolver(
                 openshift=openshift,
                 is_present=is_present,
                 package_name=package_name,
@@ -197,7 +197,7 @@ def _check_package_version(package_name: str, package_version: Optional[str], in
     return versions
 
 
-def learn_about_solver(
+def learn_using_solver(
     openshift: OpenShift,
     graph: GraphDatabase,
     is_present: bool,
@@ -206,7 +206,7 @@ def learn_about_solver(
     package_version: str,
     solver: Optional[str],
 ) -> int:
-    """Learn about solvers for Package Version Index."""
+    """Learn using solver about Package Version Index dependencies."""
     if not is_present:
         # Package never seen (schedule all solver workflows to collect all knowledge for Thoth)
         are_solvers_scheduled = _schedule_all_solvers(
@@ -243,14 +243,14 @@ def learn_about_solver(
     return are_solvers_scheduled
 
 
-def learn_about_revsolver(
+def learn_using_revsolver(
     openshift: OpenShift,
     is_present: bool,
     package_name: str,
     package_version: str,
     revsolver_packages_seen: List[Tuple[str, str]],
 ) -> Tuple[int, List[Tuple[str, str]]]:
-    """Learn about revsolver for Package Version."""
+    """Learn using revsolver about Package Version dependencies."""
     # TODO: Create query in the database for package version revsolved
     if not is_present and (package_name, package_version) not in revsolver_packages_seen:
         # Package never seen (schedule revsolver workflow to collect knowledge for Thoth)
@@ -272,7 +272,7 @@ def learn_about_security(
     index_url: str,
     package_version: str,
 ) -> int:
-    """Learn about security for Package Version Index."""
+    """Learn about security of Package Version Index."""
     if is_present:
         is_analyzed = graph.si_aggregated_python_package_version_exists(
             package_name=package_name, package_version=package_version, index_url=index_url
@@ -315,7 +315,7 @@ def _schedule_solver(
 
 
 def _schedule_all_solvers(
-    openshift: OpenShift, package_name: str, package_version: Optional[str], indexes: List[str]
+    openshift: OpenShift, package_name: str, package_version: str, indexes: List[str]
 ) -> int:
     """Schedule all solvers."""
     try:
