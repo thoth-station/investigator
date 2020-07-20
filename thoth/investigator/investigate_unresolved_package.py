@@ -189,7 +189,9 @@ def _check_package_version(package_name: str, package_version: Optional[str], in
             versions = source.get_package_versions(package_name)
 
         except Exception as exc:
-            _LOGGER.warning(f"Could not retrieve versions for {package_name} from {index_url}: {str(exc)}")
+            _LOGGER.warning(
+                f"Could not retrieve versions for package {package_name} from index {index_url}: {str(exc)}"
+            )
 
     else:
         versions.append(package_version)
@@ -274,6 +276,7 @@ def learn_about_security(
 ) -> int:
     """Learn about security of Package Version Index."""
     if is_present:
+        # Check if package version index has been already analyzed for security
         is_analyzed = graph.si_aggregated_python_package_version_exists(
             package_name=package_name, package_version=package_version, index_url=index_url
         )
@@ -314,9 +317,7 @@ def _schedule_solver(
     return is_scheduled
 
 
-def _schedule_all_solvers(
-    openshift: OpenShift, package_name: str, package_version: str, indexes: List[str]
-) -> int:
+def _schedule_all_solvers(openshift: OpenShift, package_name: str, package_version: str, indexes: List[str]) -> int:
     """Schedule all solvers."""
     try:
         packages = f"{package_name}==={package_version}"
