@@ -134,10 +134,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     # Parse package version for each index
     for index_url in indexes:
 
-        versions = _check_package_version(
-            package_version=package_version,
-            index_url=index_url
-        )
+        versions = _check_package_version(package_version=package_version, index_url=index_url)
 
         revsolver_packages_seen: List[Tuple[str, str]] = []
 
@@ -177,6 +174,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
 
     SUCCESSES_COUNTER.inc()
 
+
 def _check_package_version(package_version: Optional[str], index_url: str) -> List[str]:
     """"Check package version."""
     versions = []
@@ -189,7 +187,7 @@ def _check_package_version(package_version: Optional[str], index_url: str) -> Li
             versions = source.get_package_versions(package_name)
 
         except Exception as exc:
-            _LOGGER.exception(str(exc))
+            _LOGGER.warning(f"Could not retrieve versions for {package_name} from {index_url}: {str(exc)}")
             continue
     else:
         versions.append(package_version)
