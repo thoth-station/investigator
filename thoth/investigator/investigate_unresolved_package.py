@@ -165,7 +165,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                     solver_name=solver_name,
                 )
                 if not is_solved:
-                    is_scheduled = _schedule_solver(
+                    is_solver_scheduled = _schedule_solver(
                         openshift=openshift,
                         package_name=package_name,
                         package_version=package_version,
@@ -183,7 +183,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
 
         else:
             # Package never seen (schedule workflows to collect all knowledge for Thoth)
-            are_scheduled = _schedule_all_solvers(
+            are_solvers_scheduled = _schedule_all_solvers(
                 package_name=package_name, package_version=package_version, indexes=[index_url]
             )
 
@@ -241,22 +241,21 @@ def _schedule_all_solvers(openshift: OpenShift, package_name: str, package_versi
 
 def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version: str) -> int:
     """Schedule revsolver."""
-    if package_version and (package_name, package_version) not in revsolver_packages_seen:
-        try:
-            analysis_id = openshift.schedule_revsolver(
-                package_name=package_name, package_version=package_version, debug=_LOG_REVSOLVER
-            )
-            _LOGGER.info(
-                "Scheduled reverse solver for package %r in version %r, analysis is %r",
-                package_name,
-                package_version,
-                analysis_id,
-            )
-            is_scheduled = 1
-        except Exception:
-            _LOGGER.warning("Failed to schedule reverse solver for %r in version %r", package_name, package_version)
-            is_scheduled = 0
-            continue
+    try:
+        analysis_id = openshift.schedule_revsolver(
+            package_name=package_name, package_version=package_version, debug=_LOG_REVSOLVER
+        )
+        _LOGGER.info(
+            "Scheduled reverse solver for package %r in version %r, analysis is %r",
+            package_name,
+            package_version,
+            analysis_id,
+        )
+        is_scheduled = 1
+    except Exception:
+        _LOGGER.warning("Failed to schedule reverse solver for %r in version %r", package_name, package_version)
+        is_scheduled = 0
+        continue
 
     return is_scheduled
 
