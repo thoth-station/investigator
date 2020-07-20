@@ -267,14 +267,11 @@ def learn_about_security(
 
 
 def _schedule_solver(
-    openshift: Openshift, package_name: str, package_version: Optional[str], indexes: List[str], solver_name: str
+    openshift: Openshift, package_name: str, package_version: str, indexes: List[str], solver_name: str
 ) -> int:
     """Schedule solver."""
     try:
-        if not package_version:
-            packages = package_name
-        else:
-            packages = f"{package_name}==={package_version}"
+        packages = f"{package_name}==={package_version}"
 
         analysis_id = openshift.schedule_solver(
             solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=_LOG_SOLVER
@@ -299,18 +296,15 @@ def _schedule_all_solvers(
 ) -> int:
     """Schedule all solvers."""
     try:
-        if not package_version:
-            packages = package_name
-        else:
-            packages = f"{package_name}==={package_version}"
+        packages = f"{package_name}==={package_version}"
 
         analysis_ids = openshift.schedule_all_solvers(packages=packages, indexes=indexes)
         _LOGGER.info(
             "Scheduled solvers %r for packages %r from indexes %r, analysis ids are %r", packages, indexes, analysis_ids
         )
         are_scheduled = len(analysis_ids)
-    except Exception:
-        _LOGGER.warning(f"Failed to schedule solvers for package {packages} from {indexes}")
+    except Exception as e:
+        _LOGGER.warning(f"Failed to schedule solvers for package {packages} from {indexes}: {e}")
         are_scheduled = 0
 
     return are_scheduled
@@ -329,8 +323,8 @@ def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version
             analysis_id,
         )
         is_scheduled = 1
-    except Exception:
-        _LOGGER.warning("Failed to schedule reverse solver for %r in version %r", package_name, package_version)
+    except Exception as e:
+        _LOGGER.warning("Failed to schedule reverse solver for %r in version %r: %r", package_name, package_version, e)
         is_scheduled = 0
 
     return is_scheduled
@@ -353,9 +347,9 @@ def _schedule_security_indicator(openshift: OpenShift, package_name: str, packag
             analysis_id,
         )
         is_scheduled = 1
-    except Exception:
+    except Exception as e:
         _LOGGER.warning(
-            f"Failed to schedule SI for package {package_name} in version {package_version} from index {index_url}"
+            f"Failed to schedule SI for package {package_name} in version {package_version} from index {index_url}: {e}"
         )
         is_scheduled = 0
 
