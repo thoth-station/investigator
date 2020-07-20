@@ -234,7 +234,7 @@ def learn_about_solver(
 def learn_about_revsolver(openshift: Openshift, is_present: bool, package_name: str, package_version: str):
     """Learn about revsolver for Package Version Index."""
     if not is_present:
-        # Package never seen (schedule revsolver workflow to collect all knowledge for Thoth)
+        # Package never seen (schedule revsolver workflow to collect knowledge for Thoth)
         is_revsolver_scheduled = _schedule_revsolver(
             openshift=openshift, package_name=package_name, package_version=package_version
         )
@@ -258,6 +258,7 @@ def learn_about_security(
         if is_si_analyzer_scheduled:
             return is_si_analyzer_scheduled
 
+    # Package never seen (schedule si workflow to collect knowledge for Thoth)
     is_si_analyzer_scheduled = _schedule_security_indicator(
         openshift=openshift, package_name=package_name, package_version=package_version, index_url=index_url
     )
