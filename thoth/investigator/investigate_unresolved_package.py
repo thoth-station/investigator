@@ -31,6 +31,7 @@ from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
 from thoth.common import OpenShift
 from thoth.python import Pipfile
+from thoth.python import Source
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway, Counter
 
 _LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
