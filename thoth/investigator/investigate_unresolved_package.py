@@ -128,9 +128,16 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     graph.connect()
 
     if not package_version:
-        version = "*"
-    else:
-        version = package_version
+        _LOGGER.debug("consider index %r", index_url)
+        source = Source(index_url)
+
+        versions = []
+
+        try:
+            versions = source.get_package_versions(package_name)
+
+        except Exception as exc:
+            _LOGGER.exception(str(exc))
 
     # Select indexes
     registered_indexes: List[str] = graph.get_python_package_index_urls_all()
@@ -146,76 +153,100 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
         else:
             _LOGGER.info("Using Thoth registered indexes...")
 
+    # Parse package version for each index
+    for index_url in indexes:
+
+        if versions:
+            for package_version in versions:
+
+                # Check if package version index exists in Thoth Knowledge Graph
+                is_present = graph.python_package_version_exists(
+                    package_name=package_name, package_version=package_version, index_url=index_url
+                )
+
+                learn_about_solver(
+                    is_present=is_present,
+                    package_name=package_name,
+                    package_version=package_version,
+                    index_url=index_url,
+                    solver=solver,
+                )
+
+                learn_about_revsolver(is_present=is_present, package_name=package_name, package_version=package_version)
+
+                learn_about_security(
+                    is_present=is_present,
+                    package_name=package_name,
+                    package_version=package_version,
+                    index_url=index_url,
+                )
+
+    SUCCESSES_COUNTER.inc()
+
+
+def learn_about_solver(
+    is_present: bool, package_name: str, indexes: List[str], package_version: str, solver: Optional[str]
+):
+    """Learn about solvers for Package Version Index."""
+    if not is_present:
+        # Package never seen (schedule all solver workflows to collect all knowledge for Thoth)
+        are_solvers_scheduled = _schedule_all_solvers(
+            package_name=package_name, package_version=package_version, indexes=indexes
+        )
+        return are_solvers_scheduled
+
     # Select solvers
     if not solver:
         solvers: List[str] = openshift.get_solver_names()
     else:
         solvers = [solver]
 
-    # Parse package version for each index
-    for index_url in indexes:
+    # Check for which solver has not been solved and schedule solver workflow
+    are_solvers_scheduled = 0
 
-        # Check if package version index exists in Thoth Knowledge Graph
-        is_present = graph.python_package_version_exists(
-            package_name=package_name, package_version=version, index_url=index_url
+    for solver_name in solvers:
+        is_solved = graph.python_package_version_exists(
+            package_name=package_name, package_version=package_version, index_url=index_url, solver_name=solver_name
         )
 
-        if is_present:
+        if not is_solved:
 
-            # Check for which solver has been already solved
-            for solver_name in solvers:
-                is_solved = graph.python_package_version_exists(
-                    package_name=package_name,
-                    package_version=package_version,
-                    index_url=index_url,
-                    solver_name=solver_name,
-                )
-                if not is_solved:
-                    is_solver_scheduled = _schedule_solver(
-                        openshift=openshift,
-                        package_name=package_name,
-                        package_version=package_version,
-                        indexes=[index_url],
-                        solver_name=solver_name,
-                    )
-            is_si_analyzed = si_aggregated_python_package_version_exists(
-                package_name=package_name, package_version=package_version, index_url=index_url
+            is_solver_scheduled = _schedule_solver(
+                openshift=openshift,
+                package_name=package_name,
+                package_version=package_version,
+                indexes=[index_url],
+                solver_name=solver_name,
             )
 
-            if not is_si_analyzed:
-                is_si_analyzer_scheduled = _schedule_security_indicator(
-                    package_name=package_name, package_version=package_version, index_url=index_url
-                )
+            are_solvers_scheduled += is_solver_scheduled
 
-        else:
-            # Package never seen (schedule workflows to collect all knowledge for Thoth)
-            are_solvers_scheduled = _schedule_all_solvers(
-                package_name=package_name, package_version=package_version, indexes=[index_url]
-            )
+    return are_solvers_scheduled
 
-            if not package_version:
-                _LOGGER.debug("consider index %r", index_url)
-                source = Source(index_url)
 
-                versions = []
+def learn_about_revsolver(is_present: bool, package_name: str, package_version: str):
+    """Learn about revsolver for Package Version Index."""
+    if not is_present:
+        # Package never seen (schedule revsolver workflow to collect all knowledge for Thoth)
+        is_revsolver_scheduled = _schedule_revsolver(package_name=package_name, package_version=package_version)
+        return is_revsolver_scheduled
 
-                try:
-                    versions = source.get_package_versions(package_name)
 
-                except Exception as exc:
-                    _LOGGER.exception(str(exc))
+def learn_about_security(is_present: bool, package_name: str, indexes: List[str], package_version: str):
+    """Learn about security for Package Version Index."""
+    if is_present:
+        is_si_analyzed = si_aggregated_python_package_version_exists(
+            package_name=package_name, package_version=package_version, index_url=index_url
+        )
 
-                if versions:
-                    for package_version in versions:
-                        is_revsolver_scheduled = _schedule_revsolver(
-                            package_name=package_name, package_version=package_version
-                        )
+        if is_si_analyzed:
+            return is_si_analyzer_scheduled
 
-                        is_si_analyzer_scheduled = _schedule_security_indicator(
-                            package_name=package_name, package_version=package_version, index_url=index_url
-                        )
+    is_si_analyzer_scheduled = _schedule_security_indicator(
+        package_name=package_name, package_version=package_version, index_url=index_url
+    )
 
-    SUCCESSES_COUNTER.inc()
+    return is_si_analyzer_scheduled
 
 
 def _schedule_solver(
