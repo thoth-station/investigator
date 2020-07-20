@@ -132,7 +132,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     indexes = registered_indexes
 
     if not requested_indexes:
-        _LOGGER.info("using Thoth registered indexes...")
+        _LOGGER.info("Using Thoth registered indexes...")
     else:
         if all(index_url in registered_indexes for index_url in requested_indexes):
             indexes = requested_indexes
@@ -173,13 +173,13 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                         solver_name=solver_name,
                     )
             is_si_analyzed = si_aggregated_python_package_version_exists(
-                package_name=package_name,
-                package_version=package_version,
-                index_url=index_url,
+                package_name=package_name, package_version=package_version, index_url=index_url
             )
-            
+
             if not is_si_analyzed:
-                is_si_analyzer_scheduled = _schedule_security_indicator(package_name=package_name, package_version=package_version, index_url=index_url)  
+                is_si_analyzer_scheduled = _schedule_security_indicator(
+                    package_name=package_name, package_version=package_version, index_url=index_url
+                )
 
         else:
             # Package never seen (schedule workflows to collect all knowledge for Thoth)
@@ -189,7 +189,9 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
 
             is_revsolver_scheduled = _schedule_revsolver(package_name=package_name, package_version=package_version)
 
-            is_si_analyzer_scheduled = _schedule_security_indicator(package_name=package_name, package_version=package_version, index_url=index_url)
+            is_si_analyzer_scheduled = _schedule_security_indicator(
+                package_name=package_name, package_version=package_version, index_url=index_url
+            )
 
     SUCCESSES_COUNTER.inc()
 
@@ -257,6 +259,7 @@ def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version
             continue
 
     return is_scheduled
+
 
 def _schedule_security_indicator(package_name: str, package_version: str, index_url: str) -> int:
     """Schedule Security Indicator."""
