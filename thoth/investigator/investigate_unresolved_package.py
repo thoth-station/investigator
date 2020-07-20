@@ -134,20 +134,12 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     # Parse package version for each index
     for index_url in indexes:
 
-        versions = []
+        versions = _check_package_version(
+            package_version=package_version,
+            index_url=index_url
+        )
+
         revsolver_packages_seen: List[Tuple[str, str]] = []
-
-        if not package_version:
-            _LOGGER.debug("consider index %r", index_url)
-            source = Source(index_url)
-
-            try:
-                versions = source.get_package_versions(package_name)
-
-            except Exception as exc:
-                _LOGGER.exception(str(exc))
-        else:
-            versions.append(package_version)
 
         for version in versions:
 
@@ -184,6 +176,25 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
             )
 
     SUCCESSES_COUNTER.inc()
+
+def _check_package_version(package_version: Optional[str], index_url: str) -> List[str]:
+    """"Check package version."""
+    versions = []
+
+    if not package_version:
+        _LOGGER.debug("consider index %r", index_url)
+        source = Source(index_url)
+
+        try:
+            versions = source.get_package_versions(package_name)
+
+        except Exception as exc:
+            _LOGGER.exception(str(exc))
+            continue
+    else:
+        versions.append(package_version)
+
+    return versions
 
 
 def learn_about_solver(
