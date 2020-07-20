@@ -127,18 +127,6 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     graph = GraphDatabase()
     graph.connect()
 
-    if not package_version:
-        _LOGGER.debug("consider index %r", index_url)
-        source = Source(index_url)
-
-        versions = []
-
-        try:
-            versions = source.get_package_versions(package_name)
-
-        except Exception as exc:
-            _LOGGER.exception(str(exc))
-
     # Select indexes
     registered_indexes: List[str] = graph.get_python_package_index_urls_all()
 
@@ -155,6 +143,20 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
 
     # Parse package version for each index
     for index_url in indexes:
+
+        versions = []
+
+        if not package_version:
+            _LOGGER.debug("consider index %r", index_url)
+            source = Source(index_url)
+
+            try:
+                versions = source.get_package_versions(package_name)
+
+            except Exception as exc:
+                _LOGGER.exception(str(exc))
+        else:
+            versions.append(package_version)
 
         if versions:
             for package_version in versions:
