@@ -151,7 +151,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     for index_url in indexes:
 
         is_present = graph.python_package_version_exists(
-            package_name=package_name, package_version=package_version, index_url=index_url, solver_name=solver_name
+            package_name=package_name, package_version=package_version, index_url=index_url
         )
 
         if is_present:
