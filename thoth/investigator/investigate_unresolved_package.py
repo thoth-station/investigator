@@ -127,7 +127,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     graph.connect()
 
     if not package_version:
-        version="*"
+        version = "*"
     else:
         version = package_version
 
@@ -192,13 +192,30 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                 package_name=package_name, package_version=package_version, indexes=[index_url]
             )
 
-            is_revsolver_scheduled = _schedule_revsolver(package_name=package_name, package_version=package_version)
+            if not package_version:
+                _LOGGER.debug("consider index %r", index_url)
+                source = Source(index_url)
 
-            is_si_analyzer_scheduled = _schedule_security_indicator(
-                package_name=package_name, package_version=package_version, index_url=index_url
-            )
+                versions = []
+
+                try:
+                    versions = source.get_package_versions(package_name)
+
+                except Exception as exc:
+                    _LOGGER.exception(str(exc))
+
+                if versions:
+                    for package_version in versions:
+                        is_revsolver_scheduled = _schedule_revsolver(
+                            package_name=package_name, package_version=package_version
+                        )
+
+                        is_si_analyzer_scheduled = _schedule_security_indicator(
+                            package_name=package_name, package_version=package_version, index_url=index_url
+                        )
 
     SUCCESSES_COUNTER.inc()
+
 
 def _schedule_solver(
     openshift: Openshift, package_name: str, package_version: Optional[str], indexes: List[str], solver_name: str
@@ -228,7 +245,9 @@ def _schedule_solver(
     return is_scheduled
 
 
-def _schedule_all_solvers(openshift: OpenShift, package_name: str, package_version: Optional[str], indexes: List[str]) -> int:
+def _schedule_all_solvers(
+    openshift: OpenShift, package_name: str, package_version: Optional[str], indexes: List[str]
+) -> int:
     """Schedule all solvers."""
     try:
         if not package_version:
