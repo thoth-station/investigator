@@ -134,7 +134,9 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     # Parse package version for each index
     for index_url in indexes:
 
-        versions = _check_package_version(package_version=package_version, index_url=index_url)
+        versions = _check_package_version(
+            package_name=package_name, package_version=package_version, index_url=index_url
+        )
 
         revsolver_packages_seen: List[Tuple[str, str]] = []
 
@@ -175,8 +177,8 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     SUCCESSES_COUNTER.inc()
 
 
-def _check_package_version(package_version: Optional[str], index_url: str) -> List[str]:
-    """"Check package version."""
+def _check_package_version(package_name: str, package_version: Optional[str], index_url: str) -> List[str]:
+    """Check package version."""
     versions = []
 
     if not package_version:
@@ -188,7 +190,7 @@ def _check_package_version(package_version: Optional[str], index_url: str) -> Li
 
         except Exception as exc:
             _LOGGER.warning(f"Could not retrieve versions for {package_name} from {index_url}: {str(exc)}")
-            continue
+
     else:
         versions.append(package_version)
 
@@ -272,12 +274,12 @@ def learn_about_security(
 ) -> int:
     """Learn about security for Package Version Index."""
     if is_present:
-        is_si_analyzer_scheduled = graph.si_aggregated_python_package_version_exists(
+        is_analyzed = graph.si_aggregated_python_package_version_exists(
             package_name=package_name, package_version=package_version, index_url=index_url
         )
 
-        if is_si_analyzer_scheduled:
-            return is_si_analyzer_scheduled
+        if is_analyzed:
+            return 0
 
     # Package never seen (schedule si workflow to collect knowledge for Thoth)
     is_si_analyzer_scheduled = _schedule_security_indicator(
