@@ -135,6 +135,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     for index_url in indexes:
 
         versions = []
+        revsolver_packages_seen = []
 
         if not package_version:
             _LOGGER.debug("consider index %r", index_url)
@@ -165,12 +166,15 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                 solver=solver,
             )
 
-            learn_about_revsolver(
-                openshift=openshift,
-                is_present=is_present,
-                package_name=package_name,
-                package_version=version,
-            )
+            # TODO: Create query in the database for package version revsolved
+            if (package_name, package_version) not in revsolver_packages_seen:
+                learn_about_revsolver(
+                    openshift=openshift,
+                    is_present=is_present,
+                    package_name=package_name,
+                    package_version=version,
+                )
+                revsolver_packages_seen.add((package_name, package_version))
 
             learn_about_security(
                 openshift=openshift,
