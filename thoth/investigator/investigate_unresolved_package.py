@@ -32,7 +32,7 @@ from thoth.messaging import MessageBase
 from thoth.common import OpenShift
 from thoth.python import Pipfile
 from thoth.python import Source
-from prometheus_client import CollectorRegistry, Gauge, Counter
+from prometheus_client import Gauge, Counter
 
 _LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
 _LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
@@ -48,10 +48,6 @@ SUCCESSES_COUNTER = Counter(
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-_THOTH_METRICS_PUSHGATEWAY_URL = os.getenv(
-    "PROMETHEUS_PUSHGATEWAY_URL", "pushgateway-dh-prod-monitoring.cloud.datahub.psi.redhat.com:80"
-)
 
 
 def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tuple[Dict[Any, Any], Optional[str]]:
