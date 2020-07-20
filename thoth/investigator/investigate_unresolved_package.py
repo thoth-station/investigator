@@ -166,15 +166,13 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                 solver=solver,
             )
 
-            # TODO: Create query in the database for package version revsolved
-            if (package_name, package_version) not in revsolver_packages_seen:
-                learn_about_revsolver(
-                    openshift=openshift,
-                    is_present=is_present,
-                    package_name=package_name,
-                    package_version=version,
-                )
-                revsolver_packages_seen.add((package_name, package_version))
+            learn_about_revsolver(
+                openshift=openshift,
+                is_present=is_present,
+                package_name=package_name,
+                package_version=version,
+                revsolver_packages_seen=revsolver_packages_seen
+            )
 
             learn_about_security(
                 openshift=openshift,
@@ -236,12 +234,17 @@ def learn_about_solver(
 
 def learn_about_revsolver(openshift: OpenShift, is_present: bool, package_name: str, package_version: str):
     """Learn about revsolver for Package Version."""
-    if not is_present:
+    # TODO: Create query in the database for package version revsolved
+    if not is_present and (package_name, package_version) not in revsolver_packages_seen::
         # Package never seen (schedule revsolver workflow to collect knowledge for Thoth)
         is_revsolver_scheduled = _schedule_revsolver(
             openshift=openshift, package_name=package_name, package_version=package_version
         )
-        return is_revsolver_scheduled
+        revsolver_packages_seen.add((package_name, package_version))
+
+        return is_revsolver_scheduled, revsolver_packages_seen
+
+    return 0, revsolver_packages_seen
 
 
 def learn_about_security(
