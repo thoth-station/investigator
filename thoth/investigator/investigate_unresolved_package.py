@@ -29,33 +29,20 @@ from pathlib import Path
 
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
+from thoth.messaging import UnresolvedPackageMessage
 from thoth.common import OpenShift
 from thoth.python import Pipfile
-from prometheus_client import CollectorRegistry, Gauge, push_to_gateway, Counter
+from thoth.python import Source
+
+from thoth.investigator import metrics
+from thoth.investigator.metrics import IN_PROGRESS_GAUGE
+from thoth.investigator.metrics import EXCEPTIONS_COUNTER
+from thoth.investigator.metrics import SUCCESSES_COUNTER
 
 _LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
-
-IN_PROGRESS_GAUGE = Gauge(
-    "investigators_in_progress", "Total number of investigation messages currently being processed."
-)
-EXCEPTIONS_COUNTER = Counter(
-    "investigator_exceptions", "Number of investigation messages which failed to be processed."
-)
-SUCCESSES_COUNTER = Counter(
-    "investigators_processed", "Number of investigation messages which were successfully processed."
-)
-
-prometheus_registry = CollectorRegistry()
+_LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
 
 _LOGGER = logging.getLogger(__name__)
-
-_METRIC_UNRESOLVED_TYPE = Gauge(
-    "thoth_unresolved_package", "Unresolved package scheduled info.", ["package_name"], registry=prometheus_registry
-)
-
-_THOTH_METRICS_PUSHGATEWAY_URL = os.getenv(
-    "PROMETHEUS_PUSHGATEWAY_URL", "pushgateway-dh-prod-monitoring.cloud.datahub.psi.redhat.com:80"
-)
 
 
 def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tuple[Dict[Any, Any], Optional[str]]:
@@ -120,67 +107,289 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     requested_indexes: Optional[List[str]] = unresolved_package.index_url
     solver = unresolved_package.solver
 
+    openshift = OpenShift()
+
+    total_solver_wfs_scheduled = 0
+    total_revsolver_wfs_scheduled = 0
+    total_si_wfs_scheduled = 0
+
     graph = GraphDatabase()
     graph.connect()
 
+    # Select indexes
     registered_indexes: List[str] = graph.get_python_package_index_urls_all()
 
     indexes = registered_indexes
 
     if not requested_indexes:
-        _LOGGER.info("Scheduling Thoth registered indexes...")
+        _LOGGER.info("Using Thoth registered indexes...")
     else:
         if all(index_url in registered_indexes for index_url in requested_indexes):
             indexes = requested_indexes
             _LOGGER.info("Using requested indexes...")
         else:
-            _LOGGER.info("Scheduling Thoth registered indexes...")
+            _LOGGER.info("Using Thoth registered indexes...")
 
-    is_scheduled = _schedule_solver(
-        package_name=package_name, package_version=package_version, indexes=indexes, solver=solver
-    )
+    # Parse package version for each index
+    for index_url in indexes:
 
-    # TODO: Expose metrics instead of sending to Pushgateway
-    send_metrics_to_pushgateway(unresolved_package=unresolved_package, is_scheduled=is_scheduled)
+        versions = _check_package_version(
+            package_name=package_name, package_version=package_version, index_url=index_url
+        )
+
+        revsolver_packages_seen: List[Tuple[str, str]] = []
+
+        for version in versions:
+
+            # Check if package version index exists in Thoth Knowledge Graph
+            is_present = graph.python_package_version_exists(
+                package_name=package_name, package_version=version, index_url=index_url
+            )
+
+            solver_wfs_scheduled = learn_using_solver(
+                openshift=openshift,
+                graph=graph,
+                is_present=is_present,
+                package_name=package_name,
+                package_version=version,
+                index_url=index_url,
+                solver=solver,
+            )
+
+            revsolver_wfs_scheduled, revsolver_packages_seen = learn_using_revsolver(
+                openshift=openshift,
+                is_present=is_present,
+                package_name=package_name,
+                package_version=version,
+                revsolver_packages_seen=revsolver_packages_seen,
+            )
+
+            si_wfs_scheduled = learn_about_security(
+                openshift=openshift,
+                graph=graph,
+                is_present=is_present,
+                package_name=package_name,
+                package_version=version,
+                index_url=index_url,
+            )
+
+            total_solver_wfs_scheduled += solver_wfs_scheduled
+            total_revsolver_wfs_scheduled += revsolver_wfs_scheduled
+            total_si_wfs_scheduled += si_wfs_scheduled
+
+    metrics.investigator_scheduled_workflows.labels(
+        message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver"
+    ).set(total_solver_wfs_scheduled)
+
+    metrics.investigator_scheduled_workflows.labels(
+        message_type=UnresolvedPackageMessage.topic_name, workflow_type="revsolver"
+    ).set(total_revsolver_wfs_scheduled)
+
+    metrics.investigator_scheduled_workflows.labels(
+        message_type=UnresolvedPackageMessage.topic_name, workflow_type="security-indicator"
+    ).set(total_si_wfs_scheduled)
+
     SUCCESSES_COUNTER.inc()
 
 
-def _schedule_solver(package_name: str, package_version: str, indexes: List[str], solver: str) -> int:
-    """Schedule solver."""
-    openshift = OpenShift()
+def _check_package_version(package_name: str, package_version: Optional[str], index_url: str) -> List[str]:
+    """Check package version."""
+    versions = []
 
+    if not package_version:
+        _LOGGER.debug("consider index %r", index_url)
+        source = Source(index_url)
+
+        try:
+            versions = source.get_package_versions(package_name)
+
+        except Exception as exc:
+            _LOGGER.warning(
+                f"Could not retrieve versions for package {package_name} from index {index_url}: {str(exc)}"
+            )
+
+    else:
+        versions.append(package_version)
+
+    return versions
+
+
+def learn_using_solver(
+    openshift: OpenShift,
+    graph: GraphDatabase,
+    is_present: bool,
+    package_name: str,
+    index_url: str,
+    package_version: str,
+    solver: Optional[str],
+) -> int:
+    """Learn using solver about Package Version Index dependencies."""
+    if not is_present:
+        # Package never seen (schedule all solver workflows to collect all knowledge for Thoth)
+        are_solvers_scheduled = _schedule_all_solvers(
+            openshift=openshift, package_name=package_name, package_version=package_version, indexes=[index_url]
+        )
+        return are_solvers_scheduled
+
+    # Select solvers
+    if not solver:
+        solvers: List[str] = openshift.get_solver_names()
+    else:
+        solvers = [solver]
+
+    # Check for which solver has not been solved and schedule solver workflow
+    are_solvers_scheduled = 0
+
+    for solver_name in solvers:
+        is_solved = graph.python_package_version_exists(
+            package_name=package_name, package_version=package_version, index_url=index_url, solver_name=solver_name
+        )
+
+        if not is_solved:
+
+            is_solver_scheduled = _schedule_solver(
+                openshift=openshift,
+                package_name=package_name,
+                package_version=package_version,
+                indexes=[index_url],
+                solver_name=solver_name,
+            )
+
+            are_solvers_scheduled += is_solver_scheduled
+
+    return are_solvers_scheduled
+
+
+def learn_using_revsolver(
+    openshift: OpenShift,
+    is_present: bool,
+    package_name: str,
+    package_version: str,
+    revsolver_packages_seen: List[Tuple[str, str]],
+) -> Tuple[int, List[Tuple[str, str]]]:
+    """Learn using revsolver about Package Version dependencies."""
+    # TODO: Create query in the database for package version revsolved
+    if not is_present and (package_name, package_version) not in revsolver_packages_seen:
+        # Package never seen (schedule revsolver workflow to collect knowledge for Thoth)
+        is_revsolver_scheduled = _schedule_revsolver(
+            openshift=openshift, package_name=package_name, package_version=package_version
+        )
+        revsolver_packages_seen.append((package_name, package_version))
+
+        return is_revsolver_scheduled, revsolver_packages_seen
+
+    return 0, revsolver_packages_seen
+
+
+def learn_about_security(
+    openshift: OpenShift,
+    graph: GraphDatabase,
+    is_present: bool,
+    package_name: str,
+    index_url: str,
+    package_version: str,
+) -> int:
+    """Learn about security of Package Version Index."""
+    if is_present:
+        # Check if package version index has been already analyzed for security
+        is_analyzed = graph.si_aggregated_python_package_version_exists(
+            package_name=package_name, package_version=package_version, index_url=index_url
+        )
+
+        if is_analyzed:
+            return 0
+
+    # Package never seen (schedule si workflow to collect knowledge for Thoth)
+    is_si_analyzer_scheduled = _schedule_security_indicator(
+        openshift=openshift, package_name=package_name, package_version=package_version, index_url=index_url
+    )
+
+    return is_si_analyzer_scheduled
+
+
+def _schedule_solver(
+    openshift: OpenShift, package_name: str, package_version: str, indexes: List[str], solver_name: str
+) -> int:
+    """Schedule solver."""
     try:
-        if not package_version:
-            packages = package_name
-        else:
-            packages = f"{package_name}==={package_version}"
+        packages = f"{package_name}==={package_version}"
 
         analysis_id = openshift.schedule_solver(
-            solver=solver, packages=packages, indexes=indexes, transitive=False, debug=_LOG_SOLVER
+            solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=_LOG_SOLVER
         )
         _LOGGER.info(
             "Scheduled solver %r for packages %r from indexes %r, analysis is %r",
-            solver,
+            solver_name,
             packages,
             indexes,
             analysis_id,
         )
         is_scheduled = 1
     except Exception as e:
-        _LOGGER.warning(f"Failed to schedule solver for package {packages} from {indexes}: {e}")
+        _LOGGER.warning(f"Failed to schedule solver {solver_name} for package {packages} from {indexes}: {e}")
         is_scheduled = 0
 
     return is_scheduled
 
 
-def send_metrics_to_pushgateway(unresolved_package: MessageBase, is_scheduled: int) -> None:
-    """Send metrics to Pushgateway."""
-    _METRIC_UNRESOLVED_TYPE.labels(package_name=unresolved_package.package_name).set(is_scheduled)
-    _LOGGER.info("unresolved_package(%r)=%r", unresolved_package.package_name, is_scheduled)
+def _schedule_all_solvers(openshift: OpenShift, package_name: str, package_version: str, indexes: List[str]) -> int:
+    """Schedule all solvers."""
+    try:
+        packages = f"{package_name}==={package_version}"
 
-    if _THOTH_METRICS_PUSHGATEWAY_URL:
-        try:
-            _LOGGER.info(f"Submitting metrics to Prometheus pushgateway {_THOTH_METRICS_PUSHGATEWAY_URL}")
-            push_to_gateway(_THOTH_METRICS_PUSHGATEWAY_URL, job="unresolved-package", registry=prometheus_registry)
-        except Exception as e:
-            _LOGGER.info(f"An error occurred pushing the metrics: {str(e)}")
+        analysis_ids = openshift.schedule_all_solvers(packages=packages, indexes=indexes)
+        _LOGGER.info(
+            "Scheduled solvers %r for packages %r from indexes %r, analysis ids are %r", packages, indexes, analysis_ids
+        )
+        are_scheduled = len(analysis_ids)
+    except Exception as e:
+        _LOGGER.warning(f"Failed to schedule solvers for package {packages} from {indexes}: {e}")
+        are_scheduled = 0
+
+    return are_scheduled
+
+
+def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version: str) -> int:
+    """Schedule revsolver."""
+    try:
+        analysis_id = openshift.schedule_revsolver(
+            package_name=package_name, package_version=package_version, debug=_LOG_REVSOLVER
+        )
+        _LOGGER.info(
+            "Scheduled reverse solver for package %r in version %r, analysis is %r",
+            package_name,
+            package_version,
+            analysis_id,
+        )
+        is_scheduled = 1
+    except Exception as e:
+        _LOGGER.warning("Failed to schedule reverse solver for %r in version %r: %r", package_name, package_version, e)
+        is_scheduled = 0
+
+    return is_scheduled
+
+
+def _schedule_security_indicator(openshift: OpenShift, package_name: str, package_version: str, index_url: str) -> int:
+    """Schedule Security Indicator."""
+    try:
+        analysis_id = openshift.schedule_security_indicator(
+            python_package_name=package_name,
+            python_package_version=package_version,
+            python_package_index=index_url,
+            aggregation_function="process_data",
+        )
+        _LOGGER.info(
+            "Scheduled SI %r for package %r in version %r from index %r, analysis is %r",
+            package_name,
+            package_version,
+            index_url,
+            analysis_id,
+        )
+        is_scheduled = 1
+    except Exception as e:
+        _LOGGER.warning(
+            f"Failed to schedule SI for package {package_name} in version {package_version} from index {index_url}: {e}"
+        )
+        is_scheduled = 0
+
+    return is_scheduled
