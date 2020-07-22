@@ -95,8 +95,8 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
     return (packages_to_solve, None)
 
 
-@metrics.EXCEPTIONS_COUNTER.count_exceptions()
-@metrics.IN_PROGRESS_GAUGE.track_inprogress()
+@metrics.exceptions.count_exceptions()
+@metrics.in_progress.track_inprogress()
 def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     """Parse unresolved package message."""
     package_name = unresolved_package.package_name
@@ -186,7 +186,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
         message_type=UnresolvedPackageMessage.topic_name, workflow_type="security-indicator"
     ).set(total_si_wfs_scheduled)
 
-    metrics.SUCCESSES_COUNTER.inc()
+    metrics.success.inc()
 
 
 def _check_package_version(package_name: str, package_version: Optional[str], index_url: str) -> List[str]:

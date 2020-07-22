@@ -21,33 +21,27 @@
 
 from thoth.investigator import __service_version__
 
-from prometheus_client import CollectorRegistry, Gauge, Counter
+from prometheus_client import Gauge, Counter
 
-
-# A registry for the consumer metrics...
-prometheus_registry = CollectorRegistry()
 
 # add the application version info metric
-_API_GAUGE_METRIC = Gauge(
-    "investigator_consumer_info", "Investigator Version Info", labelnames=["version"], registry=prometheus_registry,
+investigator_info = Gauge(
+    "investigator_consumer_info", "Investigator Version Info", labelnames=["version"]
 )
-_API_GAUGE_METRIC.labels(version=__service_version__).inc()
+investigator_info.labels(version=__service_version__).inc()
 
 # Metrics for Kafka
-IN_PROGRESS_GAUGE = Gauge(
+in_progress = Gauge(
     "investigators_in_progress",
-    "Total number of investigation messages currently being processed.",
-    registry=prometheus_registry,
+    "Total number of investigation messages currently being processed."
 )
-EXCEPTIONS_COUNTER = Counter(
+exceptions = Counter(
     "investigator_exceptions",
-    "Number of investigation messages which failed to be processed.",
-    registry=prometheus_registry,
+    "Number of investigation messages which failed to be processed."
 )
-SUCCESSES_COUNTER = Counter(
+success = Counter(
     "investigators_processed",
-    "Number of investigation messages which were successfully processed.",
-    registry=prometheus_registry,
+    "Number of investigation messages which were successfully processed."
 )
 
 # Scheduled workflows
