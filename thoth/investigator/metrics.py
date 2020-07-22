@@ -25,24 +25,13 @@ from prometheus_client import Gauge, Counter
 
 
 # add the application version info metric
-investigator_info = Gauge(
-    "investigator_consumer_info", "Investigator Version Info", labelnames=["version"]
-)
+investigator_info = Gauge("investigator_consumer_info", "Investigator Version Info", labelnames=["version"])
 investigator_info.labels(version=__service_version__).inc()
 
 # Metrics for Kafka
-in_progress = Gauge(
-    "investigators_in_progress",
-    "Total number of investigation messages currently being processed."
-)
-exceptions = Counter(
-    "investigator_exceptions",
-    "Number of investigation messages which failed to be processed."
-)
-success = Counter(
-    "investigators_processed",
-    "Number of investigation messages which were successfully processed."
-)
+in_progress = Gauge("investigators_in_progress", "Total number of investigation messages currently being processed.")
+exceptions = Counter("investigator_exceptions", "Number of investigation messages which failed to be processed.")
+success = Counter("investigators_processed", "Number of investigation messages which were successfully processed.")
 
 # Scheduled workflows
 investigator_scheduled_workflows = Gauge(
