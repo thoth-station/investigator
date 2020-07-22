@@ -66,3 +66,10 @@ all the things that you see...
 
 ## Release 0.2.6 (2020-07-17T15:20:36)
 * Add more logging (#94)
+
+## Release 0.2.7 (2020-07-22T10:22:55)
+* Feature/metrics (#108)
+* :pushpin: Automatic update of dependency hypothesis from 5.20.2 to 5.20.3 (#105)
+* Schedule workflows (#103)
+* :pushpin: Automatic update of dependency hypothesis from 5.20.1 to 5.20.2 (#102)
+* :pushpin: Automatic update of dependency hypothesis from 5.20.0 to 5.20.1 (#100)
