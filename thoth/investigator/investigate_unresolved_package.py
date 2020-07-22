@@ -35,9 +35,6 @@ from thoth.python import Pipfile
 from thoth.python import Source
 
 from thoth.investigator import metrics
-from thoth.investigator.metrics import IN_PROGRESS_GAUGE
-from thoth.investigator.metrics import EXCEPTIONS_COUNTER
-from thoth.investigator.metrics import SUCCESSES_COUNTER
 
 _LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
 _LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
@@ -98,8 +95,8 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
     return (packages_to_solve, None)
 
 
-@EXCEPTIONS_COUNTER.count_exceptions()
-@IN_PROGRESS_GAUGE.track_inprogress()
+@metrics.EXCEPTIONS_COUNTER.count_exceptions()
+@metrics.IN_PROGRESS_GAUGE.track_inprogress()
 def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     """Parse unresolved package message."""
     package_name = unresolved_package.package_name
@@ -189,7 +186,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
         message_type=UnresolvedPackageMessage.topic_name, workflow_type="security-indicator"
     ).set(total_si_wfs_scheduled)
 
-    SUCCESSES_COUNTER.inc()
+    metrics.SUCCESSES_COUNTER.inc()
 
 
 def _check_package_version(package_name: str, package_version: Optional[str], index_url: str) -> List[str]:
