@@ -29,23 +29,15 @@ from pathlib import Path
 
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
+from thoth.messaging import UnresolvedPackageMessage
 from thoth.common import OpenShift
 from thoth.python import Pipfile
 from thoth.python import Source
-from prometheus_client import Gauge, Counter
+
+from thoth.investigator import metrics
 
 _LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
 _LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
-
-IN_PROGRESS_GAUGE = Gauge(
-    "investigators_in_progress", "Total number of investigation messages currently being processed."
-)
-EXCEPTIONS_COUNTER = Counter(
-    "investigator_exceptions", "Number of investigation messages which failed to be processed."
-)
-SUCCESSES_COUNTER = Counter(
-    "investigators_processed", "Number of investigation messages which were successfully processed."
-)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -103,8 +95,8 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
     return (packages_to_solve, None)
 
 
-@EXCEPTIONS_COUNTER.count_exceptions()
-@IN_PROGRESS_GAUGE.track_inprogress()
+@metrics.exceptions.count_exceptions()
+@metrics.in_progress.track_inprogress()
 def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     """Parse unresolved package message."""
     package_name = unresolved_package.package_name
@@ -113,6 +105,10 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
     solver = unresolved_package.solver
 
     openshift = OpenShift()
+
+    total_solver_wfs_scheduled = 0
+    total_revsolver_wfs_scheduled = 0
+    total_si_wfs_scheduled = 0
 
     graph = GraphDatabase()
     graph.connect()
@@ -147,7 +143,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                 package_name=package_name, package_version=version, index_url=index_url
             )
 
-            learn_using_solver(
+            solver_wfs_scheduled = learn_using_solver(
                 openshift=openshift,
                 graph=graph,
                 is_present=is_present,
@@ -157,7 +153,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                 solver=solver,
             )
 
-            learn_using_revsolver(
+            revsolver_wfs_scheduled, revsolver_packages_seen = learn_using_revsolver(
                 openshift=openshift,
                 is_present=is_present,
                 package_name=package_name,
@@ -165,7 +161,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                 revsolver_packages_seen=revsolver_packages_seen,
             )
 
-            learn_about_security(
+            si_wfs_scheduled = learn_about_security(
                 openshift=openshift,
                 graph=graph,
                 is_present=is_present,
@@ -174,7 +170,23 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
                 index_url=index_url,
             )
 
-    SUCCESSES_COUNTER.inc()
+            total_solver_wfs_scheduled += solver_wfs_scheduled
+            total_revsolver_wfs_scheduled += revsolver_wfs_scheduled
+            total_si_wfs_scheduled += si_wfs_scheduled
+
+    metrics.investigator_scheduled_workflows.labels(
+        message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver"
+    ).set(total_solver_wfs_scheduled)
+
+    metrics.investigator_scheduled_workflows.labels(
+        message_type=UnresolvedPackageMessage.topic_name, workflow_type="revsolver"
+    ).set(total_revsolver_wfs_scheduled)
+
+    metrics.investigator_scheduled_workflows.labels(
+        message_type=UnresolvedPackageMessage.topic_name, workflow_type="security-indicator"
+    ).set(total_si_wfs_scheduled)
+
+    metrics.success.inc()
 
 
 def _check_package_version(package_name: str, package_version: Optional[str], index_url: str) -> List[str]:
