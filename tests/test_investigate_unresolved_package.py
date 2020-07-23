@@ -23,7 +23,6 @@ from pathlib import Path
 
 from .base_test import InvestigatorTestCase
 from thoth.investigator.investigate_unresolved_package import investigate_unresolved_package
-from thoth.investigator.investigate_unresolved_package import parse_unresolved_package_message
 
 
 class TestProducer(InvestigatorTestCase):
