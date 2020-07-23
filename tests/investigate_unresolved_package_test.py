@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""Test unresolved package handler."""
+"""Test investigator."""
 
 from tests.base_test import InvestigatorTestCase
 from thoth.investigator.investigate_unresolved_package import investigate_unresolved_package
