@@ -17,11 +17,7 @@
 
 """Test unresolved package handler."""
 
-import pytest
-
-from pathlib import Path
-
-from .base_test import InvestigatorTestCase
+from tests.base_test import InvestigatorTestCase
 from thoth.investigator.investigate_unresolved_package import investigate_unresolved_package
 
 
@@ -35,6 +31,6 @@ class TestProducer(InvestigatorTestCase):
         unresolved_packages, solver = investigate_unresolved_package(file_test_path=self._ADVISER_DOCUMENT_PATH)
         unresolved_package = unresolved_packages["black"]
         assert unresolved_package.name == "black"
-        assert unresolved_package.version is "*"
+        assert unresolved_package.version == "*"
         assert unresolved_package.index is None
         assert solver == "solver-rhel-8-py36"
