@@ -42,7 +42,7 @@ _LOGGER = logging.getLogger(__name__)
 _LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
 
 # initialize the application
-app = MessageBase.app
+app = MessageBase().app
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
 
 
