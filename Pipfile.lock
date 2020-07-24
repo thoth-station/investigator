@@ -737,11 +737,11 @@
         },
         "thoth-messaging": {
             "hashes": [
-                "sha256:33643aabdf38544dbcbeab6fbb3e6875a3ca87ff42a60de2a95c10e4c58a4d6d",
-                "sha256:86dbc7f4c6929a1394dd46c586c4eff64ae9683fc03be2fb83a4edb5e9e0b3c0"
+                "sha256:2f180bcf9037db00f988ebf56ac54d70bdcd42d5ba279e784836f2dbc0e39279",
+                "sha256:4f653e68675394f3e77c6e90d46ba55b2829703cfef4e5ed5dee08384e8d0449"
             ],
             "index": "pypi",
-            "version": "==0.5.0"
+            "version": "==0.6.0"
         },
         "thoth-python": {
             "hashes": [
@@ -772,7 +772,7 @@
                 "sha256:79ee589a3caca649a9bfd2a8de4709837400dfa00b6cc81962a1e6a1815969ae",
                 "sha256:f8d2bd89d25bc39dabe7d23df520442fa1d8969b82544370e03d88b5a591c392"
             ],
-            "markers": "python_version < '3.7'",
+            "markers": "python_version < '3.8'",
             "version": "==3.7.4.2"
         },
         "tzlocal": {
@@ -1161,15 +1161,15 @@
                 "sha256:79ee589a3caca649a9bfd2a8de4709837400dfa00b6cc81962a1e6a1815969ae",
                 "sha256:f8d2bd89d25bc39dabe7d23df520442fa1d8969b82544370e03d88b5a591c392"
             ],
-            "markers": "python_version < '3.7'",
+            "markers": "python_version < '3.8'",
             "version": "==3.7.4.2"
         },
         "virtualenv": {
             "hashes": [
-                "sha256:26cdd725a57fef4c7c22060dba4647ebd8ca377e30d1c1cf547b30a0b79c43b4",
-                "sha256:c51f1ba727d1614ce8fd62457748b469fbedfdab2c7e5dd480c9ae3fbe1233f1"
+                "sha256:688a61d7976d82b92f7906c367e83bb4b3f0af96f8f75bfcd3da95608fe8ac6c",
+                "sha256:8f582a030156282a9ee9d319984b759a232b07f86048c1d6a9e394afa44e78c8"
             ],
-            "version": "==20.0.27"
+            "version": "==20.0.28"
         },
         "wcwidth": {
             "hashes": [
