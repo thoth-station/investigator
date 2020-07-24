@@ -73,3 +73,12 @@ all the things that you see...
 * Schedule workflows (#103)
 * :pushpin: Automatic update of dependency hypothesis from 5.20.1 to 5.20.2 (#102)
 * :pushpin: Automatic update of dependency hypothesis from 5.20.0 to 5.20.1 (#100)
+
+## Release 0.3.0 (2020-07-24T08:36:19)
+* Update README (#120)
+* Adjust app initialization with new implementation in thoth-messaging (#115)
+* Add tests (#116)
+* :pushpin: Automatic update of dependency thoth-storages from 0.24.4 to 0.24.5 (#119)
+* :pushpin: Automatic update of dependency thoth-storages from 0.24.4 to 0.24.5 (#117)
+* :pushpin: Automatic update of dependency hypothesis from 5.20.3 to 5.21.0 (#118)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.3.7 to 0.5.0 (#114)
