@@ -27,7 +27,7 @@ from thoth.investigator.investigate_unresolved_package import investigate_unreso
 
 import asyncio
 
-app = MessageBase.app
+app = MessageBase().app
 
 DEBUG_LEVEL = bool(int(os.getenv("DEBUG_LEVEL", 0)))
 

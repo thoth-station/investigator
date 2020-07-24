@@ -5,8 +5,8 @@ verify_ssl = true
 
 [packages]
 thoth-common = "*"
-thoth-messaging= "*"
-thoth-storages= "*"
+thoth-messaging = "*"
+thoth-storages = "*"
 prometheus-client = "<0.7.0"
 thoth-python = "*"
 
