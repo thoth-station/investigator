@@ -49,7 +49,10 @@ async def main() -> None:
     for package in unresolved_packages:
         package_name = unresolved_packages[package].name
         package_version = unresolved_packages[package].version
-        sources = [unresolved_packages[package].index]
+
+        sources = []
+        if unresolved_packages[package].index:
+            sources = [unresolved_packages[package].index]
 
         try:
             async_tasks.append(
