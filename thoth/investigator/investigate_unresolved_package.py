@@ -136,7 +136,8 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
 
         revsolver_packages_seen: List[Tuple[str, str]] = []
 
-        for version in versions:
+        # Loop versions from the latest one
+        for version in versions[::-1]:
 
             # Check if package version index exists in Thoth Knowledge Graph
             is_present = graph.python_package_version_exists(
