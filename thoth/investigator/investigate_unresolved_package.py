@@ -193,7 +193,7 @@ def _check_package_version(package_name: str, package_version: Optional[str], in
     """Check package version."""
     versions = []
 
-    if not package_version:
+    if not package_version or package_version == "*":
         _LOGGER.debug("consider index %r", index_url)
         source = Source(index_url)
 
