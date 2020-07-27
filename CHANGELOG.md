@@ -82,3 +82,6 @@ all the things that you see...
 * :pushpin: Automatic update of dependency thoth-storages from 0.24.4 to 0.24.5 (#117)
 * :pushpin: Automatic update of dependency hypothesis from 5.20.3 to 5.21.0 (#118)
 * :pushpin: Automatic update of dependency thoth-messaging from 0.3.7 to 0.5.0 (#114)
+
+## Release 0.4.0 (2020-07-27T15:38:48)
+* Consider all versions explicitly and loop backward from latest (#124)
