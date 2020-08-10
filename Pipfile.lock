@@ -737,11 +737,11 @@
         },
         "thoth-messaging": {
             "hashes": [
-                "sha256:a02c8c84d81a6dafdf073131ec126f9d23a21aab18df4e26a6acdd5d510b1015",
-                "sha256:d9f2f4f0e60ba92a7974c12bc4d6ab90028ca0fadbee4c6b020aace9553b01db"
+                "sha256:09f11ebe3b63ca0788315c2e6d76ef84de6e27f0b4e5b9f625895f7429704c8c",
+                "sha256:6a990282ce7c7c41ec1bff0704c9c723cf2a7cadbefb30c87dd5718c176dc7a9"
             ],
             "index": "pypi",
-            "version": "==0.6.2"
+            "version": "==0.6.3"
         },
         "thoth-python": {
             "hashes": [
