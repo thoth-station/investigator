@@ -19,13 +19,7 @@
 """This file contains methods used by Thoth investigator to investigate on solved packages."""
 
 
-import sys
 import logging
-import json
-import os
-
-from typing import Optional, Dict, Any, List, Tuple
-from pathlib import Path
 
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
@@ -35,6 +29,8 @@ from thoth.common import OpenShift
 from thoth.investigator import metrics
 from thoth.investigator import common
 
+_LOGGER = logging.getLogger(__name__)
+
 
 @metrics.exceptions.count_exceptions()
 @metrics.in_progress.track_inprogress()
@@ -43,39 +39,20 @@ def parse_solved_package_message(solved_package: MessageBase) -> None:
     package_name = solved_package.package_name
     package_version = solved_package.package_version
     index_url: str = solved_package.index_url
-    solver: str = solved_package.solver
 
     openshift = OpenShift()
 
-    total_si_wfs_scheduled = 0
-
     graph = GraphDatabase()
     graph.connect()
-
-    # Adviser logic
-
-    # 1. Retrieve adviser ids for specific thoth_integrations with need_re_run == True
-
-    # 2. For each adviser ids retrieved:
-    # check if there are adviser ids with adviser_re_run_ids == adviser_id retrieved
-    # if yes do nothing (new adviser runs exist for adviser_id), else:
-
-    # 3. Check if the adviser run has unsolved packages corresponding to the solved one
-    # If yes, Schedule adviser workflow with adviser_re_run_id == adviser_id
-
-    # Check if package version index exists in Thoth Knowledge Graph
-    is_present = graph.python_package_version_exists(
-        package_name=package_name, package_version=version, index_url=index_url
-    )
 
     # SI logic
 
     si_wfs_scheduled = common.learn_about_security(
         openshift=openshift,
         graph=graph,
-        is_present=is_present,
+        is_present=True,
         package_name=package_name,
-        package_version=version,
+        package_version=package_version,
         index_url=index_url,
     )
 
