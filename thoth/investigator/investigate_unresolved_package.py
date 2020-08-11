@@ -200,7 +200,7 @@ def _check_package_version(package_name: str, package_version: Optional[str], in
 
         try:
             # Get sorted versions (latest first -> latest = versions[0])
-            versions = map(str, source.get_sorted_package_versions(package_name))
+            versions = list(map(str, source.get_sorted_package_versions(package_name)))
 
         except Exception as exc:
             _LOGGER.warning(
