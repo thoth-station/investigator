@@ -137,8 +137,7 @@ def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
         revsolver_packages_seen: List[Tuple[str, str]] = []
 
         # Loop versions from the latest one
-        # TODO: Create method in thoth-python for sorting
-        for version in versions[::-1]:
+        for version in versions:
 
             # Check if package version index exists in Thoth Knowledge Graph
             is_present = graph.python_package_version_exists(
@@ -200,7 +199,8 @@ def _check_package_version(package_name: str, package_version: Optional[str], in
         source = Source(index_url)
 
         try:
-            versions = source.get_package_versions(package_name)
+            # Get sorted versions (latest first -> latest = versions[0])
+            versions = source.get_sorted_package_versions(package_name)
 
         except Exception as exc:
             _LOGGER.warning(
