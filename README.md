@@ -29,7 +29,9 @@ to Kafka for each package release to be solved using Thoth [Solver](https://gith
 
 Consumer is currently able to handle the following Kafka messages:
 
-- [UnresolvedPackageMessage](https://github.com/thoth-station/messaging/blob/a579a480819a9b35123e9002243f4bba6d082929/thoth/messaging/unresolved_package.py#L35).
+#### UnresolvedPackageMessage
+
+- [UnresolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/unresolved_package.py).
 
 This message received contains:
 
@@ -45,3 +47,21 @@ Thoth investigator checks Thoth knowledge Graph and decides which workflows need
 - [Solver](https://github.com/thoth-station/solver) workflow
 - [Revsolver](https://github.com/thoth-station/revsolver) workflow
 - [Security Indicator](https://github.com/thoth-station/si-aggregator) workflow
+
+#### SolvedPackageMessage
+
+- [SolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/solved_package.py).
+
+This message received contains:
+
+```python
+package_name: str
+package_version: str
+index_url: str
+solver: str
+```
+
+Thoth investigator checks Thoth knowledge Graph and decides which workflows need to be scheduled to increase Thoth knowledge:
+
+- [Security Indicator](https://github.com/thoth-station/si-aggregator) workflow
+- [Adviser](https://github.com/thoth-station/adviser) workflow
