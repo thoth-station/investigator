@@ -91,7 +91,6 @@ def learn_using_revsolver(
     revsolver_packages_seen: List[Tuple[str, str]],
 ) -> Tuple[int, List[Tuple[str, str]]]:
     """Learn using revsolver about Package Version dependencies."""
-    # TODO: Create query in the database for package version revsolved
     if not is_present and (package_name, package_version) not in revsolver_packages_seen:
         # Package never seen (schedule revsolver workflow to collect knowledge for Thoth)
         is_revsolver_scheduled = _schedule_revsolver(
