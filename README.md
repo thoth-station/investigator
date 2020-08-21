@@ -64,4 +64,3 @@ solver: str
 Thoth investigator checks Thoth knowledge Graph and decides which workflows need to be scheduled to increase Thoth knowledge:
 
 - [Security Indicator](https://github.com/thoth-station/si-aggregator) workflow
-- [Adviser](https://github.com/thoth-station/adviser) workflow
