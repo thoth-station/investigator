@@ -98,21 +98,18 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
 
 @metrics.exceptions.count_exceptions()
 @metrics.in_progress.track_inprogress()
-def parse_unresolved_package_message(unresolved_package: MessageBase) -> None:
+def parse_unresolved_package_message(
+    unresolved_package: MessageBase, openshift: Openshift, graph: GraphDatabase
+) -> None:
     """Parse unresolved package message."""
     package_name = unresolved_package.package_name
     package_version = unresolved_package.package_version
     requested_indexes: Optional[List[str]] = unresolved_package.index_url
     solver = unresolved_package.solver
 
-    openshift = OpenShift()
-
     total_solver_wfs_scheduled = 0
     total_revsolver_wfs_scheduled = 0
     total_si_wfs_scheduled = 0
-
-    graph = GraphDatabase()
-    graph.connect()
 
     # Select indexes
     registered_indexes: List[str] = graph.get_python_package_index_urls_all()
@@ -343,7 +340,9 @@ def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version
         )
         is_scheduled = 1
     except Exception as e:
-        _LOGGER.exception("Failed to schedule reverse solver for %r in version %r: %r", package_name, package_version, e)
+        _LOGGER.exception(
+            "Failed to schedule reverse solver for %r in version %r: %r", package_name, package_version, e
+        )
         is_scheduled = 0
 
     return is_scheduled
