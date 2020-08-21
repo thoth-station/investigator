@@ -61,30 +61,3 @@ def parse_solved_package_message(solved_package: MessageBase) -> None:
     ).set(si_wfs_scheduled)
 
     metrics.success.inc()
-
-
-def _schedule_security_indicator(package_name: str, package_version: str, index_url: str) -> int:
-    """Schedule Security Indicator."""
-    openshift = OpenShift()
-    try:
-        analysis_id = openshift.schedule_security_indicator(
-            python_package_name=package_name,
-            python_package_version=package_version,
-            python_package_index=index_url,
-            aggregation_function="process_data",
-        )
-        _LOGGER.info(
-            "Scheduled SI %r for package %r in version %r from index %r, analysis is %r",
-            package_name,
-            package_version,
-            index_url,
-            analysis_id,
-        )
-        is_scheduled = 1
-    except Exception:
-        _LOGGER.warning(
-            f"Failed to schedule SI for package {package_name} in version {package_version} from index {index_url}"
-        )
-        is_scheduled = 0
-
-    return is_scheduled
