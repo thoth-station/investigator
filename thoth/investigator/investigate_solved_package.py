@@ -34,7 +34,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @metrics.exceptions.count_exceptions()
 @metrics.in_progress.track_inprogress()
-def parse_solved_package_message(solved_package: MessageBase, openshift: Openshift, graph: GraphDatabase) -> None:
+def parse_solved_package_message(solved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase) -> None:
     """Parse soolved package message."""
     package_name = solved_package.package_name
     package_version = solved_package.package_version

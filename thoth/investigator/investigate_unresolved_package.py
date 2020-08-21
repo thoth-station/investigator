@@ -99,7 +99,7 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
 @metrics.exceptions.count_exceptions()
 @metrics.in_progress.track_inprogress()
 def parse_unresolved_package_message(
-    unresolved_package: MessageBase, openshift: Openshift, graph: GraphDatabase
+    unresolved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase
 ) -> None:
     """Parse unresolved package message."""
     package_name = unresolved_package.package_name
