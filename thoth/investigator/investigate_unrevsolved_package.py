@@ -21,7 +21,6 @@
 
 import logging
 
-from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
 from thoth.messaging import UnrevsolvedPackageMessage
 from thoth.common import OpenShift
@@ -43,9 +42,9 @@ def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift:
 
     revsolver_wfs_scheduled, revsolver_packages_seen = common.learn_using_revsolver(
         openshift=openshift,
-        is_present=is_present,
+        is_present=True,
         package_name=package_name,
-        package_version=version,
+        package_version=package_version,
         revsolver_packages_seen=[],
     )
 
