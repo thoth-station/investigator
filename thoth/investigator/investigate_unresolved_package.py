@@ -306,7 +306,7 @@ def _schedule_solver(
         )
         is_scheduled = 1
     except Exception as e:
-        _LOGGER.warning(f"Failed to schedule solver {solver_name} for package {packages} from {indexes}: {e}")
+        _LOGGER.exception(f"Failed to schedule solver {solver_name} for package {packages} from {indexes}: {e}")
         is_scheduled = 0
 
     return is_scheduled
@@ -323,7 +323,7 @@ def _schedule_all_solvers(openshift: OpenShift, package_name: str, package_versi
         )
         are_scheduled = len(analysis_ids)
     except Exception as e:
-        _LOGGER.warning(f"Failed to schedule solvers for package {packages} from {indexes}: {e}")
+        _LOGGER.exception(f"Failed to schedule solvers for package {packages} from {indexes}: {e}")
         are_scheduled = 0
 
     return are_scheduled
@@ -343,7 +343,7 @@ def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version
         )
         is_scheduled = 1
     except Exception as e:
-        _LOGGER.warning("Failed to schedule reverse solver for %r in version %r: %r", package_name, package_version, e)
+        _LOGGER.exception("Failed to schedule reverse solver for %r in version %r: %r", package_name, package_version, e)
         is_scheduled = 0
 
     return is_scheduled

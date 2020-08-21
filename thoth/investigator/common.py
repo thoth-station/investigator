@@ -70,7 +70,7 @@ def _schedule_security_indicator(openshift: OpenShift, package_name: str, packag
         )
         is_scheduled = 1
     except Exception as e:
-        _LOGGER.warning(
+        _LOGGER.exception(
             f"Failed to schedule SI for package {package_name} in version {package_version} from index {index_url}: {e}"
         )
         is_scheduled = 0
