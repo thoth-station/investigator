@@ -24,8 +24,12 @@ import os
 
 from thoth.investigator import __service_version__
 
-from thoth.messaging import MessageBase, UnresolvedPackageMessage
+from thoth.messaging import MessageBase, UnresolvedPackageMessage, SolvedPackageMessage
 from thoth.investigator.investigate_unresolved_package import parse_unresolved_package_message
+from thoth.investigator.investigate_solved_package import parse_solved_package_message
+
+from thoth.common import OpenShift
+from thoth.storages.graph import GraphDatabase
 
 from aiohttp import web
 from prometheus_client import generate_latest
@@ -44,6 +48,12 @@ _LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
 # initialize the application
 app = MessageBase().app
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
+solved_package_message_topic = SolvedPackageMessage().topic
+
+openshift = OpenShift()
+graph = GraphDatabase()
+
+graph.connect()
 
 
 @app.page("/metrics")
@@ -63,7 +73,14 @@ async def get_health(self, request):
 async def consume_unresolved_package(unresolved_packages) -> None:
     """Loop when an unresolved package message is received."""
     async for unresolved_package in unresolved_packages:
-        parse_unresolved_package_message(unresolved_package=unresolved_package)
+        parse_unresolved_package_message(unresolved_package=unresolved_package, openshift=openshift, graph=graph)
+
+
+@app.agent(solved_package_message_topic)
+async def consume_solved_package(solved_packages) -> None:
+    """Loop when an unresolved package message is received."""
+    async for solved_package in solved_packages:
+        parse_solved_package_message(solved_package=solved_package, openshift=openshift, graph=graph)
 
 
 if __name__ == "__main__":
