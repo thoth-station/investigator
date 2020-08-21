@@ -40,7 +40,7 @@ def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift:
 
     # Revsolver logic
 
-    revsolver_wfs_scheduled, revsolver_packages_seen = common.learn_using_revsolver(
+    revsolver_wfs_scheduled, _ = common.learn_using_revsolver(
         openshift=openshift,
         is_present=True,
         package_name=package_name,
