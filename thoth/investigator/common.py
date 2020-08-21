@@ -18,12 +18,17 @@
 
 """This is Thoth investigator common methods."""
 
+import os
 import logging
+
+from typing import List, Tuple
 
 from thoth.common import OpenShift
 from thoth.storages import GraphDatabase
 
 _LOGGER = logging.getLogger(__name__)
+
+_LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
 
 
 def learn_about_security(
@@ -72,6 +77,49 @@ def _schedule_security_indicator(openshift: OpenShift, package_name: str, packag
     except Exception as e:
         _LOGGER.exception(
             f"Failed to schedule SI for package {package_name} in version {package_version} from index {index_url}: {e}"
+        )
+        is_scheduled = 0
+
+    return is_scheduled
+
+
+def learn_using_revsolver(
+    openshift: OpenShift,
+    is_present: bool,
+    package_name: str,
+    package_version: str,
+    revsolver_packages_seen: List[Tuple[str, str]],
+) -> Tuple[int, List[Tuple[str, str]]]:
+    """Learn using revsolver about Package Version dependencies."""
+    # TODO: Create query in the database for package version revsolved
+    if not is_present and (package_name, package_version) not in revsolver_packages_seen:
+        # Package never seen (schedule revsolver workflow to collect knowledge for Thoth)
+        is_revsolver_scheduled = _schedule_revsolver(
+            openshift=openshift, package_name=package_name, package_version=package_version
+        )
+        revsolver_packages_seen.append((package_name, package_version))
+
+        return is_revsolver_scheduled, revsolver_packages_seen
+
+    return 0, revsolver_packages_seen
+
+
+def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version: str) -> int:
+    """Schedule revsolver."""
+    try:
+        analysis_id = openshift.schedule_revsolver(
+            package_name=package_name, package_version=package_version, debug=_LOG_REVSOLVER
+        )
+        _LOGGER.info(
+            "Scheduled reverse solver for package %r in version %r, analysis is %r",
+            package_name,
+            package_version,
+            analysis_id,
+        )
+        is_scheduled = 1
+    except Exception as e:
+        _LOGGER.exception(
+            "Failed to schedule reverse solver for %r in version %r: %r", package_name, package_version, e
         )
         is_scheduled = 0
 
