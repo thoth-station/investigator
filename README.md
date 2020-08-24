@@ -48,6 +48,21 @@ Thoth investigator checks Thoth knowledge Graph and decides which workflows need
 - [Revsolver](https://github.com/thoth-station/revsolver) workflow
 - [Security Indicator](https://github.com/thoth-station/si-aggregator) workflow
 
+#### UnrevsolvedPackageMessage
+
+- [UnrevsolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/unrevsolved_package.py).
+
+This message received contains:
+
+```python
+package_name: str
+package_version: str
+```
+
+Thoth investigator checks Thoth knowledge Graph and decides which workflows need to be scheduled to increase Thoth knowledge:
+
+- [Revsolver](https://github.com/thoth-station/revsolver) workflow
+
 #### SolvedPackageMessage
 
 - [SolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/solved_package.py).

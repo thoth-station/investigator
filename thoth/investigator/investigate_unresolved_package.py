@@ -38,7 +38,6 @@ from thoth.investigator import metrics
 from thoth.investigator import common
 
 _LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
-_LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -156,7 +155,7 @@ def parse_unresolved_package_message(
 
             # Revsolver logic
 
-            revsolver_wfs_scheduled, revsolver_packages_seen = learn_using_revsolver(
+            revsolver_wfs_scheduled, revsolver_packages_seen = common.learn_using_revsolver(
                 openshift=openshift,
                 is_present=is_present,
                 package_name=package_name,
@@ -263,27 +262,6 @@ def learn_using_solver(
     return are_solvers_scheduled
 
 
-def learn_using_revsolver(
-    openshift: OpenShift,
-    is_present: bool,
-    package_name: str,
-    package_version: str,
-    revsolver_packages_seen: List[Tuple[str, str]],
-) -> Tuple[int, List[Tuple[str, str]]]:
-    """Learn using revsolver about Package Version dependencies."""
-    # TODO: Create query in the database for package version revsolved
-    if not is_present and (package_name, package_version) not in revsolver_packages_seen:
-        # Package never seen (schedule revsolver workflow to collect knowledge for Thoth)
-        is_revsolver_scheduled = _schedule_revsolver(
-            openshift=openshift, package_name=package_name, package_version=package_version
-        )
-        revsolver_packages_seen.append((package_name, package_version))
-
-        return is_revsolver_scheduled, revsolver_packages_seen
-
-    return 0, revsolver_packages_seen
-
-
 def _schedule_solver(
     openshift: OpenShift, package_name: str, package_version: str, indexes: List[str], solver_name: str
 ) -> int:
@@ -324,25 +302,3 @@ def _schedule_all_solvers(openshift: OpenShift, package_name: str, package_versi
         are_scheduled = 0
 
     return are_scheduled
-
-
-def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version: str) -> int:
-    """Schedule revsolver."""
-    try:
-        analysis_id = openshift.schedule_revsolver(
-            package_name=package_name, package_version=package_version, debug=_LOG_REVSOLVER
-        )
-        _LOGGER.info(
-            "Scheduled reverse solver for package %r in version %r, analysis is %r",
-            package_name,
-            package_version,
-            analysis_id,
-        )
-        is_scheduled = 1
-    except Exception as e:
-        _LOGGER.exception(
-            "Failed to schedule reverse solver for %r in version %r: %r", package_name, package_version, e
-        )
-        is_scheduled = 0
-
-    return is_scheduled
