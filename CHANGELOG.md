@@ -107,3 +107,7 @@ all the things that you see...
 * :pushpin: Automatic update of dependency thoth-common from 0.14.2 to 0.16.0 (#132)
 * :pushpin: Automatic update of dependency hypothesis from 5.21.0 to 5.23.2 (#131)
 * :pushpin: Automatic update of dependency hypothesis from 5.21.0 to 5.23.2 (#128)
+
+## Release 0.4.2 (2020-08-24T07:41:43)
+* :pushpin: Automatic update of dependency thoth-storages from 0.25.4 to 0.25.5 (#161)
+* Add methods to handle Unrevsolved Package Message (#159)
