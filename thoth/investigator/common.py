@@ -20,15 +20,20 @@
 
 import os
 import logging
+from urllib.parse import urlparse
 
 from typing import List, Tuple
 
 from thoth.common import OpenShift
 from thoth.storages import GraphDatabase
+from thoth.sourcemanagement.sourcemanagement import SourceManagement
+from thoth.sourcemanagement.enums import ServiceType
 
 _LOGGER = logging.getLogger(__name__)
 
 _LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
+GITHUB_PRIVATE_TOKEN = os.getenv("THOTH_GITHUB_PRIVATE_TOKEN")
+GITLAB_PRIVATE_TOKEN = os.getenv("THOTH_GITLAB_PRIVATE_TOKEN")
 
 
 def learn_about_security(
@@ -123,3 +128,18 @@ def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version
         is_scheduled = 0
 
     return is_scheduled
+
+
+def git_source_from_url(url: str) -> SourceManagement:
+    """Parse URL to get SourceManagement object."""
+    res = urlparse(url)
+    service_url = res.netloc
+    service_name = service_url.split(".")[-2]
+    service_type = ServiceType.by_name(service_name)
+    if service_type == ServiceType.GITHUB:
+        token = GITHUB_PRIVATE_TOKEN
+    elif service_type == ServiceType.GITLAB:
+        token = GITLAB_PRIVATE_TOKEN
+    else:
+        raise NotImplementedError("There is no token for this service type")
+    return SourceManagement(service_type, res.scheme + "://" + res.netloc, token, res.path)

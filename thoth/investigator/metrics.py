@@ -29,12 +29,24 @@ investigator_info = Gauge("investigator_consumer_info", "Investigator Version In
 investigator_info.labels(version=__service_version__).inc()
 
 # Metrics for Kafka
-in_progress = Gauge("investigators_in_progress", "Total number of investigation messages currently being processed.")
-exceptions = Counter("investigator_exceptions", "Number of investigation messages which failed to be processed.")
-success = Counter("investigators_processed", "Number of investigation messages which were successfully processed.")
+in_progress = Gauge(
+    "investigators_in_progress",
+    "Total number of investigation messages currently being processed.",
+    labelnames=["message_type"],
+)
+exceptions = Counter(
+    "investigator_exceptions",
+    "Number of investigation messages which failed to be processed.",
+    labelnames=["message_type"],
+)
+success = Counter(
+    "investigators_processed",
+    "Number of investigation messages which were successfully processed.",
+    lablenames=["message_type"],
+)
 
 # Scheduled workflows
-investigator_scheduled_workflows = Gauge(
+scheduled_workflows = Gauge(
     "thoth_investigator_scheduled_workflows",
     "Scheduled workflows by investigator per type.",
     ["message_type", "workflow_type"],

@@ -15,41 +15,46 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
-"""This file contains methods used by Thoth investigator to investigate on unrevsolved packages."""
-
+"""This file contains methods used by Thoth investigator to investigate on solved packages."""
 
 import logging
 
+from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
-from thoth.messaging import UnrevsolvedPackageMessage
+from thoth.messaging import SolvedPackageMessage
 from thoth.common import OpenShift
 
 from thoth.investigator import metrics
 from thoth.investigator import common
 
+from thoth.investigator.solved_package import solved_package_exceptions
+from thoth.investigator.solved_package import solved_package_success
+from thoth.investigator.solved_package import solved_package_in_progress
+
 _LOGGER = logging.getLogger(__name__)
 
 
-@metrics.exceptions.count_exceptions()
-@metrics.in_progress.track_inprogress()
-def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift: OpenShift) -> None:
+@solved_package_exceptions.count_exceptions()
+@solved_package_in_progress.track_inprogress()
+def parse_solved_package_message(solved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase) -> None:
     """Parse soolved package message."""
-    package_name = unrevsolved_package.package_name
-    package_version = unrevsolved_package.package_version
+    package_name = solved_package.package_name
+    package_version = solved_package.package_version
+    index_url: str = solved_package.index_url
 
-    # Revsolver logic
+    # SI logic
 
-    revsolver_wfs_scheduled, _ = common.learn_using_revsolver(
+    si_wfs_scheduled = common.learn_about_security(
         openshift=openshift,
+        graph=graph,
         is_present=True,
         package_name=package_name,
         package_version=package_version,
-        revsolver_packages_seen=[],
+        index_url=index_url,
     )
 
     metrics.investigator_scheduled_workflows.labels(
-        message_type=UnrevsolvedPackageMessage.topic_name, workflow_type="revsolver"
-    ).set(revsolver_wfs_scheduled)
+        message_type=SolvedPackageMessage.topic_name, workflow_type="security-indicator"
+    ).set(si_wfs_scheduled)
 
-    metrics.success.inc()
+    solved_package_success.inc()

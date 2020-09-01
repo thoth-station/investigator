@@ -28,9 +28,16 @@ from thoth.messaging import MessageBase
 from thoth.messaging import UnresolvedPackageMessage
 from thoth.messaging import UnrevsolvedPackageMessage
 from thoth.messaging import SolvedPackageMessage
-from thoth.investigator.investigate_unresolved_package import parse_unresolved_package_message
-from thoth.investigator.investigate_solved_package import parse_solved_package_message
-from thoth.investigator.investigate_unrevsolved_package import parse_revsolved_package_message
+from thoth.messaging import HashMismatchMessage
+from thoth.messaging import MissingPackageMessage
+from thoth.messaging import MissingVersionMessage
+
+from thoth.investigator import parse_hash_mismatch
+from thoth.investigator import parse_missing_package
+from thoth.investigator import parse_missing_version
+from thoth.investigator import parse_revsolved_package_message
+from thoth.investigator import parse_solved_package_message
+from thoth.investigator import parse_unresolved_package_message
 
 from thoth.common import OpenShift
 from thoth.storages.graph import GraphDatabase
@@ -54,6 +61,9 @@ app = MessageBase().app
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
 unrevsolved_package_message_topic = UnrevsolvedPackageMessage().topic
 solved_package_message_topic = SolvedPackageMessage().topic
+hash_mismatch_message_topic = HashMismatchMessage().topic
+missing_package_message_topic = MissingPackageMessage().topic
+missing_version_message_topic = MissingVersionMessage().topic
 
 openshift = OpenShift()
 graph = GraphDatabase()
@@ -93,6 +103,27 @@ async def consume_solved_package(solved_packages) -> None:
     """Loop when an unresolved package message is received."""
     async for solved_package in solved_packages:
         parse_solved_package_message(solved_package=solved_package, openshift=openshift, graph=graph)
+
+
+@app.agent(hash_mismatch_message_topic)
+async def consume_hash_mismatch(hash_mismatches):
+    """Loop when an hash mismatch message is received."""
+    async for hash_mismatch in hash_mismatches:
+        parse_hash_mismatch(mismatch=hash_mismatch, openshift=openshift, graph=graph)
+
+
+@app.agent(missing_package_message_topic)
+async def consume_missing_package(missing_packages):
+    """Loop when an missing package message is received."""
+    async for missing_package in missing_packages:
+        parse_missing_package(package=missing_package, openshift=openshift, graph=graph)
+
+
+@app.agent(missing_version_message_topic)
+async def consume_missing_version(missing_versions):
+    """Loop when an missing version message is received."""
+    async for missing_version in missing_versions:
+        parse_missing_version(version=missing_version, openshift=openshift, graph=graph)
 
 
 if __name__ == "__main__":
