@@ -31,6 +31,7 @@ from thoth.messaging import SolvedPackageMessage
 from thoth.messaging import HashMismatchMessage
 from thoth.messaging import MissingPackageMessage
 from thoth.messaging import MissingVersionMessage
+from thoth.messaging import AdviseJustificationMessage
 
 from thoth.investigator import parse_hash_mismatch
 from thoth.investigator import parse_missing_package
@@ -38,6 +39,7 @@ from thoth.investigator import parse_missing_version
 from thoth.investigator import parse_revsolved_package_message
 from thoth.investigator import parse_solved_package_message
 from thoth.investigator import parse_unresolved_package_message
+from thoth.investigator import expose_advise_justification_metrics
 
 from thoth.common import OpenShift
 from thoth.storages.graph import GraphDatabase
@@ -58,12 +60,15 @@ _LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
 
 # initialize the application
 app = MessageBase().app
+
+# Get all topics
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
 unrevsolved_package_message_topic = UnrevsolvedPackageMessage().topic
 solved_package_message_topic = SolvedPackageMessage().topic
 hash_mismatch_message_topic = HashMismatchMessage().topic
 missing_package_message_topic = MissingPackageMessage().topic
 missing_version_message_topic = MissingVersionMessage().topic
+advise_justification_message_topic = AdviseJustificationMessage().topic
 
 openshift = OpenShift()
 graph = GraphDatabase()
@@ -124,6 +129,13 @@ async def consume_missing_version(missing_versions):
     """Loop when an missing version message is received."""
     async for missing_version in missing_versions:
         parse_missing_version(version=missing_version, openshift=openshift, graph=graph)
+
+
+@app.agent(advise_justification_message_topic)
+async def consume_advise_justification(advise_justifications):
+    """Loop when an advise justification message is received."""
+    async for advise_justification in advise_justifications:
+        expose_advise_justification_metrics(advise_justification=advise_justification)
 
 
 if __name__ == "__main__":

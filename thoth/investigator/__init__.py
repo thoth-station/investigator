@@ -31,6 +31,7 @@ from .hash_mismatch import parse_hash_mismatch
 from .unresolved_package import parse_unresolved_package_message
 from .unrevsolved_package import parse_revsolved_package_message
 from .solved_package import parse_solved_package_message
+from .advise_justification import expose_advise_justification_metrics
 
 __version__ = "0.4.2"
 __service_version__ = (
@@ -49,4 +50,5 @@ __all__ = [
     "parse_unresolved_package_message",
     "parse_revsolved_package_message",
     "parse_solved_package_message",
+    "expose_advise_justification_metrics",
 ]
