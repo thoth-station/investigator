@@ -17,7 +17,7 @@
 
 """Set labels for missing_version metrics."""
 
-from thoth.investigator.metrics import in_progress, success, exceptions
+from ..metrics import in_progress, success, exceptions
 
 missing_version_in_progress = in_progress.labels(message_type="missing_version")
 missing_version_success = success.labels(message_type="missing_version")

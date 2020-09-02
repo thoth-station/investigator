@@ -17,7 +17,7 @@
 
 """Set labels for unrevsolved metrics."""
 
-from thoth.investigator.metrics import in_progress, success, exceptions
+from ..metrics import in_progress, success, exceptions
 
 unrevsolved_package_in_progress = in_progress.labels(message_type="unrevsolved_package")
 unrevsolved_package_success = success.labels(message_type="unrevsolved_package")

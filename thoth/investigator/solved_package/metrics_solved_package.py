@@ -17,7 +17,7 @@
 
 """Set labels for solved_package metrics."""
 
-from thoth.investigator.metrics import in_progress, success, exceptions
+from ..metrics import in_progress, success, exceptions
 
 solved_package_in_progress = in_progress.labels(message_type="solved_package")
 solved_package_success = success.labels(message_type="solved_package")

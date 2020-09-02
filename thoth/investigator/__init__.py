@@ -25,13 +25,6 @@ from thoth.messaging import __version__ as __messaging__version__
 from thoth.storages import __version__ as __storages__version__
 from thoth.python import __version__ as __python__version__
 
-__version__ = "0.4.2"
-__service_version__ = (
-    f"{__version__}+"
-    f"messaging.{__messaging__version__}.storages.{__storages__version__}."
-    f"common.{__common__version__}.python.{__python__version__}"
-)
-
 from .missing_package import parse_missing_package
 from .missing_version import parse_missing_version
 from .hash_mismatch import parse_hash_mismatch
@@ -39,6 +32,13 @@ from .unresolved_package import parse_unresolved_package_message
 from .unrevsolved_package import parse_revsolved_package_message
 from .solved_package import parse_solved_package_message
 from .advise_justification import expose_advise_justification_metrics
+
+__version__ = "0.4.2"
+__service_version__ = (
+    f"{__version__}+"
+    f"messaging.{__messaging__version__}.storages.{__storages__version__}."
+    f"common.{__common__version__}.python.{__python__version__}"
+)
 
 # Init logging here when gunicorn import this application.
 init_logging()

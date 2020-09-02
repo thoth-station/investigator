@@ -17,7 +17,7 @@
 
 """Set labels for hash_mismatch metrics."""
 
-from thoth.investigator.metrics import in_progress, success, exceptions
+from ..metrics import in_progress, success, exceptions
 
 hash_mismatch_in_progress = in_progress.labels(message_type="hash_mismatch")
 hash_mismatch_success = success.labels(message_type="hash_mismatch")
