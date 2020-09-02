@@ -40,6 +40,8 @@ package_name: str
 package_version: Optional[str]
 index_url: Optional[List[str]]
 solver: Optional[str]
+component_name: str
+service_version: str
 ```
 
 Thoth investigator checks Thoth knowledge Graph and decides which workflows need to be scheduled to increase Thoth knowledge:
@@ -57,6 +59,8 @@ This message received contains:
 ```python
 package_name: str
 package_version: str
+component_name: str
+service_version: str
 ```
 
 Thoth investigator checks Thoth knowledge Graph and decides which workflows need to be scheduled to increase Thoth knowledge:
@@ -74,6 +78,8 @@ package_name: str
 package_version: str
 index_url: str
 solver: str
+component_name: str
+service_version: str
 ```
 
 Thoth investigator checks Thoth knowledge Graph and decides which workflows need to be scheduled to increase Thoth knowledge:
@@ -90,6 +96,8 @@ This message received contains:
 message: str
 justification_type: str
 count: int
+component_name: str
+service_version: str
 ```
 
 These messages get processed to update advise justification metrics (`advise_justification_type_number`)
@@ -106,6 +114,8 @@ package_name: str
 package_version: str
 missing_from_source: List[str]
 missing_from_database: List[str]
+component_name: str
+service_version: str
 ```
 
 If the hashes for a package don't match on the database and package index we schedule workflows and update database.
@@ -119,6 +129,8 @@ This message received contains:
 ```python
 index_url: str
 package_name: str
+component_name: str
+service_version: str
 ```
 
 If package goes missing from a package index we mark all it as missing.
@@ -133,6 +145,8 @@ This message received contains:
 index_url: str
 package_name: str
 package_version: str
+component_name: str
+service_version: str
 ```
 
 If package version goes missing from a package index we mark it as missing.
