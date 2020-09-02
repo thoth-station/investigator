@@ -32,13 +32,13 @@ from thoth.messaging import MissingVersionMessage
 from thoth.messaging import AdviseJustificationMessage
 
 from thoth.investigator import __service_version__
-from thoth.investigator import parse_hash_mismatch
-from thoth.investigator import parse_missing_package
-from thoth.investigator import parse_missing_version
-from thoth.investigator import parse_revsolved_package_message
-from thoth.investigator import parse_solved_package_message
-from thoth.investigator import parse_unresolved_package_message
-from thoth.investigator import expose_advise_justification_metrics
+from thoth.investigator.hash_mismatch import parse_hash_mismatch
+from thoth.investigator.missing_package import parse_missing_package
+from thoth.investigator.missing_version import parse_missing_version
+from thoth.investigator.unrevsolved_package import parse_revsolved_package_message
+from thoth.investigator.solved_package import parse_solved_package_message
+from thoth.investigator.unesolved_package import parse_unresolved_package_message
+from thoth.investigator.advise_justification import expose_advise_justification_metrics
 
 from thoth.common import OpenShift
 from thoth.storages.graph import GraphDatabase
