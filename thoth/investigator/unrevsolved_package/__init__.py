@@ -17,14 +17,8 @@
 
 """The important parts for parsing unrevsolved_package messages."""
 
-from .metrics_unrevsolved_package import unrevsolved_package_success
-from .metrics_unrevsolved_package import unrevsolved_package_exceptions
-from .metrics_unrevsolved_package import unrevsolved_package_in_progress
 from .investigate_unrevsolved_package import parse_revsolved_package_message
 
 __all__ = [
-    "unrevsolved_package_success",
-    "unrevsolved_package_exceptions",
-    "unrevsolved_package_in_progress",
     "parse_revsolved_package_message",
 ]

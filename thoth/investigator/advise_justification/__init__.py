@@ -17,16 +17,8 @@
 
 """The important parts for exposing advise justification messages."""
 
-from .metrics_advise_justification import advise_justification_exceptions
-from .metrics_advise_justification import advise_justification_in_progress
-from .metrics_advise_justification import advise_justification_success
-from .metrics_advise_justification import advise_justification_type_number
 from .investigate_advise_justification import expose_advise_justification_metrics
 
 __all__ = [
-    "advise_justification_success",
-    "advise_justification_exceptions",
-    "advise_justification_in_progress",
-    "advise_justification_type_number",
     "expose_advise_justification_metrics",
 ]
