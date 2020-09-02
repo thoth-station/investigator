@@ -51,5 +51,4 @@ __all__ = [
     "parse_revsolved_package_message",
     "parse_solved_package_message",
     "expose_advise_justification_metrics",
-    "__service_version__",
 ]

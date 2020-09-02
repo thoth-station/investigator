@@ -23,11 +23,11 @@ from thoth.messaging import MessageBase
 from thoth.messaging import UnrevsolvedPackageMessage
 from thoth.common import OpenShift
 
-from thoth.investigator import common
-from thoth.investigator.unrevsolved_package import unrevsolved_package_exceptions
-from thoth.investigator.unrevsolved_package import unrevsolved_package_in_progress
-from thoth.investigator.unrevsolved_package import unrevsolved_package_success
-from thoth.investigator import metrics
+from .. import common
+from ..metrics import scheduled_workflows
+from .metrics_unrevsolved_package import unrevsolved_package_exceptions
+from .metrics_unrevsolved_package import unrevsolved_package_in_progress
+from .metrics_unrevsolved_package import unrevsolved_package_success
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,8 +49,8 @@ def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift:
         revsolver_packages_seen=[],
     )
 
-    metrics.investigator_scheduled_workflows.labels(
-        message_type=UnrevsolvedPackageMessage.topic_name, workflow_type="revsolver"
-    ).set(revsolver_wfs_scheduled)
+    scheduled_workflows.labels(message_type=UnrevsolvedPackageMessage.topic_name, workflow_type="revsolver").set(
+        revsolver_wfs_scheduled
+    )
 
     unrevsolved_package_success.inc()

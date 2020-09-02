@@ -19,10 +19,10 @@
 
 import re
 
-from thoth.investigator.missing_package import missing_package_exceptions
-from thoth.investigator.missing_package import missing_package_success
-from thoth.investigator.missing_package import missing_package_in_progress
-from thoth.investigator.common import git_source_from_url
+from .metrics_missing_package import missing_package_exceptions
+from .metrics_missing_package import missing_package_success
+from .metrics_missing_package import missing_package_in_progress
+from ..common import git_source_from_url
 
 
 @missing_package_exceptions.count_exceptions()

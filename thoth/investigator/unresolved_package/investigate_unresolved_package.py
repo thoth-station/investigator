@@ -32,11 +32,11 @@ from thoth.common import OpenShift
 from thoth.python import Pipfile
 from thoth.python import Source
 
-from thoth.investigator import metrics
-from thoth.investigator import common
-from thoth.investigator.unresolved_package import unresolved_package_exceptions
-from thoth.investigator.unresolved_package import unresolved_package_in_progress
-from thoth.investigator.unresolved_package import unresolved_package_success
+from ..metrics import scheduled_workflows
+from .. import common
+from .metrics_unresolved_package import unresolved_package_exceptions
+from .metrics_unresolved_package import unresolved_package_in_progress
+from .metrics_unresolved_package import unresolved_package_success
 
 _LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
 
@@ -179,15 +179,15 @@ def parse_unresolved_package_message(
             total_revsolver_wfs_scheduled += revsolver_wfs_scheduled
             total_si_wfs_scheduled += si_wfs_scheduled
 
-    metrics.investigator_scheduled_workflows.labels(
-        message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver"
-    ).set(total_solver_wfs_scheduled)
+    scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver").set(
+        total_solver_wfs_scheduled
+    )
 
-    metrics.investigator_scheduled_workflows.labels(
-        message_type=UnresolvedPackageMessage.topic_name, workflow_type="revsolver"
-    ).set(total_revsolver_wfs_scheduled)
+    scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="revsolver").set(
+        total_revsolver_wfs_scheduled
+    )
 
-    metrics.investigator_scheduled_workflows.labels(
+    scheduled_workflows.labels(
         message_type=UnresolvedPackageMessage.topic_name, workflow_type="security-indicator"
     ).set(total_si_wfs_scheduled)
 

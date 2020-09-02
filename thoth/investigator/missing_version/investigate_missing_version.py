@@ -19,10 +19,10 @@
 
 import logging
 
-from thoth.investigator.common import git_source_from_url
-from thoth.investigator.missing_version import missing_version_exceptions
-from thoth.investigator.missing_version import missing_version_in_progress
-from thoth.investigator.missing_version import missing_version_success
+from ..common import git_source_from_url
+from .metrics_missing_version import missing_version_exceptions
+from .metrics_missing_version import missing_version_in_progress
+from .metrics_missing_version import missing_version_success
 
 _LOGGER = logging.getLogger(__name__)
 

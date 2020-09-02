@@ -19,10 +19,10 @@
 
 import logging
 
-from thoth.investigator import common
-from thoth.investigator.hash_mismatch import hash_mismatch_exceptions
-from thoth.investigator.hash_mismatch import hash_mismatch_success
-from thoth.investigator.hash_mismatch import hash_mismatch_in_progress
+from .. import common
+from .metrics_hash_mismatch import hash_mismatch_exceptions
+from .metrics_hash_mismatch import hash_mismatch_success
+from .metrics_hash_mismatch import hash_mismatch_in_progress
 
 _LOGGER = logging.getLogger(__name__)
 

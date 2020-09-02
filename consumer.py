@@ -22,8 +22,6 @@
 import logging
 import os
 
-from thoth.investigator import __service_version__
-
 from thoth.messaging import MessageBase
 from thoth.messaging import UnresolvedPackageMessage
 from thoth.messaging import UnrevsolvedPackageMessage
@@ -33,6 +31,7 @@ from thoth.messaging import MissingPackageMessage
 from thoth.messaging import MissingVersionMessage
 from thoth.messaging import AdviseJustificationMessage
 
+from thoth.investigator import __service_version__
 from thoth.investigator import parse_hash_mismatch
 from thoth.investigator import parse_missing_package
 from thoth.investigator import parse_missing_version

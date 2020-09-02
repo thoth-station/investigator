@@ -20,10 +20,10 @@
 import logging
 import os
 
-from thoth.investigator.advise_justification import advise_justification_exceptions
-from thoth.investigator.advise_justification import advise_justification_success
-from thoth.investigator.advise_justification import advise_justification_in_progress
-from thoth.investigator.advise_justification import advise_justification_type_number
+from .metrics_advise_justification import advise_justification_exceptions
+from .metrics_advise_justification import advise_justification_success
+from .metrics_advise_justification import advise_justification_in_progress
+from .metrics_advise_justification import advise_justification_type_number
 
 _LOGGER = logging.getLogger(__name__)
 
