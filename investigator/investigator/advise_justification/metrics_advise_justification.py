@@ -18,7 +18,7 @@
 """Set labels for advise justification metrics."""
 
 from prometheus_client import Gauge
-from ..metrics import in_progress, success, exceptions
+from ..metrics import in_progress, success, exceptions, registry
 
 advise_justification_in_progress = in_progress.labels(message_type="advise_justification")
 advise_justification_success = success.labels(message_type="advise_justification")
@@ -29,4 +29,5 @@ advise_justification_type_number = Gauge(
     "thoth_advise_justification_type_number",
     "Number of advise justification provided per justification type.",
     ["advise_message", "justification_type", "thoth_environment"],
+    registry=registry,
 )
