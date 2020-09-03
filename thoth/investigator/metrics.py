@@ -19,7 +19,7 @@
 """This is Thoth investigator consumer metrics."""
 
 
-from thoth.investigator import __service_version__
+from . import __service_version__
 
 from prometheus_client import Gauge, Counter
 
