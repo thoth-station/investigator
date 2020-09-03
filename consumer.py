@@ -40,7 +40,7 @@ from investigator.investigator.solved_package import parse_solved_package_messag
 from investigator.investigator.unresolved_package import parse_unresolved_package_message
 from investigator.investigator.advise_justification import expose_advise_justification_metrics
 
-from thoth.common import OpenShift
+from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
 
 from aiohttp import web
@@ -73,6 +73,12 @@ openshift = OpenShift()
 graph = GraphDatabase()
 
 graph.connect()
+
+
+@app.task()
+async def after_initialization():
+    """Run things after the app has started."""
+    init_logging()
 
 
 @app.page("/metrics")
