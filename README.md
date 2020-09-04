@@ -198,7 +198,7 @@ These are extensions of the metrics in `thoth/investigator/metrics.py`
 The following is an example of a basic metrics file for a message `foo`:
 
 ```python
-from thoth.investigator.metrics import in_progress, success, exceptions
+from ..metrics import in_progress, success, exceptions
 
 foo_in_progress = in_progress.labels(message_type="foo")
 foo_success = success.labels(message_type="foo")
@@ -206,12 +206,9 @@ foo_exceptions = exceptions.labels(message_type="foo")
 ```
 
 You can add metrics as you see fit, but if the metric is not specific only to your messages please move it to
-thoth/investigator/metrics.py and set the proper labels to differentiate between messages.
+investigator/investigator/metrics.py and set the proper labels to differentiate between messages.
 
 ### Other additions
 
-- `thoth/investigator/<message_name>/__init__.py`, please add the function for parsing messages and all the metrics
-
-- `thoth/investigator/<message_name>/__init__.py`, add the function for parsing the new message
-
+- `investigator/investigator/<message_name>/__init__.py`, please add the function for parsing messages
 - `consumer.py`, add a new faust agent to process the message
