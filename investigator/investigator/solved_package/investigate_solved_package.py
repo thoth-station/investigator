@@ -15,9 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 """This file contains methods used by Thoth investigator to investigate on solved packages."""
-
 
 import logging
 
@@ -26,14 +24,18 @@ from thoth.messaging import MessageBase
 from thoth.messaging import SolvedPackageMessage
 from thoth.common import OpenShift
 
-from thoth.investigator import metrics
-from thoth.investigator import common
+from ..metrics import scheduled_workflows
+from .. import common
+
+from .metrics_solved_package import solved_package_exceptions
+from .metrics_solved_package import solved_package_success
+from .metrics_solved_package import solved_package_in_progress
 
 _LOGGER = logging.getLogger(__name__)
 
 
-@metrics.exceptions.count_exceptions()
-@metrics.in_progress.track_inprogress()
+@solved_package_exceptions.count_exceptions()
+@solved_package_in_progress.track_inprogress()
 def parse_solved_package_message(solved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase) -> None:
     """Parse soolved package message."""
     package_name = solved_package.package_name
@@ -51,8 +53,8 @@ def parse_solved_package_message(solved_package: MessageBase, openshift: OpenShi
         index_url=index_url,
     )
 
-    metrics.investigator_scheduled_workflows.labels(
-        message_type=SolvedPackageMessage.topic_name, workflow_type="security-indicator"
-    ).set(si_wfs_scheduled)
+    scheduled_workflows.labels(message_type=SolvedPackageMessage.topic_name, workflow_type="security-indicator").set(
+        si_wfs_scheduled
+    )
 
-    metrics.success.inc()
+    solved_package_success.inc()

@@ -15,9 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 """This file contains methods used by Thoth investigator to investigate on unresolved packages."""
-
 
 import sys
 import logging
@@ -34,8 +32,11 @@ from thoth.common import OpenShift
 from thoth.python import Pipfile
 from thoth.python import Source
 
-from thoth.investigator import metrics
-from thoth.investigator import common
+from ..metrics import scheduled_workflows
+from .. import common
+from .metrics_unresolved_package import unresolved_package_exceptions
+from .metrics_unresolved_package import unresolved_package_in_progress
+from .metrics_unresolved_package import unresolved_package_success
 
 _LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
 
@@ -95,8 +96,8 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
     return (packages_to_solve, None)
 
 
-@metrics.exceptions.count_exceptions()
-@metrics.in_progress.track_inprogress()
+@unresolved_package_exceptions.count_exceptions()
+@unresolved_package_in_progress.track_inprogress()
 def parse_unresolved_package_message(
     unresolved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase
 ) -> None:
@@ -178,19 +179,19 @@ def parse_unresolved_package_message(
             total_revsolver_wfs_scheduled += revsolver_wfs_scheduled
             total_si_wfs_scheduled += si_wfs_scheduled
 
-    metrics.investigator_scheduled_workflows.labels(
-        message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver"
-    ).set(total_solver_wfs_scheduled)
+    scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver").set(
+        total_solver_wfs_scheduled
+    )
 
-    metrics.investigator_scheduled_workflows.labels(
-        message_type=UnresolvedPackageMessage.topic_name, workflow_type="revsolver"
-    ).set(total_revsolver_wfs_scheduled)
+    scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="revsolver").set(
+        total_revsolver_wfs_scheduled
+    )
 
-    metrics.investigator_scheduled_workflows.labels(
+    scheduled_workflows.labels(
         message_type=UnresolvedPackageMessage.topic_name, workflow_type="security-indicator"
     ).set(total_si_wfs_scheduled)
 
-    metrics.success.inc()
+    unresolved_package_success.inc()
 
 
 def _check_package_version(package_name: str, package_version: Optional[str], index_url: str) -> List[str]:

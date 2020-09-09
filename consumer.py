@@ -22,17 +22,25 @@
 import logging
 import os
 
-from thoth.investigator import __service_version__
-
 from thoth.messaging import MessageBase
 from thoth.messaging import UnresolvedPackageMessage
 from thoth.messaging import UnrevsolvedPackageMessage
 from thoth.messaging import SolvedPackageMessage
-from thoth.investigator.investigate_unresolved_package import parse_unresolved_package_message
-from thoth.investigator.investigate_solved_package import parse_solved_package_message
-from thoth.investigator.investigate_unrevsolved_package import parse_revsolved_package_message
+from thoth.messaging import HashMismatchMessage
+from thoth.messaging import MissingPackageMessage
+from thoth.messaging import MissingVersionMessage
+from thoth.messaging import AdviseJustificationMessage
 
-from thoth.common import OpenShift
+from investigator.investigator import __service_version__
+from investigator.investigator.hash_mismatch import parse_hash_mismatch
+from investigator.investigator.missing_package import parse_missing_package
+from investigator.investigator.missing_version import parse_missing_version
+from investigator.investigator.unrevsolved_package import parse_revsolved_package_message
+from investigator.investigator.solved_package import parse_solved_package_message
+from investigator.investigator.unresolved_package import parse_unresolved_package_message
+from investigator.investigator.advise_justification import expose_advise_justification_metrics
+
+from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
 
 from aiohttp import web
@@ -51,14 +59,26 @@ _LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
 
 # initialize the application
 app = MessageBase().app
+
+# Get all topics
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
 unrevsolved_package_message_topic = UnrevsolvedPackageMessage().topic
 solved_package_message_topic = SolvedPackageMessage().topic
+hash_mismatch_message_topic = HashMismatchMessage().topic
+missing_package_message_topic = MissingPackageMessage().topic
+missing_version_message_topic = MissingVersionMessage().topic
+advise_justification_message_topic = AdviseJustificationMessage().topic
 
 openshift = OpenShift()
 graph = GraphDatabase()
 
 graph.connect()
+
+
+@app.task()
+async def after_initialization():
+    """Run things after the app has started."""
+    init_logging()
 
 
 @app.page("/metrics")
@@ -93,6 +113,34 @@ async def consume_solved_package(solved_packages) -> None:
     """Loop when an unresolved package message is received."""
     async for solved_package in solved_packages:
         parse_solved_package_message(solved_package=solved_package, openshift=openshift, graph=graph)
+
+
+@app.agent(hash_mismatch_message_topic)
+async def consume_hash_mismatch(hash_mismatches):
+    """Loop when an hash mismatch message is received."""
+    async for hash_mismatch in hash_mismatches:
+        parse_hash_mismatch(mismatch=hash_mismatch, openshift=openshift, graph=graph)
+
+
+@app.agent(missing_package_message_topic)
+async def consume_missing_package(missing_packages):
+    """Loop when an missing package message is received."""
+    async for missing_package in missing_packages:
+        parse_missing_package(package=missing_package, openshift=openshift, graph=graph)
+
+
+@app.agent(missing_version_message_topic)
+async def consume_missing_version(missing_versions):
+    """Loop when an missing version message is received."""
+    async for missing_version in missing_versions:
+        parse_missing_version(version=missing_version, openshift=openshift, graph=graph)
+
+
+@app.agent(advise_justification_message_topic)
+async def consume_advise_justification(advise_justifications):
+    """Loop when an advise justification message is received."""
+    async for advise_justification in advise_justifications:
+        expose_advise_justification_metrics(advise_justification=advise_justification)
 
 
 if __name__ == "__main__":

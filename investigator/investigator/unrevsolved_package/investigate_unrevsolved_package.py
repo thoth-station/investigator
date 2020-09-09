@@ -15,9 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 """This file contains methods used by Thoth investigator to investigate on unrevsolved packages."""
-
 
 import logging
 
@@ -25,14 +23,17 @@ from thoth.messaging import MessageBase
 from thoth.messaging import UnrevsolvedPackageMessage
 from thoth.common import OpenShift
 
-from thoth.investigator import metrics
-from thoth.investigator import common
+from .. import common
+from ..metrics import scheduled_workflows
+from .metrics_unrevsolved_package import unrevsolved_package_exceptions
+from .metrics_unrevsolved_package import unrevsolved_package_in_progress
+from .metrics_unrevsolved_package import unrevsolved_package_success
 
 _LOGGER = logging.getLogger(__name__)
 
 
-@metrics.exceptions.count_exceptions()
-@metrics.in_progress.track_inprogress()
+@unrevsolved_package_exceptions.count_exceptions()
+@unrevsolved_package_in_progress.track_inprogress()
 def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift: OpenShift) -> None:
     """Parse soolved package message."""
     package_name = unrevsolved_package.package_name
@@ -48,8 +49,8 @@ def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift:
         revsolver_packages_seen=[],
     )
 
-    metrics.investigator_scheduled_workflows.labels(
-        message_type=UnrevsolvedPackageMessage.topic_name, workflow_type="revsolver"
-    ).set(revsolver_wfs_scheduled)
+    scheduled_workflows.labels(message_type=UnrevsolvedPackageMessage.topic_name, workflow_type="revsolver").set(
+        revsolver_wfs_scheduled
+    )
 
-    metrics.success.inc()
+    unrevsolved_package_success.inc()
