@@ -111,3 +111,31 @@ all the things that you see...
 ## Release 0.4.2 (2020-08-24T07:41:43)
 * :pushpin: Automatic update of dependency thoth-storages from 0.25.4 to 0.25.5 (#161)
 * Add methods to handle Unrevsolved Package Message (#159)
+
+## Release 0.4.3 (2020-09-09T14:42:17)
+### Features
+* change directory name
+* create directory investigator
+* remove import of service version
+* change all to relative imports
+* include thoth-sourcemanagement
+* add service version to __all__
+* add component_name and service_version
+* add dev guide for parsing new message
+* add processing of advise justification messages
+### Bug Fixes
+* init logger after app initalizes
+### Improvements
+* simplify __init__.py
+* use relative import for metrics
+* new structure for investigator and move package update consumer
+### Automatic Updates
+* :pushpin: Automatic update of dependency thoth-common from 0.17.0 to 0.17.2 (#176)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.6.7 to 0.7.0 (#177)
+* :pushpin: Automatic update of dependency hypothesis from 5.29.1 to 5.30.0 (#174)
+* :pushpin: Automatic update of dependency thoth-common from 0.16.1 to 0.17.0 (#171)
+* :pushpin: Automatic update of dependency hypothesis from 5.28.0 to 5.29.1 (#173)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.6.5 to 0.6.7 (#172)
+* :pushpin: Automatic update of dependency hypothesis from 5.27.0 to 5.28.0 (#165)
+* :pushpin: Automatic update of dependency pytest-mypy from 0.6.2 to 0.7.0 (#163)
+* :pushpin: Automatic update of dependency hypothesis from 5.27.0 to 5.28.0 (#162)
