@@ -39,6 +39,8 @@ else:
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.info("Thoth Investigator producer v%s", __service_version__)
 
+_COMPONENT_NAME = "thoth-investigator"
+
 
 @app.command()
 async def main() -> None:
@@ -58,7 +60,12 @@ async def main() -> None:
             async_tasks.append(
                 unresolved_package.publish_to_topic(
                     unresolved_package.MessageContents(
-                        package_name=package_name, package_version=package_version, index_url=sources, solver=solver
+                        package_name=package_name,
+                        package_version=package_version,
+                        index_url=sources,
+                        solver=solver,
+                        service_version=__service_version__,
+                        component_name=_COMPONENT_NAME,
                     )
                 )
             )
