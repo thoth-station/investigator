@@ -139,3 +139,7 @@ all the things that you see...
 * :pushpin: Automatic update of dependency hypothesis from 5.27.0 to 5.28.0 (#165)
 * :pushpin: Automatic update of dependency pytest-mypy from 0.6.2 to 0.7.0 (#163)
 * :pushpin: Automatic update of dependency hypothesis from 5.27.0 to 5.28.0 (#162)
+
+## Release 0.4.4 (2020-09-10T09:42:39)
+### Features
+* add component and version to message (#185)
