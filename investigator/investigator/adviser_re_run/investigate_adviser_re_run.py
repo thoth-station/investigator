@@ -36,10 +36,7 @@ _LOGGER = logging.getLogger(__name__)
 @adviser_re_run_in_progress.track_inprogress()
 def parse_adviser_re_run_message(adviser_re_run: MessageBase, openshift: OpenShift) -> None:
     """Parse adviser re run message."""
-    adviser_wfs_scheduled = _re_schedule_adviser(
-        openshift=openshift,
-        parameters=adviser_re_run,
-    )
+    adviser_wfs_scheduled = _re_schedule_adviser(openshift=openshift, parameters=adviser_re_run,)
 
     scheduled_workflows.labels(message_type=AdviserReRunMessage.topic_name, workflow_type="adviser").set(
         adviser_wfs_scheduled
@@ -76,15 +73,11 @@ def _re_schedule_adviser(openshift: OpenShift, parameters: MessageBase) -> int:
         )
 
         _LOGGER.info(
-            "Re Scheduled Adviser for `failed` adviser run %r, analysis is %r",
-            re_run_adviser_id,
-            analysis_id,
+            "Re Scheduled Adviser for `failed` adviser run %r, analysis is %r", re_run_adviser_id, analysis_id,
         )
         is_scheduled = 1
     except Exception as e:
-        _LOGGER.exception(
-            f"Failed to schedule Adviser for `failed` adviser run {re_run_adviser_id}: {e}"
-        )
+        _LOGGER.exception(f"Failed to schedule Adviser for `failed` adviser run {re_run_adviser_id}: {e}")
         is_scheduled = 0
 
     return is_scheduled
