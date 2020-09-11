@@ -143,3 +143,11 @@ all the things that you see...
 ## Release 0.4.4 (2020-09-10T09:42:39)
 ### Features
 * add component and version to message (#185)
+
+## Release 0.4.5 (2020-09-11T14:15:26)
+### Features
+* Add Investigate AdviserReRunMessage to Investigator (#192)
+### Automatic Updates
+* :pushpin: Automatic update of dependency hypothesis from 5.33.2 to 5.35.0 (#193)
+* :pushpin: Automatic update of dependency thoth-storages from 0.25.6 to 0.25.7 (#191)
+* :pushpin: Automatic update of dependency thoth-common from 0.18.0 to 0.18.1 (#190)
