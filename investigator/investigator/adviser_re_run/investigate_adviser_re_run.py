@@ -50,16 +50,16 @@ def parse_adviser_re_run_message(adviser_re_run: MessageBase, openshift: OpenShi
 
 def _re_schedule_adviser(openshift: OpenShift, parameters: MessageBase) -> int:
     """Re-Schedule Adviser."""
-    re_run_adviser_id = adviser_re_run.adviser_id
-    application_stack = adviser_re_run.application_stack
-    recommendation_type = adviser_re_run.recommendation_type
-    runtime_environment = adviser_re_run.runtime_environment
-    origin = adviser_re_run.origin
-    github_event_type = adviser_re_run.github_event_type
-    github_check_run_id = adviser_re_run.github_check_run_id
-    github_installation_id = adviser_re_run.github_installation_id
-    github_base_repo_url = adviser_re_run.github_base_repo_url
-    source_type = adviser_re_run.source_type
+    re_run_adviser_id = parameters.adviser_id
+    application_stack = parameters.application_stack
+    recommendation_type = parameters.recommendation_type
+    runtime_environment = parameters.runtime_environment
+    origin = parameters.origin
+    github_event_type = parameters.github_event_type
+    github_check_run_id = parameters.github_check_run_id
+    github_installation_id = parameters.github_installation_id
+    github_base_repo_url = parameters.github_base_repo_url
+    source_type = parameters.source_type
 
     try:
         analysis_id = openshift.schedule_adviser(
