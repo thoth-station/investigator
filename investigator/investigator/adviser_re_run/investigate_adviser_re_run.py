@@ -38,7 +38,7 @@ def parse_adviser_re_run_message(adviser_re_run: MessageBase, openshift: OpenShi
     """Parse adviser re run message."""
     adviser_wfs_scheduled = _re_schedule_adviser(openshift=openshift, parameters=adviser_re_run,)
 
-    scheduled_workflows.labels(message_type=AdviserReRunMessage.topic_name, workflow_type="adviser").set(
+    scheduled_workflows.labels(message_type=AdviserReRunMessage.topic_name, workflow_type="adviser").inc(
         adviser_wfs_scheduled
     )
 

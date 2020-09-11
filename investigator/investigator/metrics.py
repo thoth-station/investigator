@@ -52,7 +52,7 @@ success = Counter(
 )
 
 # Scheduled workflows
-scheduled_workflows = Gauge(
+scheduled_workflows = Counter(
     "thoth_investigator_scheduled_workflows",
     "Scheduled workflows by investigator per type.",
     ["message_type", "workflow_type"],

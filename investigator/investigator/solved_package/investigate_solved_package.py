@@ -53,7 +53,7 @@ def parse_solved_package_message(solved_package: MessageBase, openshift: OpenShi
         index_url=index_url,
     )
 
-    scheduled_workflows.labels(message_type=SolvedPackageMessage.topic_name, workflow_type="security-indicator").set(
+    scheduled_workflows.labels(message_type=SolvedPackageMessage.topic_name, workflow_type="security-indicator").inc(
         si_wfs_scheduled
     )
 

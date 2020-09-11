@@ -49,7 +49,7 @@ def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift:
         revsolver_packages_seen=[],
     )
 
-    scheduled_workflows.labels(message_type=UnrevsolvedPackageMessage.topic_name, workflow_type="revsolver").set(
+    scheduled_workflows.labels(message_type=UnrevsolvedPackageMessage.topic_name, workflow_type="revsolver").inc(
         revsolver_wfs_scheduled
     )
 
