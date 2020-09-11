@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""The important parts for exposing advise justification messages."""
+"""The important parts for parsing adviser re run messages."""
 
 from .investigate_adviser_re_run import parse_adviser_re_run_message
 
