@@ -65,14 +65,14 @@ _LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
 app = MessageBase().app
 
 # Get all topics
-unresolved_package_message_topic = UnresolvedPackageMessage().topic
-unrevsolved_package_message_topic = UnrevsolvedPackageMessage().topic
-solved_package_message_topic = SolvedPackageMessage().topic
+advise_justification_message_topic = AdviseJustificationMessage().topic
+adviser_re_run_message_topic = AdviserReRunMessage().topic
 hash_mismatch_message_topic = HashMismatchMessage().topic
 missing_package_message_topic = MissingPackageMessage().topic
 missing_version_message_topic = MissingVersionMessage().topic
-advise_justification_message_topic = AdviseJustificationMessage().topic
-adviser_re_run_message_topic = AdviserReRunMessage().topic
+solved_package_message_topic = SolvedPackageMessage().topic
+unresolved_package_message_topic = UnresolvedPackageMessage().topic
+unrevsolved_package_message_topic = UnrevsolvedPackageMessage().topic
 
 openshift = OpenShift()
 graph = GraphDatabase()
