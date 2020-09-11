@@ -23,22 +23,26 @@ import logging
 import os
 
 from thoth.messaging import MessageBase
-from thoth.messaging import UnresolvedPackageMessage
-from thoth.messaging import UnrevsolvedPackageMessage
-from thoth.messaging import SolvedPackageMessage
+from thoth.messaging import AdviseJustificationMessage
+from thoth.messaging import AdviserReRunMessage
 from thoth.messaging import HashMismatchMessage
 from thoth.messaging import MissingPackageMessage
 from thoth.messaging import MissingVersionMessage
-from thoth.messaging import AdviseJustificationMessage
+from thoth.messaging import SolvedPackageMessage
+from thoth.messaging import UnresolvedPackageMessage
+from thoth.messaging import UnrevsolvedPackageMessage
+
 
 from investigator.investigator import __service_version__
+from investigator.investigator.advise_justification import expose_advise_justification_metrics
+from investigator.investigator.adviser_re_run import parse_adviser_re_run_message
 from investigator.investigator.hash_mismatch import parse_hash_mismatch
 from investigator.investigator.missing_package import parse_missing_package
 from investigator.investigator.missing_version import parse_missing_version
-from investigator.investigator.unrevsolved_package import parse_revsolved_package_message
 from investigator.investigator.solved_package import parse_solved_package_message
+from investigator.investigator.unrevsolved_package import parse_revsolved_package_message
 from investigator.investigator.unresolved_package import parse_unresolved_package_message
-from investigator.investigator.advise_justification import expose_advise_justification_metrics
+
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -68,6 +72,7 @@ hash_mismatch_message_topic = HashMismatchMessage().topic
 missing_package_message_topic = MissingPackageMessage().topic
 missing_version_message_topic = MissingVersionMessage().topic
 advise_justification_message_topic = AdviseJustificationMessage().topic
+adviser_re_run_message_topic = AdviserReRunMessage().topic
 
 openshift = OpenShift()
 graph = GraphDatabase()
@@ -141,6 +146,13 @@ async def consume_advise_justification(advise_justifications):
     """Loop when an advise justification message is received."""
     async for advise_justification in advise_justifications:
         expose_advise_justification_metrics(advise_justification=advise_justification)
+
+
+@app.agent(adviser_re_run_message_topic)
+async def consume_adviser_re_run(adviser_re_runs):
+    """Loop when an adviser re run message is received."""
+    async for adviser_re_run in adviser_re_runs:
+        parse_adviser_re_run_message(adviser_re_run=adviser_re_run, openshift=openshift)
 
 
 if __name__ == "__main__":
