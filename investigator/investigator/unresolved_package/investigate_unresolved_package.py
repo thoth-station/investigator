@@ -179,17 +179,17 @@ def parse_unresolved_package_message(
             total_revsolver_wfs_scheduled += revsolver_wfs_scheduled
             total_si_wfs_scheduled += si_wfs_scheduled
 
-    scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver").set(
+    scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver").inc(
         total_solver_wfs_scheduled
     )
 
-    scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="revsolver").set(
+    scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="revsolver").inc(
         total_revsolver_wfs_scheduled
     )
 
     scheduled_workflows.labels(
         message_type=UnresolvedPackageMessage.topic_name, workflow_type="security-indicator"
-    ).set(total_si_wfs_scheduled)
+    ).inc(total_si_wfs_scheduled)
 
     unresolved_package_success.inc()
 
