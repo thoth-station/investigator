@@ -99,25 +99,18 @@ async def get_health(self, request):
     return web.json_response(data)
 
 
-@app.agent(unresolved_package_message_topic)
-async def consume_unresolved_package(unresolved_packages) -> None:
-    """Loop when an unresolved package message is received."""
-    async for unresolved_package in unresolved_packages:
-        parse_unresolved_package_message(unresolved_package=unresolved_package, openshift=openshift, graph=graph)
+@app.agent(advise_justification_message_topic)
+async def consume_advise_justification(advise_justifications):
+    """Loop when an advise justification message is received."""
+    async for advise_justification in advise_justifications:
+        expose_advise_justification_metrics(advise_justification=advise_justification)
 
 
-@app.agent(unrevsolved_package_message_topic)
-async def consume_unrevsolved_package(unrevsolved_packages) -> None:
-    """Loop when an unresolved package message is received."""
-    async for unrevsolved_package in unrevsolved_packages:
-        parse_revsolved_package_message(unrevsolved_package=unrevsolved_package, openshift=openshift)
-
-
-@app.agent(solved_package_message_topic)
-async def consume_solved_package(solved_packages) -> None:
-    """Loop when an unresolved package message is received."""
-    async for solved_package in solved_packages:
-        parse_solved_package_message(solved_package=solved_package, openshift=openshift, graph=graph)
+@app.agent(adviser_re_run_message_topic)
+async def consume_adviser_re_run(adviser_re_runs):
+    """Loop when an adviser re run message is received."""
+    async for adviser_re_run in adviser_re_runs:
+        parse_adviser_re_run_message(adviser_re_run=adviser_re_run, openshift=openshift)
 
 
 @app.agent(hash_mismatch_message_topic)
@@ -141,18 +134,25 @@ async def consume_missing_version(missing_versions):
         parse_missing_version(version=missing_version, openshift=openshift, graph=graph)
 
 
-@app.agent(advise_justification_message_topic)
-async def consume_advise_justification(advise_justifications):
-    """Loop when an advise justification message is received."""
-    async for advise_justification in advise_justifications:
-        expose_advise_justification_metrics(advise_justification=advise_justification)
+@app.agent(solved_package_message_topic)
+async def consume_solved_package(solved_packages) -> None:
+    """Loop when an unresolved package message is received."""
+    async for solved_package in solved_packages:
+        parse_solved_package_message(solved_package=solved_package, openshift=openshift, graph=graph)
 
 
-@app.agent(adviser_re_run_message_topic)
-async def consume_adviser_re_run(adviser_re_runs):
-    """Loop when an adviser re run message is received."""
-    async for adviser_re_run in adviser_re_runs:
-        parse_adviser_re_run_message(adviser_re_run=adviser_re_run, openshift=openshift)
+@app.agent(unresolved_package_message_topic)
+async def consume_unresolved_package(unresolved_packages) -> None:
+    """Loop when an unresolved package message is received."""
+    async for unresolved_package in unresolved_packages:
+        parse_unresolved_package_message(unresolved_package=unresolved_package, openshift=openshift, graph=graph)
+
+
+@app.agent(unrevsolved_package_message_topic)
+async def consume_unrevsolved_package(unrevsolved_packages) -> None:
+    """Loop when an unresolved package message is received."""
+    async for unrevsolved_package in unrevsolved_packages:
+        parse_revsolved_package_message(unrevsolved_package=unrevsolved_package, openshift=openshift)
 
 
 if __name__ == "__main__":
