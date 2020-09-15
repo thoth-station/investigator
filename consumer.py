@@ -157,11 +157,15 @@ async def consume_unrevsolved_package(unrevsolved_packages) -> None:
     async for unrevsolved_package in unrevsolved_packages:
         parse_revsolved_package_message(unrevsolved_package=unrevsolved_package, openshift=openshift)
 
+
 @app.agent(si_unanalyzed_package_message_topic)
 async def consume_si_unanalyzed_package(si_unanalyzed_packages) -> None:
     """Loop when an SI Unanalyzed package message is received."""
     async for si_unanalyzed_package in si_unanalyzed_packages:
-        parse_si_unanalyzed_package_message(si_unanalyzed_package=si_unanalyzed_package, openshift=openshift, graph=graph)
+        parse_si_unanalyzed_package_message(
+            si_unanalyzed_package=si_unanalyzed_package, openshift=openshift, graph=graph
+        )
+
 
 if __name__ == "__main__":
     app.main()

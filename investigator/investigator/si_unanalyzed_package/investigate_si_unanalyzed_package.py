@@ -17,6 +17,8 @@
 
 """This file contains methods used by Thoth investigator to investigate on si unanalyzed packages."""
 
+import os
+import logging
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
 from thoth.messaging import SIUnanalyzedPackageMessage
@@ -32,7 +34,6 @@ from .metrics_si_unanalyzed_package import si_unanalyzed_package_exceptions
 _LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
 
 _LOGGER = logging.getLogger(__name__)
-
 
 
 @si_unanalyzed_package_exceptions.count_exceptions()
@@ -56,8 +57,8 @@ def parse_si_unanalyzed_package_message(
         index_url=index_url,
     )
 
-    scheduled_workflows.labels(message_type=SIUnanalyzedPackageMessage.topic_name, workflow_type="security-indicator").inc(
-        si_wfs_scheduled
-    )
+    scheduled_workflows.labels(
+        message_type=SIUnanalyzedPackageMessage.topic_name, workflow_type="security-indicator"
+    ).inc(si_wfs_scheduled)
 
     si_unanalyzed_package_success.inc()
