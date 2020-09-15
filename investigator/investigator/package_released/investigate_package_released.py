@@ -39,7 +39,7 @@ def parse_package_released_message(package_released: MessageBase, openshift: Ope
 
     # Solver logic
 
-    common.learn_using_solver(
+    solver_wf_scheduled = common.learn_using_solver(
         openshift=openshift,
         graph=graph,
         is_present=False,
@@ -50,13 +50,13 @@ def parse_package_released_message(package_released: MessageBase, openshift: Ope
 
     # Revsolver logic
 
-    common.learn_using_revsolver(
+    revsolver_wf_scheduled, _ = common.learn_using_revsolver(
         openshift=openshift, is_present=False, package_name=package_name, package_version=package_version,
     )
 
     # SI logic
 
-    common.learn_about_security(
+    si_wf_scheduled = common.learn_about_security(
         openshift=openshift,
         graph=graph,
         is_present=False,
@@ -65,10 +65,16 @@ def parse_package_released_message(package_released: MessageBase, openshift: Ope
         package_version=package_version,
     )
 
-    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="solver").inc()
+    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="solver").inc(
+        solver_wf_scheduled
+    )
 
-    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="revsolver").inc()
+    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="revsolver").inc(
+        revsolver_wf_scheduled
+    )
 
-    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="security-indicator").inc()
+    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="security-indicator").inc(
+        si_wf_scheduled
+    )
 
     package_released_success.inc()
