@@ -22,7 +22,7 @@ import os
 import logging
 from math import inf
 from urllib.parse import urlparse
-import asyncio
+from time import sleep
 
 from typing import List, Tuple
 
@@ -43,7 +43,11 @@ def _limit_pending_workflows(openshift: OpenShift, limit: int):
         def inner_func1(*args, **kwargs):
             total_pending = inf
             while total_pending > limit:
-                asyncio.sleep(0.5)
+                #####################################################################################################
+                # to make this awaitable would require a major rework because of the number of sync functions which #
+                # call submit_workflow.                                                                             #
+                #####################################################################################################
+                sleep(0.5)
                 total_pending = openshift.workflow_manager.get_pending_workflows()
             func(*args, **kwargs)
 
