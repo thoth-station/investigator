@@ -139,7 +139,7 @@ def learn_using_solver(
     package_name: str,
     index_url: str,
     package_version: str,
-    solver: Optional[str],
+    solver: Optional[str] = None,
 ) -> int:
     """Learn using solver about Package Version Index dependencies."""
     if not is_present:
