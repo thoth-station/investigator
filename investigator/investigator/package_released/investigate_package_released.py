@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""This file contains methods used by Thoth investigator to investigate on package releases."""
+"""This file contains methods used by Thoth investigator to investigate on package released messages."""
 
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
