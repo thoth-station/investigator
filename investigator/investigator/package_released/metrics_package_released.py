@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""The important parts for parsing package_release messages."""
+"""Set labels for package_released metrics."""
 
-from .investigate_package_release import parse_package_release_message
+from ..metrics import in_progress, success, exceptions
 
-__all__ = [
-    "parse_package_release_message",
-]
+package_released_in_progress = in_progress.labels(message_type="package_released")
+package_released_success = success.labels(message_type="package_released")
+package_released_exceptions = exceptions.labels(message_type="package_released")

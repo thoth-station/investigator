@@ -19,23 +19,23 @@
 
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
-from thoth.messaging import PackageReleaseMessage
+from thoth.messaging import PackageReleasedMessage
 from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
 from .. import common
-from .metrics_package_release import package_release_exceptions
-from .metrics_package_release import package_release_in_progress
-from .metrics_package_release import package_release_success
+from .metrics_package_released import package_released_exceptions
+from .metrics_package_released import package_released_in_progress
+from .metrics_package_released import package_released_success
 
 
-@package_release_exceptions.count_exceptions()
-@package_release_in_progress.track_inprogress()
-def parse_package_release_message(package_release: MessageBase, openshift: OpenShift, graph: GraphDatabase) -> None:
-    """Parse package release message."""
-    package_name = package_release.package_name
-    package_version = package_release.package_version
-    index_url = package_release.index_url
+@package_released_exceptions.count_exceptions()
+@package_released_in_progress.track_inprogress()
+def parse_package_released_message(package_released: MessageBase, openshift: OpenShift, graph: GraphDatabase) -> None:
+    """Parse package released message."""
+    package_name = package_released.package_name
+    package_version = package_released.package_version
+    index_url = package_released.index_url
 
     common.learn_using_solver(
         openshift=openshift,
@@ -46,6 +46,6 @@ def parse_package_release_message(package_release: MessageBase, openshift: OpenS
         package_version=package_version,
     )
 
-    scheduled_workflows.labels(message_type=PackageReleaseMessage.topic_name, workflow_type="solver").inc()
+    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="solver").inc()
 
-    package_release_success.inc()
+    package_released_success.inc()
