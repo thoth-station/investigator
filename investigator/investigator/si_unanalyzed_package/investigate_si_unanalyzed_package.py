@@ -17,7 +17,6 @@
 
 """This file contains methods used by Thoth investigator to investigate on si unanalyzed packages."""
 
-import os
 import logging
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
@@ -30,8 +29,6 @@ from .. import common
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_in_progress
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_success
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_exceptions
-
-_LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
 
 _LOGGER = logging.getLogger(__name__)
 
