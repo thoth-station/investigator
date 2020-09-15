@@ -20,7 +20,9 @@
 
 import os
 import logging
+from math import inf
 from urllib.parse import urlparse
+import asyncio
 
 from typing import List, Tuple
 
@@ -34,6 +36,20 @@ _LOGGER = logging.getLogger(__name__)
 _LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
 GITHUB_PRIVATE_TOKEN = os.getenv("THOTH_GITHUB_PRIVATE_TOKEN")
 GITLAB_PRIVATE_TOKEN = os.getenv("THOTH_GITLAB_PRIVATE_TOKEN")
+
+
+def _limit_pending_workflows(openshift: OpenShift, limit: int):
+    def wait_for_limit(func):
+        def inner_func1(*args, **kwargs):
+            total_pending = inf
+            while total_pending > limit:
+                asyncio.sleep(0.5)
+                total_pending = openshift.workflow_manager.get_pending_workflows()
+            func(*args, **kwargs)
+
+        return inner_func1
+
+    return wait_for_limit
 
 
 def learn_about_security(

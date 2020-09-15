@@ -43,6 +43,7 @@ from investigator.investigator.solved_package import parse_solved_package_messag
 from investigator.investigator.unrevsolved_package import parse_revsolved_package_message
 from investigator.investigator.unresolved_package import parse_unresolved_package_message
 
+from investigator.investigator import common
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -61,6 +62,8 @@ else:
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
 
+_PENDING_WORKFLOW_LIMIT = os.getenv("ARGO_PENDING_WORKFLOW_LIMIT", None)
+
 # initialize the application
 app = MessageBase().app
 
@@ -78,6 +81,20 @@ openshift = OpenShift()
 graph = GraphDatabase()
 
 graph.connect()
+
+###############################################################################################################
+# This sets makes all calls to submit workflows to our openshift instance first check to see the total number #
+# of pending workflows before we schedule the next one. We simply async wait until we drop below threshold.   #
+# We are simply adding our own decorator to a function defined by a different module, it would be the same as #
+# doing:                                                                                                      #
+# @_limit_pending_workflows(openshift, _PENDING_WORKFLOW_LIMIT)                                               #
+# def submit_workflow(*args, **kwargs):                                                                       #
+# ...                                                                                                         #
+###############################################################################################################
+if _PENDING_WORKFLOW_LIMIT is not None:
+    openshift.workflow_manager.submit_workflow = common._limit_pending_workflows(
+        openshift, int(_PENDING_WORKFLOW_LIMIT)
+    )(openshift.workflow_manager.submit_workflow)
 
 
 @app.task()
