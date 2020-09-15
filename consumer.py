@@ -31,6 +31,7 @@ from thoth.messaging import MissingVersionMessage
 from thoth.messaging import SolvedPackageMessage
 from thoth.messaging import UnresolvedPackageMessage
 from thoth.messaging import UnrevsolvedPackageMessage
+from thoth.messaging import SIUnanalyzedPackageMessage
 
 
 from investigator.investigator import __service_version__
