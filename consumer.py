@@ -43,7 +43,7 @@ from investigator.investigator.missing_version import parse_missing_version
 from investigator.investigator.solved_package import parse_solved_package_message
 from investigator.investigator.unrevsolved_package import parse_revsolved_package_message
 from investigator.investigator.unresolved_package import parse_unresolved_package_message
-
+from investigator.investigator.si_unanalyzed_package import parse_si_unanalyzed_package_message
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -74,6 +74,8 @@ missing_version_message_topic = MissingVersionMessage().topic
 solved_package_message_topic = SolvedPackageMessage().topic
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
 unrevsolved_package_message_topic = UnrevsolvedPackageMessage().topic
+si_unanalyzed_package_message_topic = SIUnanalyzedPackageMessage().topic
+
 
 openshift = OpenShift()
 graph = GraphDatabase()
@@ -155,6 +157,11 @@ async def consume_unrevsolved_package(unrevsolved_packages) -> None:
     async for unrevsolved_package in unrevsolved_packages:
         parse_revsolved_package_message(unrevsolved_package=unrevsolved_package, openshift=openshift)
 
+@app.agent(si_unanalyzed_package_message_topic)
+async def consume_si_unanalyzed_package(si_unanalyzed_packages) -> None:
+    """Loop when an SI Unanalyzed package message is received."""
+    async for si_unanalyzed_package in si_unanalyzed_packages:
+        parse_si_unanalyzed_package_message(si_unanalyzed_package=si_unanalyzed_package, openshift=openshift, graph=graph)
 
 if __name__ == "__main__":
     app.main()
