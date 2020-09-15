@@ -60,4 +60,4 @@ def parse_si_unanalyzed_package_message(
         si_wfs_scheduled
     )
 
-    solved_package_success.inc()
+    si_unanalyzed_package_success.inc()
