@@ -95,7 +95,7 @@ def learn_using_revsolver(
     is_present: bool,
     package_name: str,
     package_version: str,
-    revsolver_packages_seen: List[Tuple[str, str]],
+    revsolver_packages_seen: List[Tuple[str, str]] = [],
 ) -> Tuple[int, List[Tuple[str, str]]]:
     """Learn using revsolver about Package Version dependencies."""
     if not is_present and (package_name, package_version) not in revsolver_packages_seen:

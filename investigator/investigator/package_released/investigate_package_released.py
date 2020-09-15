@@ -37,6 +37,8 @@ def parse_package_released_message(package_released: MessageBase, openshift: Ope
     package_version = package_released.package_version
     index_url = package_released.index_url
 
+    # Solver logic
+
     common.learn_using_solver(
         openshift=openshift,
         graph=graph,
@@ -46,6 +48,27 @@ def parse_package_released_message(package_released: MessageBase, openshift: Ope
         package_version=package_version,
     )
 
+    # Revsolver logic
+
+    common.learn_using_revsolver(
+        openshift=openshift, is_present=False, package_name=package_name, package_version=package_version,
+    )
+
+    # SI logic
+
+    common.learn_about_security(
+        openshift=openshift,
+        graph=graph,
+        is_present=False,
+        package_name=package_name,
+        index_url=index_url,
+        package_version=package_version,
+    )
+
     scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="solver").inc()
+
+    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="revsolver").inc()
+
+    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="security-indicator").inc()
 
     package_released_success.inc()
