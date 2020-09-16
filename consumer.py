@@ -31,6 +31,7 @@ from thoth.messaging import MissingVersionMessage
 from thoth.messaging import SolvedPackageMessage
 from thoth.messaging import UnresolvedPackageMessage
 from thoth.messaging import UnrevsolvedPackageMessage
+from thoth.messaging import PackageReleasedMessage
 
 
 from investigator.investigator import __service_version__
@@ -42,6 +43,7 @@ from investigator.investigator.missing_version import parse_missing_version
 from investigator.investigator.solved_package import parse_solved_package_message
 from investigator.investigator.unrevsolved_package import parse_revsolved_package_message
 from investigator.investigator.unresolved_package import parse_unresolved_package_message
+from investigator.investigator.package_released import parse_package_released_message
 
 
 from thoth.common import OpenShift, init_logging
@@ -73,6 +75,7 @@ missing_version_message_topic = MissingVersionMessage().topic
 solved_package_message_topic = SolvedPackageMessage().topic
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
 unrevsolved_package_message_topic = UnrevsolvedPackageMessage().topic
+package_released_message_topic = PackageReleasedMessage().topic
 
 openshift = OpenShift()
 graph = GraphDatabase()
@@ -153,6 +156,13 @@ async def consume_unrevsolved_package(unrevsolved_packages) -> None:
     """Loop when an unresolved package message is received."""
     async for unrevsolved_package in unrevsolved_packages:
         parse_revsolved_package_message(unrevsolved_package=unrevsolved_package, openshift=openshift)
+
+
+@app.agent(package_released_message_topic)
+async def consume_package_released(package_releases) -> None:
+    """Loop when a package released message is received."""
+    async for package_released in package_releases:
+        parse_package_released_message(package_released=package_released, openshift=openshift, graph=graph)
 
 
 if __name__ == "__main__":
