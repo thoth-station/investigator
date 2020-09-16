@@ -107,7 +107,6 @@ def parse_unresolved_package_message(
 
     total_solver_wfs_scheduled = 0
     total_revsolver_wfs_scheduled = 0
-    total_si_wfs_scheduled = 0
 
     # Select indexes
     registered_indexes: List[str] = graph.get_python_package_index_urls_all()
