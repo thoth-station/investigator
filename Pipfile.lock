@@ -514,10 +514,10 @@
         },
         "ogr": {
             "hashes": [
-                "sha256:25a6e95193b173e3ca0cb07435a451cb8e794dbbae8e7252443be1e72ad80178",
-                "sha256:a9dd97b5de245406d238a4b644adad01070a22817208b6f9b96956317dc7ef5f"
+                "sha256:3b399d309e64d34848ad88dc4895b71278d7ace34e53a640ee8b091816136276",
+                "sha256:78f7443372e36c545c38c65945e038f08b2abed61ed98d4dd1432e518114ee47"
             ],
-            "version": "==0.14.0"
+            "version": "==0.15.0"
         },
         "openshift": {
             "hashes": [
@@ -902,11 +902,11 @@
         },
         "thoth-storages": {
             "hashes": [
-                "sha256:43dd52cce863d1ed1c423cbc7ab7595971ccb247c337be973208be3f14f420d3",
-                "sha256:af2c54c64769ac2e5d473ac9e7c1f94be5df39f2170928ba520ea72de2b58c99"
+                "sha256:3da5aa54ec216a1c9b9c58880b5456740c4276472f68081b34ec81713528f804",
+                "sha256:7ccbe2d0f1ea8c459156f4384053bac6117cfcf071ad4d4b2b07f9109f8fbeb4"
             ],
             "index": "pypi",
-            "version": "==0.25.9"
+            "version": "==0.25.10"
         },
         "toml": {
             "hashes": [
