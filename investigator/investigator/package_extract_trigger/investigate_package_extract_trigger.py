@@ -19,8 +19,10 @@
 
 import logging
 
-from thoth.messaging import PackageExtractMessage
+from thoth.messaging import PackageExtractTriggerMessage
 from thoth.common import OpenShift
+
+from ..common import wait_for_limit
 
 from .metrics_package_extract_trigger import package_extract_trigger_exceptions
 from .metrics_package_extract_trigger import package_extract_trigger_in_progress
@@ -31,8 +33,11 @@ _LOGGER = logging.getLogger(__name__)
 
 @package_extract_trigger_exceptions.count_exceptions()
 @package_extract_trigger_in_progress.track_inprogress()
-def parse_package_extract_trigger_message(package_extract_trigger: PackageExtractMessage, openshift: OpenShift) -> None:
+async def parse_package_extract_trigger_message(
+    package_extract_trigger: PackageExtractTriggerMessage, openshift: OpenShift
+) -> None:
     """Parse package_extract_trigger message."""
+    await wait_for_limit(openshift)
     workflow_name = openshift.schedule_package_extract(
         image=package_extract_trigger.image,
         environment_type=package_extract_trigger.environment_type,

@@ -138,7 +138,7 @@ async def consume_adviser_re_run(adviser_re_runs):
 async def consume_adviser_trigger(adviser_triggers):
     """Loop when an adviser trigger message is received."""
     async for adviser_trigger in adviser_triggers:
-        parse_adviser_trigger_message(adviser_trigger=adviser_trigger, openshift=openshift)
+        await parse_adviser_trigger_message(adviser_trigger=adviser_trigger, openshift=openshift)
 
 
 @app.agent(hash_mismatch_message_topic)
@@ -152,7 +152,7 @@ async def consume_hash_mismatch(hash_mismatches):
 async def consume_kebechet_trigger(kebechet_triggers):
     """Loop when a kebechet_trigger message is received."""
     async for kebechet_trigger in kebechet_triggers:
-        parse_kebechet_trigger_message(kebechet_trigger=kebechet_trigger, openshift=openshift)
+        await parse_kebechet_trigger_message(kebechet_trigger=kebechet_trigger, openshift=openshift)
 
 
 @app.agent(missing_package_message_topic)
@@ -173,21 +173,23 @@ async def consume_missing_version(missing_versions):
 async def consume_package_extract_trigger(package_extract_triggers):
     """Loop when a package_extract_trigger message is received."""
     async for package_extract_trigger in package_extract_triggers:
-        parse_package_extract_trigger_message(package_extract_trigger=package_extract_trigger, openshift=openshift)
+        await parse_package_extract_trigger_message(
+            package_extract_trigger=package_extract_trigger, openshift=openshift
+        )
 
 
 @app.agent(package_released_message_topic)
 async def consume_package_released(package_releases) -> None:
     """Loop when a package released message is received."""
     async for package_released in package_releases:
-        parse_package_released_message(package_released=package_released, openshift=openshift, graph=graph)
+        await parse_package_released_message(package_released=package_released, openshift=openshift, graph=graph)
 
 
 @app.agent(provenance_checker_trigger_message_topic)
 async def consume_provenance_checker_trigger(provenance_checker_triggers):
     """Loop when a provenance_checker_trigger message is received."""
     async for provenance_checker_trigger in provenance_checker_triggers:
-        parse_provenance_checker_trigger_message(
+        await parse_provenance_checker_trigger_message(
             provenance_checker_trigger=provenance_checker_trigger, openshift=openshift,
         )
 
@@ -196,14 +198,14 @@ async def consume_provenance_checker_trigger(provenance_checker_triggers):
 async def consume_qebhwt_trigger(qebhwt_triggers):
     """Loop when a qebhwt_trigger message is received."""
     async for qebhwt_trigger in qebhwt_triggers:
-        parse_qebhwt_trigger_message(qebhwt_trigger=qebhwt_trigger, openshift=openshift)
+        await parse_qebhwt_trigger_message(qebhwt_trigger=qebhwt_trigger, openshift=openshift)
 
 
 @app.agent(si_unanalyzed_package_message_topic)
 async def consume_si_unanalyzed_package(si_unanalyzed_packages) -> None:
     """Loop when an SI Unanalyzed package message is received."""
     async for si_unanalyzed_package in si_unanalyzed_packages:
-        parse_si_unanalyzed_package_message(
+        await parse_si_unanalyzed_package_message(
             si_unanalyzed_package=si_unanalyzed_package, openshift=openshift, graph=graph
         )
 
