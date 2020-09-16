@@ -25,27 +25,37 @@ import os
 from thoth.messaging import MessageBase
 from thoth.messaging import AdviseJustificationMessage
 from thoth.messaging import AdviserReRunMessage
+from thoth.messaging import AdviserTriggerMessage
 from thoth.messaging import HashMismatchMessage
+from thoth.messaging import KebechetTriggerMessage
 from thoth.messaging import MissingPackageMessage
 from thoth.messaging import MissingVersionMessage
+from thoth.messaging import PackageExtractTriggerMessage
+from thoth.messaging import PackageReleasedMessage
+from thoth.messaging import ProvenanceCheckerTriggerMessage
+from thoth.messaging import QebHwtTriggerMessage
+from thoth.messaging import SIUnanalyzedPackageMessage
 from thoth.messaging import SolvedPackageMessage
 from thoth.messaging import UnresolvedPackageMessage
 from thoth.messaging import UnrevsolvedPackageMessage
-from thoth.messaging import SIUnanalyzedPackageMessage
-from thoth.messaging import PackageReleasedMessage
 
 
 from investigator.investigator import __service_version__
 from investigator.investigator.advise_justification import expose_advise_justification_metrics
 from investigator.investigator.adviser_re_run import parse_adviser_re_run_message
+from investigator.investigator.adviser_trigger import parse_adviser_trigger_message
 from investigator.investigator.hash_mismatch import parse_hash_mismatch
+from investigator.investigator.kebechet_trigger import parse_kebechet_trigger_message
 from investigator.investigator.missing_package import parse_missing_package
 from investigator.investigator.missing_version import parse_missing_version
+from investigator.investigator.package_extract_trigger import parse_package_extract_trigger_message
+from investigator.investigator.package_released import parse_package_released_message
+from investigator.investigator.provenance_checker_trigger import parse_provenance_checker_trigger_message
+from investigator.investigator.qebhwt_trigger import parse_qebhwt_trigger_message
+from investigator.investigator.si_unanalyzed_package import parse_si_unanalyzed_package_message
 from investigator.investigator.solved_package import parse_solved_package_message
 from investigator.investigator.unrevsolved_package import parse_revsolved_package_message
 from investigator.investigator.unresolved_package import parse_unresolved_package_message
-from investigator.investigator.si_unanalyzed_package import parse_si_unanalyzed_package_message
-from investigator.investigator.package_released import parse_package_released_message
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -70,9 +80,14 @@ app = MessageBase().app
 # Get all topics
 advise_justification_message_topic = AdviseJustificationMessage().topic
 adviser_re_run_message_topic = AdviserReRunMessage().topic
+adviser_trigger_message_topic = AdviserTriggerMessage().topic
 hash_mismatch_message_topic = HashMismatchMessage().topic
+kebechet_trigger_message_topic = KebechetTriggerMessage().topic
 missing_package_message_topic = MissingPackageMessage().topic
 missing_version_message_topic = MissingVersionMessage().topic
+package_extract_trigger_message_topic = PackageExtractTriggerMessage().topic
+provenance_checker_trigger_message_topic = ProvenanceCheckerTriggerMessage().topic
+qebhwt_trigger_message_topic = QebHwtTriggerMessage().topic
 solved_package_message_topic = SolvedPackageMessage().topic
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
 unrevsolved_package_message_topic = UnrevsolvedPackageMessage().topic
@@ -119,11 +134,25 @@ async def consume_adviser_re_run(adviser_re_runs):
         await parse_adviser_re_run_message(adviser_re_run=adviser_re_run, openshift=openshift)
 
 
+@app.agent(adviser_trigger_message_topic)
+async def consume_adviser_trigger(adviser_triggers):
+    """Loop when an adviser trigger message is received."""
+    async for adviser_trigger in adviser_triggers:
+        parse_adviser_trigger_message(adviser_trigger=adviser_trigger, openshift=openshift)
+
+
 @app.agent(hash_mismatch_message_topic)
 async def consume_hash_mismatch(hash_mismatches):
     """Loop when an hash mismatch message is received."""
     async for hash_mismatch in hash_mismatches:
         await parse_hash_mismatch(mismatch=hash_mismatch, openshift=openshift, graph=graph)
+
+
+@app.agent(kebechet_trigger_message_topic)
+async def consume_kebechet_trigger(kebechet_triggers):
+    """Loop when a kebechet_trigger message is received."""
+    async for kebechet_trigger in kebechet_triggers:
+        parse_kebechet_trigger_message(kebechet_trigger=kebechet_trigger, openshift=openshift)
 
 
 @app.agent(missing_package_message_topic)
@@ -138,6 +167,45 @@ async def consume_missing_version(missing_versions):
     """Loop when an missing version message is received."""
     async for missing_version in missing_versions:
         await parse_missing_version(version=missing_version, openshift=openshift, graph=graph)
+
+
+@app.agent(package_extract_trigger_message_topic)
+async def consume_package_extract_trigger(package_extract_triggers):
+    """Loop when a package_extract_trigger message is received."""
+    async for package_extract_trigger in package_extract_triggers:
+        parse_package_extract_trigger_message(package_extract_trigger=package_extract_trigger, openshift=openshift)
+
+
+@app.agent(package_released_message_topic)
+async def consume_package_released(package_releases) -> None:
+    """Loop when a package released message is received."""
+    async for package_released in package_releases:
+        parse_package_released_message(package_released=package_released, openshift=openshift, graph=graph)
+
+
+@app.agent(provenance_checker_trigger_message_topic)
+async def consume_provenance_checker_trigger(provenance_checker_triggers):
+    """Loop when a provenance_checker_trigger message is received."""
+    async for provenance_checker_trigger in provenance_checker_triggers:
+        parse_provenance_checker_trigger_message(
+            provenance_checker_trigger=provenance_checker_trigger, openshift=openshift,
+        )
+
+
+@app.agent(qebhwt_trigger_message_topic)
+async def consume_qebhwt_trigger(qebhwt_triggers):
+    """Loop when a qebhwt_trigger message is received."""
+    async for qebhwt_trigger in qebhwt_triggers:
+        parse_qebhwt_trigger_message(qebhwt_trigger=qebhwt_trigger, openshift=openshift)
+
+
+@app.agent(si_unanalyzed_package_message_topic)
+async def consume_si_unanalyzed_package(si_unanalyzed_packages) -> None:
+    """Loop when an SI Unanalyzed package message is received."""
+    async for si_unanalyzed_package in si_unanalyzed_packages:
+        parse_si_unanalyzed_package_message(
+            si_unanalyzed_package=si_unanalyzed_package, openshift=openshift, graph=graph
+        )
 
 
 @app.agent(solved_package_message_topic)
@@ -159,22 +227,6 @@ async def consume_unrevsolved_package(unrevsolved_packages) -> None:
     """Loop when an unresolved package message is received."""
     async for unrevsolved_package in unrevsolved_packages:
         await parse_revsolved_package_message(unrevsolved_package=unrevsolved_package, openshift=openshift)
-
-
-@app.agent(si_unanalyzed_package_message_topic)
-async def consume_si_unanalyzed_package(si_unanalyzed_packages) -> None:
-    """Loop when an SI Unanalyzed package message is received."""
-    async for si_unanalyzed_package in si_unanalyzed_packages:
-        parse_si_unanalyzed_package_message(
-            si_unanalyzed_package=si_unanalyzed_package, openshift=openshift, graph=graph
-        )
-
-
-@app.agent(package_released_message_topic)
-async def consume_package_released(package_releases) -> None:
-    """Loop when a package released message is received."""
-    async for package_released in package_releases:
-        await parse_package_released_message(package_released=package_released, openshift=openshift, graph=graph)
 
 
 if __name__ == "__main__":

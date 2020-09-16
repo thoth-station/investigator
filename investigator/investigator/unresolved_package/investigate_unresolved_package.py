@@ -107,7 +107,6 @@ async def parse_unresolved_package_message(
 
     total_solver_wfs_scheduled = 0
     total_revsolver_wfs_scheduled = 0
-    total_si_wfs_scheduled = 0
 
     # Select indexes
     registered_indexes: List[str] = graph.get_python_package_index_urls_all()
@@ -162,20 +161,8 @@ async def parse_unresolved_package_message(
                 revsolver_packages_seen=revsolver_packages_seen,
             )
 
-            # SI logic
-
-            si_wfs_scheduled = await common.learn_about_security(
-                openshift=openshift,
-                graph=graph,
-                is_present=is_present,
-                package_name=package_name,
-                package_version=version,
-                index_url=index_url,
-            )
-
             total_solver_wfs_scheduled += solver_wfs_scheduled
             total_revsolver_wfs_scheduled += revsolver_wfs_scheduled
-            total_si_wfs_scheduled += si_wfs_scheduled
 
     scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver").inc(
         total_solver_wfs_scheduled
@@ -184,10 +171,6 @@ async def parse_unresolved_package_message(
     scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="revsolver").inc(
         total_revsolver_wfs_scheduled
     )
-
-    scheduled_workflows.labels(
-        message_type=UnresolvedPackageMessage.topic_name, workflow_type="security-indicator"
-    ).inc(total_si_wfs_scheduled)
 
     unresolved_package_success.inc()
 
