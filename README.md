@@ -165,9 +165,9 @@ create a new directory in thoth/investigator which looks like this:
 
 - message_name
 
-  - __init__.py
-  - investigate_<message_name>
-  - metrics_<message_name>
+  - `__init__.py`
+  - investigate_<message_name>.py
+  - metrics_<message_name>.py
 
 ### Message Parsing
 
