@@ -29,9 +29,10 @@ _LOGGER = logging.getLogger(__name__)
 
 @hash_mismatch_exceptions.count_exceptions()
 @hash_mismatch_in_progress.track_inprogress()
-def parse_hash_mismatch(mismatch, openshift, graph):
+async def parse_hash_mismatch(mismatch, openshift, graph):
     """Process a hash mismatch message from package-update producer."""
     try:
+        await common.wait_for_limit(openshift)
         openshift.schedule_all_solvers(
             packages=f"{mismatch.package_name}==={mismatch.package_version}", indexes=[mismatch.index_url],
         )

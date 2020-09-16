@@ -24,7 +24,7 @@ from thoth.messaging import AdviserReRunMessage
 from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
-
+from ..common import wait_for_limit
 from .metrics_adviser_re_run import adviser_re_run_exceptions
 from .metrics_adviser_re_run import adviser_re_run_success
 from .metrics_adviser_re_run import adviser_re_run_in_progress
@@ -34,9 +34,9 @@ _LOGGER = logging.getLogger(__name__)
 
 @adviser_re_run_exceptions.count_exceptions()
 @adviser_re_run_in_progress.track_inprogress()
-def parse_adviser_re_run_message(adviser_re_run: MessageBase, openshift: OpenShift) -> None:
+async def parse_adviser_re_run_message(adviser_re_run: MessageBase, openshift: OpenShift) -> None:
     """Parse adviser re run message."""
-    adviser_wfs_scheduled = _re_schedule_adviser(openshift=openshift, parameters=adviser_re_run,)
+    adviser_wfs_scheduled = await _re_schedule_adviser(openshift=openshift, parameters=adviser_re_run,)
 
     scheduled_workflows.labels(message_type=AdviserReRunMessage.topic_name, workflow_type="adviser").inc(
         adviser_wfs_scheduled
@@ -45,7 +45,7 @@ def parse_adviser_re_run_message(adviser_re_run: MessageBase, openshift: OpenShi
     adviser_re_run_success.inc()
 
 
-def _re_schedule_adviser(openshift: OpenShift, parameters: MessageBase) -> int:
+async def _re_schedule_adviser(openshift: OpenShift, parameters: MessageBase) -> int:
     """Re-Schedule Adviser."""
     re_run_adviser_id = parameters.adviser_id
     application_stack = parameters.application_stack
@@ -59,6 +59,7 @@ def _re_schedule_adviser(openshift: OpenShift, parameters: MessageBase) -> int:
     source_type = parameters.source_type
 
     try:
+        await wait_for_limit(openshift)
         analysis_id = openshift.schedule_adviser(
             application_stack=application_stack,
             recommendation_type=recommendation_type,

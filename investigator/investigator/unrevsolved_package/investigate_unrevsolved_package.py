@@ -34,14 +34,14 @@ _LOGGER = logging.getLogger(__name__)
 
 @unrevsolved_package_exceptions.count_exceptions()
 @unrevsolved_package_in_progress.track_inprogress()
-def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift: OpenShift) -> None:
+async def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift: OpenShift) -> None:
     """Parse soolved package message."""
     package_name = unrevsolved_package.package_name
     package_version = unrevsolved_package.package_version
 
     # Revsolver logic
 
-    revsolver_wfs_scheduled, _ = common.learn_using_revsolver(
+    revsolver_wfs_scheduled, _ = await common.learn_using_revsolver(
         openshift=openshift,
         is_present=True,
         package_name=package_name,

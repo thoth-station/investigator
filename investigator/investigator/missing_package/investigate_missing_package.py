@@ -22,12 +22,12 @@ import re
 from .metrics_missing_package import missing_package_exceptions
 from .metrics_missing_package import missing_package_success
 from .metrics_missing_package import missing_package_in_progress
-from ..common import git_source_from_url
+from ..common import git_source_from_url, wait_for_limit
 
 
 @missing_package_exceptions.count_exceptions()
 @missing_package_in_progress.track_inprogress()
-def parse_missing_package(package, openshift, graph):
+async def parse_missing_package(package, openshift, graph):
     """Process a missing package message from package-update producer."""
     repositories = graph.get_adviser_run_origins_all(
         index_url=package.index_url, package_name=package.package_name, count=None, distinct=True,
@@ -44,6 +44,7 @@ def parse_missing_package(package, openshift, graph):
         if package.package_name in requirements:
             gitservice_repo.open_issue_if_not_exist(issue_title, issue_body)
         else:
+            await wait_for_limit(openshift)
             openshift.schedule_kebechet_run_url(repo, gitservice_repo.service_type.name)
 
     missing_package_success.inc()

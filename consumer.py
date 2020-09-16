@@ -43,8 +43,6 @@ from investigator.investigator.solved_package import parse_solved_package_messag
 from investigator.investigator.unrevsolved_package import parse_revsolved_package_message
 from investigator.investigator.unresolved_package import parse_unresolved_package_message
 
-from investigator.investigator import common
-
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
 
@@ -61,8 +59,6 @@ else:
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
-
-_PENDING_WORKFLOW_LIMIT = os.getenv("ARGO_PENDING_WORKFLOW_LIMIT", None)
 
 # initialize the application
 app = MessageBase().app
@@ -81,20 +77,6 @@ openshift = OpenShift()
 graph = GraphDatabase()
 
 graph.connect()
-
-###############################################################################################################
-# This sets makes all calls to submit workflows to our openshift instance first check to see the total number #
-# of pending workflows before we schedule the next one. We simply async wait until we drop below threshold.   #
-# We are simply adding our own decorator to a function defined by a different module, it would be the same as #
-# doing:                                                                                                      #
-# @_limit_pending_workflows(openshift, _PENDING_WORKFLOW_LIMIT)                                               #
-# def submit_workflow(*args, **kwargs):                                                                       #
-# ...                                                                                                         #
-###############################################################################################################
-if _PENDING_WORKFLOW_LIMIT is not None:
-    openshift.workflow_manager.submit_workflow = common._limit_pending_workflows(
-        openshift, int(_PENDING_WORKFLOW_LIMIT)
-    )(openshift.workflow_manager.submit_workflow)
 
 
 @app.task()
@@ -120,56 +102,56 @@ async def get_health(self, request):
 async def consume_advise_justification(advise_justifications):
     """Loop when an advise justification message is received."""
     async for advise_justification in advise_justifications:
-        expose_advise_justification_metrics(advise_justification=advise_justification)
+        await expose_advise_justification_metrics(advise_justification=advise_justification)
 
 
 @app.agent(adviser_re_run_message_topic)
 async def consume_adviser_re_run(adviser_re_runs):
     """Loop when an adviser re run message is received."""
     async for adviser_re_run in adviser_re_runs:
-        parse_adviser_re_run_message(adviser_re_run=adviser_re_run, openshift=openshift)
+        await parse_adviser_re_run_message(adviser_re_run=adviser_re_run, openshift=openshift)
 
 
 @app.agent(hash_mismatch_message_topic)
 async def consume_hash_mismatch(hash_mismatches):
     """Loop when an hash mismatch message is received."""
     async for hash_mismatch in hash_mismatches:
-        parse_hash_mismatch(mismatch=hash_mismatch, openshift=openshift, graph=graph)
+        await parse_hash_mismatch(mismatch=hash_mismatch, openshift=openshift, graph=graph)
 
 
 @app.agent(missing_package_message_topic)
 async def consume_missing_package(missing_packages):
     """Loop when an missing package message is received."""
     async for missing_package in missing_packages:
-        parse_missing_package(package=missing_package, openshift=openshift, graph=graph)
+        await parse_missing_package(package=missing_package, openshift=openshift, graph=graph)
 
 
 @app.agent(missing_version_message_topic)
 async def consume_missing_version(missing_versions):
     """Loop when an missing version message is received."""
     async for missing_version in missing_versions:
-        parse_missing_version(version=missing_version, openshift=openshift, graph=graph)
+        await parse_missing_version(version=missing_version, openshift=openshift, graph=graph)
 
 
 @app.agent(solved_package_message_topic)
 async def consume_solved_package(solved_packages) -> None:
     """Loop when an unresolved package message is received."""
     async for solved_package in solved_packages:
-        parse_solved_package_message(solved_package=solved_package, openshift=openshift, graph=graph)
+        await parse_solved_package_message(solved_package=solved_package, openshift=openshift, graph=graph)
 
 
 @app.agent(unresolved_package_message_topic)
 async def consume_unresolved_package(unresolved_packages) -> None:
     """Loop when an unresolved package message is received."""
     async for unresolved_package in unresolved_packages:
-        parse_unresolved_package_message(unresolved_package=unresolved_package, openshift=openshift, graph=graph)
+        await parse_unresolved_package_message(unresolved_package=unresolved_package, openshift=openshift, graph=graph)
 
 
 @app.agent(unrevsolved_package_message_topic)
 async def consume_unrevsolved_package(unrevsolved_packages) -> None:
     """Loop when an unresolved package message is received."""
     async for unrevsolved_package in unrevsolved_packages:
-        parse_revsolved_package_message(unrevsolved_package=unrevsolved_package, openshift=openshift)
+        await parse_revsolved_package_message(unrevsolved_package=unrevsolved_package, openshift=openshift)
 
 
 if __name__ == "__main__":

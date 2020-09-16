@@ -98,7 +98,7 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
 
 @unresolved_package_exceptions.count_exceptions()
 @unresolved_package_in_progress.track_inprogress()
-def parse_unresolved_package_message(
+async def parse_unresolved_package_message(
     unresolved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase
 ) -> None:
     """Parse unresolved package message."""
@@ -144,7 +144,7 @@ def parse_unresolved_package_message(
 
             # Solver logic
 
-            solver_wfs_scheduled = learn_using_solver(
+            solver_wfs_scheduled = await learn_using_solver(
                 openshift=openshift,
                 graph=graph,
                 is_present=is_present,
@@ -156,7 +156,7 @@ def parse_unresolved_package_message(
 
             # Revsolver logic
 
-            revsolver_wfs_scheduled, revsolver_packages_seen = common.learn_using_revsolver(
+            revsolver_wfs_scheduled, revsolver_packages_seen = await common.learn_using_revsolver(
                 openshift=openshift,
                 is_present=is_present,
                 package_name=package_name,
@@ -166,7 +166,7 @@ def parse_unresolved_package_message(
 
             # SI logic
 
-            si_wfs_scheduled = common.learn_about_security(
+            si_wfs_scheduled = await common.learn_about_security(
                 openshift=openshift,
                 graph=graph,
                 is_present=is_present,
@@ -217,7 +217,7 @@ def _check_package_version(package_name: str, package_version: Optional[str], in
     return versions
 
 
-def learn_using_solver(
+async def learn_using_solver(
     openshift: OpenShift,
     graph: GraphDatabase,
     is_present: bool,
@@ -229,7 +229,7 @@ def learn_using_solver(
     """Learn using solver about Package Version Index dependencies."""
     if not is_present:
         # Package never seen (schedule all solver workflows to collect all knowledge for Thoth)
-        are_solvers_scheduled = _schedule_all_solvers(
+        are_solvers_scheduled = await _schedule_all_solvers(
             openshift=openshift, package_name=package_name, package_version=package_version, indexes=[index_url]
         )
         return are_solvers_scheduled
@@ -250,7 +250,7 @@ def learn_using_solver(
 
         if not is_solved:
 
-            is_solver_scheduled = _schedule_solver(
+            is_solver_scheduled = await _schedule_solver(
                 openshift=openshift,
                 package_name=package_name,
                 package_version=package_version,
@@ -263,13 +263,14 @@ def learn_using_solver(
     return are_solvers_scheduled
 
 
-def _schedule_solver(
+async def _schedule_solver(
     openshift: OpenShift, package_name: str, package_version: str, indexes: List[str], solver_name: str
 ) -> int:
     """Schedule solver."""
     try:
         packages = f"{package_name}==={package_version}"
 
+        await common.wait_for_limit(openshift)
         analysis_id = openshift.schedule_solver(
             solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=_LOG_SOLVER
         )
@@ -288,11 +289,14 @@ def _schedule_solver(
     return is_scheduled
 
 
-def _schedule_all_solvers(openshift: OpenShift, package_name: str, package_version: str, indexes: List[str]) -> int:
+async def _schedule_all_solvers(
+    openshift: OpenShift, package_name: str, package_version: str, indexes: List[str]
+) -> int:
     """Schedule all solvers."""
     try:
         packages = f"{package_name}==={package_version}"
 
+        await common.wait_for_limit(openshift)
         analysis_ids = openshift.schedule_all_solvers(packages=packages, indexes=indexes)
         _LOGGER.info(
             "Scheduled solvers %r for packages %r from indexes %r, analysis ids are %r", packages, indexes, analysis_ids
