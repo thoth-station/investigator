@@ -38,8 +38,6 @@ from .metrics_unresolved_package import unresolved_package_exceptions
 from .metrics_unresolved_package import unresolved_package_in_progress
 from .metrics_unresolved_package import unresolved_package_success
 
-_LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
-
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -144,13 +142,13 @@ def parse_unresolved_package_message(
 
             # Solver logic
 
-            solver_wfs_scheduled = learn_using_solver(
+            solver_wfs_scheduled = common.learn_using_solver(
                 openshift=openshift,
                 graph=graph,
                 is_present=is_present,
                 package_name=package_name,
-                package_version=version,
                 index_url=index_url,
+                package_version=version,
                 solver=solver,
             )
 
@@ -215,91 +213,3 @@ def _check_package_version(package_name: str, package_version: Optional[str], in
         versions.append(package_version)
 
     return versions
-
-
-def learn_using_solver(
-    openshift: OpenShift,
-    graph: GraphDatabase,
-    is_present: bool,
-    package_name: str,
-    index_url: str,
-    package_version: str,
-    solver: Optional[str],
-) -> int:
-    """Learn using solver about Package Version Index dependencies."""
-    if not is_present:
-        # Package never seen (schedule all solver workflows to collect all knowledge for Thoth)
-        are_solvers_scheduled = _schedule_all_solvers(
-            openshift=openshift, package_name=package_name, package_version=package_version, indexes=[index_url]
-        )
-        return are_solvers_scheduled
-
-    # Select solvers
-    if not solver:
-        solvers: List[str] = openshift.get_solver_names()
-    else:
-        solvers = [solver]
-
-    # Check for which solver has not been solved and schedule solver workflow
-    are_solvers_scheduled = 0
-
-    for solver_name in solvers:
-        is_solved = graph.python_package_version_exists(
-            package_name=package_name, package_version=package_version, index_url=index_url, solver_name=solver_name
-        )
-
-        if not is_solved:
-
-            is_solver_scheduled = _schedule_solver(
-                openshift=openshift,
-                package_name=package_name,
-                package_version=package_version,
-                indexes=[index_url],
-                solver_name=solver_name,
-            )
-
-            are_solvers_scheduled += is_solver_scheduled
-
-    return are_solvers_scheduled
-
-
-def _schedule_solver(
-    openshift: OpenShift, package_name: str, package_version: str, indexes: List[str], solver_name: str
-) -> int:
-    """Schedule solver."""
-    try:
-        packages = f"{package_name}==={package_version}"
-
-        analysis_id = openshift.schedule_solver(
-            solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=_LOG_SOLVER
-        )
-        _LOGGER.info(
-            "Scheduled solver %r for packages %r from indexes %r, analysis is %r",
-            solver_name,
-            packages,
-            indexes,
-            analysis_id,
-        )
-        is_scheduled = 1
-    except Exception as e:
-        _LOGGER.exception(f"Failed to schedule solver {solver_name} for package {packages} from {indexes}: {e}")
-        is_scheduled = 0
-
-    return is_scheduled
-
-
-def _schedule_all_solvers(openshift: OpenShift, package_name: str, package_version: str, indexes: List[str]) -> int:
-    """Schedule all solvers."""
-    try:
-        packages = f"{package_name}==={package_version}"
-
-        analysis_ids = openshift.schedule_all_solvers(packages=packages, indexes=indexes)
-        _LOGGER.info(
-            "Scheduled solvers %r for packages %r from indexes %r, analysis ids are %r", packages, indexes, analysis_ids
-        )
-        are_scheduled = len(analysis_ids)
-    except Exception as e:
-        _LOGGER.exception(f"Failed to schedule solvers for package {packages} from {indexes}: {e}")
-        are_scheduled = 0
-
-    return are_scheduled
