@@ -173,3 +173,7 @@ all the things that you see...
 * :pushpin: Automatic update of dependency pytest from 6.0.1 to 6.0.2 (#200)
 * :pushpin: Automatic update of dependency hypothesis from 5.35.0 to 5.35.2 (#202)
 * :pushpin: Automatic update of dependency thoth-common from 0.18.1 to 0.18.2 (#196)
+
+## Release 0.4.7 (2020-09-17T07:57:44)
+### Bug Fixes
+* patch fix the variable reference for metrics (#225)
