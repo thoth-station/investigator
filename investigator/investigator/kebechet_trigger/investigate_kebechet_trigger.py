@@ -22,9 +22,9 @@ import logging
 from thoth.messaging import KebechetTriggerMessage
 from thoth.common import OpenShift
 
-from .metrics_adviser_trigger import kebechet_trigger_exceptions
-from .metrics_adviser_trigger import kebechet_trigger_in_progress
-from .metrics_adviser_trigger import kebechet_trigger_success
+from .metrics_kebechet_trigger import kebechet_trigger_exceptions
+from .metrics_kebechet_trigger import kebechet_trigger_in_progress
+from .metrics_kebechet_trigger import kebechet_trigger_success
 
 _LOGGER = logging.getLogger(__name__)
 
