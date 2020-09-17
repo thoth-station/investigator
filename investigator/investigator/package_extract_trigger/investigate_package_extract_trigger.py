@@ -19,7 +19,7 @@
 
 import logging
 
-from thoth.messaging import PackageExtractMessage
+from thoth.messaging import PackageExtractTriggerMessage
 from thoth.common import OpenShift
 
 from .metrics_package_extract_trigger import package_extract_trigger_exceptions
