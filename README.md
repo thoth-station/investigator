@@ -27,129 +27,54 @@ to Kafka for each package release to be solved using Thoth [Solver](https://gith
 
 ### Consumer
 
-Consumer is currently able to handle the following Kafka messages:
+Consumer is currently able to handle the following Kafka messages focused on:
 
-#### UnresolvedPackageMessage
+### Increase Thoth Knowledge
 
-- [UnresolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/unresolved_package.py).
+The following messages are sent by different Thoth components:
 
-This message received contains:
+- [PackageReleasedMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/package_released/README.md).
 
-```python
-package_name: str
-package_version: Optional[str]
-index_url: Optional[List[str]]
-solver: Optional[str]
-component_name: str
-service_version: str
-```
+- [UnresolvedPackageMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/unresolved_package/README.md).
 
-Thoth investigator checks Thoth knowledge Graph and decides which workflows need to be scheduled to increase Thoth knowledge:
+- [UnrevsolvedPackageMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/unrevsolved_package/README.md).
 
-- [Solver](https://github.com/thoth-station/solver) workflow
-- [Revsolver](https://github.com/thoth-station/revsolver) workflow
-- [Security Indicator](https://github.com/thoth-station/si-aggregator) workflow
+- [SIUnanalyzedPackageMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/si_unanalyzed_package/README.md).
 
-#### UnrevsolvedPackageMessage
+- [SolvedPackageMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/solved_package/README.md).
 
-- [UnrevsolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/unrevsolved_package.py).
+### Monitor Thoth results and knowledge
 
-This message received contains:
+The following message is sent by [advise reporter producer](https://github.com/thoth-station/advise-reporter) to show the use of recomendations across all Thoth integrations:
 
-```python
-package_name: str
-package_version: str
-component_name: str
-service_version: str
-```
+- [AdviseJustificationMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/advise_justification/README.md).
 
-Thoth investigator checks Thoth knowledge Graph and decides which workflows need to be scheduled to increase Thoth knowledge:
+The following messages are sent by [package update producer](https://github.com/thoth-station/package-update-job) to keep knowledge in the database up to date:
 
-- [Revsolver](https://github.com/thoth-station/revsolver) workflow
+- [HashMismatchMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/hash_mismatch/README.md).
 
-#### SolvedPackageMessage
+- [MissingPackageMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/missing_package/README.md)
 
-- [SolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/solved_package.py).
+- [MissingVersionMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/missing_version/README.md)
 
-This message received contains:
+The following message is sent by [solver](https://github.com/thoth-station/solver) when Thoth acquired all missing knowledge required to provide advice to a user (human or bot):
 
-```python
-package_name: str
-package_version: str
-index_url: str
-solver: str
-component_name: str
-service_version: str
-```
+- [AdviserReRunMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/advise_justification/README.md).
 
-Thoth investigator checks Thoth knowledge Graph and decides which workflows need to be scheduled to increase Thoth knowledge:
+### Trigger User requests
 
-- [Security Indicator](https://github.com/thoth-station/si-aggregator) workflow
+The following messages are sent by [User-API producer](https://github.com/thoth-station/user-api) when users (humans or bots)
+interact with [Thoth integrations](https://github.com/thoth-station/adviser/blob/master/docs/source/integration.rst):
 
-#### AdviseJustificationMessage
+- [AdviserTriggerMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/adviser_trigger/README.md).
 
-- [AdviseJustificationMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/advise_justification.py)
+- [KebechetTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/kebechet_trigger/README.md)
 
-This message received contains:
+- [PackageExtractTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/package_extract_trigger/README.md)
 
-```python
-message: str
-justification_type: str
-count: int
-component_name: str
-service_version: str
-```
+- [ProvenanceCheckerTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/provenance_checker_trigger/README.md)
 
-These messages get processed to update advise justification metrics (`advise_justification_type_number`)
-
-#### HashMismatchMessage
-
-- [HashMismatchMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/hash_mismatch.py)
-
-This message received contains:
-
-```python
-index_url: str
-package_name: str
-package_version: str
-missing_from_source: List[str]
-missing_from_database: List[str]
-component_name: str
-service_version: str
-```
-
-If the hashes for a package don't match on the database and package index we schedule workflows and update database.
-
-#### MissingPackageMessage
-
-- [MissingPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/missing_package.py)
-
-This message received contains:
-
-```python
-index_url: str
-package_name: str
-component_name: str
-service_version: str
-```
-
-If package goes missing from a package index we mark all it as missing.
-
-#### MissingVersionMessage
-
-- [MissingVersionMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/missing_version.py)
-
-This message received contains:
-
-```python
-index_url: str
-package_name: str
-package_version: str
-component_name: str
-service_version: str
-```
-
-If package version goes missing from a package index we mark it as missing.
+- [QebHwtTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/qebhwt_trigger/README.md)
 
 ## Dev Guide
 
@@ -168,6 +93,7 @@ create a new directory in thoth/investigator which looks like this:
   - `__init__.py`
   - investigate_<message_name>.py
   - metrics_<message_name>.py
+  - README.md describing the message and what happens once consumed by investigator.
 
 ### Message Parsing
 
