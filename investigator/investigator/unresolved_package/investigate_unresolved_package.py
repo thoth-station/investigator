@@ -106,7 +106,6 @@ def parse_unresolved_package_message(
     solver = unresolved_package.solver
 
     total_solver_wfs_scheduled = 0
-    total_revsolver_wfs_scheduled = 0
 
     # Select indexes
     registered_indexes: List[str] = graph.get_python_package_index_urls_all()
@@ -151,25 +150,10 @@ def parse_unresolved_package_message(
                 solver=solver,
             )
 
-            # Revsolver logic
-
-            revsolver_wfs_scheduled, revsolver_packages_seen = common.learn_using_revsolver(
-                openshift=openshift,
-                is_present=is_present,
-                package_name=package_name,
-                package_version=version,
-                revsolver_packages_seen=revsolver_packages_seen,
-            )
-
             total_solver_wfs_scheduled += solver_wfs_scheduled
-            total_revsolver_wfs_scheduled += revsolver_wfs_scheduled
 
     scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver").inc(
         total_solver_wfs_scheduled
-    )
-
-    scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="revsolver").inc(
-        total_revsolver_wfs_scheduled
     )
 
     unresolved_package_success.inc()
