@@ -33,7 +33,7 @@ Consumer is currently able to handle the following Kafka messages focused on:
 
 The following messages are sent by different Thoth components:
 
-- [PackageReleasedMessage](https://github.com/thoth-station/investigator/blob/master/iinvestigator/investigator/package_released/README.md).
+- [PackageReleasedMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/package_released/README.md).
 
 - [UnresolvedPackageMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/unresolved_package/README.md).
 
