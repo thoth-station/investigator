@@ -128,8 +128,6 @@ def parse_unresolved_package_message(
             package_name=package_name, package_version=package_version, index_url=index_url
         )
 
-        revsolver_packages_seen: List[Tuple[str, str]] = []
-
         # Loop versions from the latest one
         for version in versions:
 
