@@ -72,9 +72,9 @@ interact with [Thoth integrations](https://github.com/thoth-station/adviser/blob
 
 - [PackageExtractTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/package_extract_trigger/README.md)
 
-- [ProvenanceCheckerTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/missing_version/README.md)
+- [ProvenanceCheckerTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/provenance_checker_trigger/README.md)
 
-- [QebHwtTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/missing_version/README.md)
+- [QebHwtTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/qebhwt_trigger/README.md)
 
 ## Dev Guide
 
