@@ -93,7 +93,7 @@ create a new directory in thoth/investigator which looks like this:
   - `__init__.py`
   - investigate_<message_name>.py
   - metrics_<message_name>.py
-  - README.md describing the message and what happens once consumed by investigator.
+  - `README.md` describing the message and what happens once consumed by investigator.
 
 ### Message Parsing
 
