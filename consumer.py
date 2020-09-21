@@ -105,8 +105,14 @@ graph = GraphDatabase()
 
 graph.connect()
 
+window_size = float(os.getenv("THOTH_INVESTIGATOR_TABLE_WINDOW", 1))
+window_expiration = float(os.getenv("THOTH_INVESTIGATOR_WINDOW_EXPIRATION", 12))
 # we should allow the time deltas to be passed as params (TEMPORARY)
-offset_table = app.Table("partition_offsets", default=int).tumbling(timedelta(minutes=1), timedelta(hours=6))
+offset_table = (
+    app.Table("partition_offsets", default=int)
+    .tumbling(timedelta(minutes=window_size), timedelta(hours=window_expiration))
+    .relative_to_now()
+)
 
 
 @app.task()
