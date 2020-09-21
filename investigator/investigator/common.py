@@ -93,7 +93,7 @@ async def _schedule_security_indicator(
             aggregation_function="process_data",
         )
         _LOGGER.info(
-            "Scheduled SI %r for package %r in version %r from index %r, analysis is %r",
+            "Scheduled SI workflow for package %r in version %r from index %r, analysis is %r",
             package_name,
             package_version,
             index_url,
