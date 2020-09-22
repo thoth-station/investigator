@@ -53,9 +53,9 @@ The following messages are sent by [package update producer](https://github.com/
 
 - [HashMismatchMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/hash_mismatch/README.md).
 
-- [MissingPackageMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/missing_package/README.md)
+- [MissingPackageMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/missing_package/README.md)
 
-- [MissingVersionMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/missing_version/README.md)
+- [MissingVersionMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/missing_version/README.md)
 
 The following message is sent by [solver](https://github.com/thoth-station/solver) when Thoth acquired all missing knowledge required to provide advice to a user (human or bot):
 
@@ -68,13 +68,13 @@ interact with [Thoth integrations](https://github.com/thoth-station/adviser/blob
 
 - [AdviserTriggerMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/adviser_trigger/README.md).
 
-- [KebechetTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/kebechet_trigger/README.md)
+- [KebechetTriggerMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/kebechet_trigger/README.md)
 
-- [PackageExtractTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/package_extract_trigger/README.md)
+- [PackageExtractTriggerMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/package_extract_trigger/README.md)
 
-- [ProvenanceCheckerTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/provenance_checker_trigger/README.md)
+- [ProvenanceCheckerTriggerMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/provenance_checker_trigger/README.md)
 
-- [QebHwtTriggerMessage](https://github.com/thoth-station/messaging/blob/master/investigator/investigator/qebhwt_trigger/README.md)
+- [QebHwtTriggerMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/qebhwt_trigger/README.md)
 
 ## Dev Guide
 

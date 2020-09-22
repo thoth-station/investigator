@@ -1,4 +1,4 @@
-# AdviserReRunMessage
+# AdviserTriggerMessage
 
 [AdviserTriggerMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/adviser_trigger.py)
 
