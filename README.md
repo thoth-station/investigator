@@ -29,6 +29,15 @@ to Kafka for each package release to be solved using Thoth [Solver](https://gith
 
 Consumer is currently able to handle the following Kafka messages:
 
+#### Configuration
+
+- See [thoth-messaging](https://github.com/thoth-station/messaging)
+- Faust Windowed Tables (see [here](https://faust.readthedocs.io/en/latest/userguide/tables.html))
+  - `THOTH_INVESTIGATOR_WINDOW_EXPIRATION`: Set time until message offset window expires
+  - `THOTH_INVESTIGATOR_TABLE_WINDOW`: The amount of time that a single table window covers
+- `THOTH_GITHUB_PRIVATE_TOKEN`: token for authenticating actions on GitHub repositories
+- `THOTH_GITLAB_PRIVATE_TOKEN`: token for authenticating actions on GitLab repositories
+
 #### UnresolvedPackageMessage
 
 - [UnresolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/unresolved_package.py).
