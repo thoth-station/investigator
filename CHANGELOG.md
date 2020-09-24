@@ -190,3 +190,10 @@ all the things that you see...
 * :pushpin: Automatic update of dependency thoth-sourcemanagement from 0.3.1 to 0.3.2 (#241)
 * :pushpin: Automatic update of dependency hypothesis from 5.35.3 to 5.35.4 (#242)
 * :pushpin: Automatic update of dependency thoth-messaging from 0.7.3 to 0.7.6 (#230)
+
+## Release 0.4.9 (2020-09-24T16:46:52)
+### Automatic Updates
+* :pushpin: Automatic update of dependency hypothesis from 5.35.4 to 5.36.0 (#254)
+* :pushpin: Automatic update of dependency thoth-python from 0.10.1 to 0.10.2 (#253)
+* :pushpin: Automatic update of dependency thoth-common from 0.19.0 to 0.20.0 (#250)
+* :pushpin: Automatic update of dependency hypothesis from 5.35.4 to 5.36.0 (#251)
