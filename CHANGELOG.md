@@ -177,3 +177,23 @@ all the things that you see...
 ## Release 0.4.7 (2020-09-17T07:57:44)
 ### Bug Fixes
 * patch fix the variable reference for metrics (#225)
+
+## Release 0.4.8 (2020-09-22T16:31:01)
+### Features
+* Adjust links (#245)
+* Adjust logging (#237)
+### Improvements
+* Update and refactor docs (#233)
+### Automatic Updates
+* :pushpin: Automatic update of dependency thoth-sourcemanagement from 0.3.1 to 0.3.2 (#244)
+* :pushpin: Automatic update of dependency thoth-storages from 0.25.10 to 0.25.11 (#240)
+* :pushpin: Automatic update of dependency thoth-sourcemanagement from 0.3.1 to 0.3.2 (#241)
+* :pushpin: Automatic update of dependency hypothesis from 5.35.3 to 5.35.4 (#242)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.7.3 to 0.7.6 (#230)
+
+## Release 0.4.9 (2020-09-24T16:46:52)
+### Automatic Updates
+* :pushpin: Automatic update of dependency hypothesis from 5.35.4 to 5.36.0 (#254)
+* :pushpin: Automatic update of dependency thoth-python from 0.10.1 to 0.10.2 (#253)
+* :pushpin: Automatic update of dependency thoth-common from 0.19.0 to 0.20.0 (#250)
+* :pushpin: Automatic update of dependency hypothesis from 5.35.4 to 5.36.0 (#251)
