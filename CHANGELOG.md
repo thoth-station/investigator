@@ -205,3 +205,9 @@ all the things that you see...
 ## Release 0.4.11 (2020-09-25T18:25:23)
 ### Features
 * Correct wrong message (#263)
+
+## Release 0.4.12 (2020-09-25T18:59:04)
+### Improvements
+* make func async (#269)
+### Automatic Updates
+* :pushpin: Automatic update of dependency hypothesis from 5.36.0 to 5.36.1 (#268)
