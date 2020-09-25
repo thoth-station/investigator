@@ -22,6 +22,8 @@ import logging
 from thoth.messaging import AdviserTriggerMessage
 from thoth.common import OpenShift
 
+from ..common import wait_for_limit
+
 from .metrics_adviser_trigger import adviser_trigger_exceptions
 from .metrics_adviser_trigger import adviser_trigger_in_progress
 from .metrics_adviser_trigger import adviser_trigger_success
@@ -31,8 +33,9 @@ _LOGGER = logging.getLogger(__name__)
 
 @adviser_trigger_exceptions.count_exceptions()
 @adviser_trigger_in_progress.track_inprogress()
-def parse_adviser_trigger_message(adviser_trigger: AdviserTriggerMessage, openshift: OpenShift) -> None:
+async def parse_adviser_trigger_message(adviser_trigger: AdviserTriggerMessage, openshift: OpenShift) -> None:
     """Parse adviser trigger message."""
+    await wait_for_limit(openshift)
     workflow_id = openshift.schedule_adviser(
         application_stack=adviser_trigger.application_stack,
         recommendation_type=adviser_trigger.recommendation_type,

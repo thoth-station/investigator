@@ -35,7 +35,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @si_unanalyzed_package_exceptions.count_exceptions()
 @si_unanalyzed_package_in_progress.track_inprogress()
-def parse_si_unanalyzed_package_message(
+async def parse_si_unanalyzed_package_message(
     si_unanalyzed_package: MessageBase, openshift: OpenShift, graph: GraphDatabase
 ) -> None:
     """Parse SI Unanalyzed package messages."""
@@ -45,7 +45,7 @@ def parse_si_unanalyzed_package_message(
 
     # SI logic
 
-    si_wfs_scheduled = common.learn_about_security(
+    si_wfs_scheduled = await common.learn_about_security(
         openshift=openshift,
         graph=graph,
         is_present=True,

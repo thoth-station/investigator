@@ -36,7 +36,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @solved_package_exceptions.count_exceptions()
 @solved_package_in_progress.track_inprogress()
-def parse_solved_package_message(solved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase) -> None:
+async def parse_solved_package_message(solved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase) -> None:
     """Parse solved package message."""
     package_name = solved_package.package_name
     package_version = solved_package.package_version
@@ -44,7 +44,7 @@ def parse_solved_package_message(solved_package: MessageBase, openshift: OpenShi
 
     # SI logic
 
-    si_wfs_scheduled = common.learn_about_security(
+    si_wfs_scheduled = await common.learn_about_security(
         openshift=openshift,
         graph=graph,
         is_present=True,

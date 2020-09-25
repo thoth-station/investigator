@@ -22,6 +22,8 @@ import logging
 from thoth.common import OpenShift
 from thoth.messaging import QebHwtTriggerMessage
 
+from ..common import wait_for_limit
+
 from .metrics_qebhwt_trigger import qebhwt_trigger_exceptions
 from .metrics_qebhwt_trigger import qebhwt_trigger_in_progress
 from .metrics_qebhwt_trigger import qebhwt_trigger_success
@@ -31,8 +33,9 @@ _LOGGER = logging.getLogger(__name__)
 
 @qebhwt_trigger_exceptions.count_exceptions()
 @qebhwt_trigger_in_progress.track_inprogress()
-def parse_qebhwt_trigger_message(qebhwt_trigger: QebHwtTriggerMessage, openshift: OpenShift) -> None:
+async def parse_qebhwt_trigger_message(qebhwt_trigger: QebHwtTriggerMessage, openshift: OpenShift) -> None:
     """Parse qebhwt_trigger message."""
+    await wait_for_limit(openshift)
     workflow_name = openshift.schedule_qebhwt_workflow(
         github_event_type=qebhwt_trigger.github_event_type,
         github_check_run_id=qebhwt_trigger.github_check_run_id,

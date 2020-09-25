@@ -32,7 +32,7 @@ DEPLOYMENT_NAME = os.environ["THOTH_DEPLOYMENT_NAME"]
 
 @advise_justification_exceptions.count_exceptions()
 @advise_justification_in_progress.track_inprogress()
-def expose_advise_justification_metrics(advise_justification):
+async def expose_advise_justification_metrics(advise_justification):
     """Retrieve adviser reports justifications."""
     advise_justification_type_number.labels(
         advise_message=advise_justification.message,

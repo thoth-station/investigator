@@ -31,7 +31,9 @@ from .metrics_package_released import package_released_success
 
 @package_released_exceptions.count_exceptions()
 @package_released_in_progress.track_inprogress()
-def parse_package_released_message(package_released: MessageBase, openshift: OpenShift, graph: GraphDatabase) -> None:
+async def parse_package_released_message(
+    package_released: MessageBase, openshift: OpenShift, graph: GraphDatabase
+) -> None:
     """Parse package released message."""
     package_name = package_released.package_name
     package_version = package_released.package_version
@@ -39,7 +41,7 @@ def parse_package_released_message(package_released: MessageBase, openshift: Ope
 
     # Solver logic
 
-    solver_wf_scheduled = common.learn_using_solver(
+    solver_wf_scheduled = await common.learn_using_solver(
         openshift=openshift,
         graph=graph,
         is_present=False,
@@ -50,13 +52,13 @@ def parse_package_released_message(package_released: MessageBase, openshift: Ope
 
     # Revsolver logic
 
-    revsolver_wf_scheduled, _ = common.learn_using_revsolver(
+    revsolver_wf_scheduled, _ = await common.learn_using_revsolver(
         openshift=openshift, is_present=False, package_name=package_name, package_version=package_version,
     )
 
     # SI logic
 
-    si_wf_scheduled = common.learn_about_security(
+    si_wf_scheduled = await common.learn_about_security(
         openshift=openshift,
         graph=graph,
         is_present=False,

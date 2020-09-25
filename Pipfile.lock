@@ -502,6 +502,7 @@
                 "sha256:3b399d309e64d34848ad88dc4895b71278d7ace34e53a640ee8b091816136276",
                 "sha256:78f7443372e36c545c38c65945e038f08b2abed61ed98d4dd1432e518114ee47"
             ],
+            "markers": "python_version >= '3.6'",
             "version": "==0.15.0"
         },
         "openshift": {

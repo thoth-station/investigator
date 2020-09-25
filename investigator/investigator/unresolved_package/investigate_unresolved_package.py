@@ -96,7 +96,7 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
 
 @unresolved_package_exceptions.count_exceptions()
 @unresolved_package_in_progress.track_inprogress()
-def parse_unresolved_package_message(
+async def parse_unresolved_package_message(
     unresolved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase
 ) -> None:
     """Parse unresolved package message."""
@@ -138,7 +138,7 @@ def parse_unresolved_package_message(
 
             # Solver logic
 
-            solver_wfs_scheduled = common.learn_using_solver(
+            solver_wfs_scheduled = await common.learn_using_solver(
                 openshift=openshift,
                 graph=graph,
                 is_present=is_present,

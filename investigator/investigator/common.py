@@ -20,7 +20,9 @@
 
 import os
 import logging
+from math import inf
 from urllib.parse import urlparse
+from asyncio import sleep
 
 from typing import List, Tuple, Optional
 
@@ -36,9 +38,22 @@ _LOGGER = logging.getLogger(__name__)
 _LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
 GITHUB_PRIVATE_TOKEN = os.getenv("THOTH_GITHUB_PRIVATE_TOKEN")
 GITLAB_PRIVATE_TOKEN = os.getenv("THOTH_GITLAB_PRIVATE_TOKEN")
+SLEEP_TIME = int(os.getenv("ARGO_PENDING_SLEEP_TIME", 2))
+_PENDING_WORKFLOW_LIMIT = os.getenv("ARGO_PENDING_WORKFLOW_LIMIT", None)
 
 
-def learn_about_security(
+async def wait_for_limit(openshift: OpenShift):
+    """Wait for pending workflow limit."""
+    total_pending = inf
+    if _PENDING_WORKFLOW_LIMIT is None:
+        return
+    limit = int(_PENDING_WORKFLOW_LIMIT)
+    while total_pending > limit:
+        await sleep(SLEEP_TIME)
+        total_pending = openshift.workflow_manager.get_pending_workflows()
+
+
+async def learn_about_security(
     openshift: OpenShift,
     graph: GraphDatabase,
     is_present: bool,
@@ -57,16 +72,20 @@ def learn_about_security(
             return 0
 
     # Package never seen (schedule si workflow to collect knowledge for Thoth)
-    is_si_analyzer_scheduled = _schedule_security_indicator(
+    await wait_for_limit(openshift)
+    is_si_analyzer_scheduled = await _schedule_security_indicator(
         openshift=openshift, package_name=package_name, package_version=package_version, index_url=index_url
     )
 
     return is_si_analyzer_scheduled
 
 
-def _schedule_security_indicator(openshift: OpenShift, package_name: str, package_version: str, index_url: str) -> int:
+async def _schedule_security_indicator(
+    openshift: OpenShift, package_name: str, package_version: str, index_url: str
+) -> int:
     """Schedule Security Indicator."""
     try:
+        await wait_for_limit(openshift)
         analysis_id = openshift.schedule_security_indicator(
             python_package_name=package_name,
             python_package_version=package_version,
@@ -90,7 +109,7 @@ def _schedule_security_indicator(openshift: OpenShift, package_name: str, packag
     return is_scheduled
 
 
-def learn_using_revsolver(
+async def learn_using_revsolver(
     openshift: OpenShift,
     is_present: bool,
     package_name: str,
@@ -100,7 +119,7 @@ def learn_using_revsolver(
     """Learn using revsolver about Package Version dependencies."""
     if not is_present and (package_name, package_version) not in revsolver_packages_seen:
         # Package never seen (schedule revsolver workflow to collect knowledge for Thoth)
-        is_revsolver_scheduled = _schedule_revsolver(
+        is_revsolver_scheduled = await _schedule_revsolver(
             openshift=openshift, package_name=package_name, package_version=package_version
         )
         revsolver_packages_seen.append((package_name, package_version))
@@ -110,9 +129,10 @@ def learn_using_revsolver(
     return 0, revsolver_packages_seen
 
 
-def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version: str) -> int:
+async def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version: str) -> int:
     """Schedule revsolver."""
     try:
+        await wait_for_limit(openshift)
         analysis_id = openshift.schedule_revsolver(
             package_name=package_name, package_version=package_version, debug=_LOG_REVSOLVER
         )
@@ -132,7 +152,7 @@ def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version
     return is_scheduled
 
 
-def learn_using_solver(
+async def learn_using_solver(
     openshift: OpenShift,
     graph: GraphDatabase,
     is_present: bool,
@@ -144,7 +164,7 @@ def learn_using_solver(
     """Learn using solver about Package Version Index dependencies."""
     if not is_present:
         # Package never seen (schedule all solver workflows to collect all knowledge for Thoth)
-        are_solvers_scheduled = _schedule_all_solvers(
+        are_solvers_scheduled = await _schedule_all_solvers(
             openshift=openshift, package_name=package_name, package_version=package_version, indexes=[index_url]
         )
         return are_solvers_scheduled
@@ -203,11 +223,14 @@ def _schedule_solver(
     return is_scheduled
 
 
-def _schedule_all_solvers(openshift: OpenShift, package_name: str, package_version: str, indexes: List[str]) -> int:
+async def _schedule_all_solvers(
+    openshift: OpenShift, package_name: str, package_version: str, indexes: List[str]
+) -> int:
     """Schedule all solvers."""
     try:
         packages = f"{package_name}==={package_version}"
 
+        await wait_for_limit(openshift)
         analysis_ids = openshift.schedule_all_solvers(packages=packages, indexes=indexes)
         _LOGGER.info(
             "Scheduled solvers %r for packages %r from indexes %r, analysis ids are %r", packages, indexes, analysis_ids
