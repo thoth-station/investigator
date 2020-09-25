@@ -40,7 +40,7 @@ async def parse_si_unanalyzed_package_message(
 ) -> None:
     """Parse SI Unanalyzed package messages."""
     package_name: str = si_unanalyzed_package.package_name
-    package_version: str = si_unanalyzed_package.version
+    package_version: str = si_unanalyzed_package.package_version
     index_url: str = si_unanalyzed_package.index_url
 
     # SI logic
