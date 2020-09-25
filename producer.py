@@ -20,10 +20,10 @@
 import logging
 import os
 
-from thoth.investigator import __service_version__
+from investigator.investigator import __service_version__
 from thoth.messaging import MessageBase
 from thoth.messaging.unresolved_package import UnresolvedPackageMessage
-from thoth.investigator.investigate_unresolved_package import investigate_unresolved_package
+from investigator.investigator.unresolved_package import investigate_unresolved_package
 
 import asyncio
 
