@@ -29,7 +29,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @missing_version_exceptions.count_exceptions()
 @missing_version_in_progress.track_inprogress()
-def parse_missing_version(version, openshift, graph):
+async def parse_missing_version(version, openshift, graph):
     """Process a missing version message from package-update producer."""
     graph.update_missing_flag_package_version(
         index_url=version.index_url,
