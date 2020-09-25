@@ -201,3 +201,7 @@ all the things that you see...
 ## Release 0.4.10 (2020-09-25T05:55:49)
 ### Features
 * correct the investigate_unresolved_package import (#259)
+
+## Release 0.4.11 (2020-09-25T18:25:23)
+### Features
+* Correct wrong message (#263)
