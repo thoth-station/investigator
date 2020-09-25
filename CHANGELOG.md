@@ -197,3 +197,7 @@ all the things that you see...
 * :pushpin: Automatic update of dependency thoth-python from 0.10.1 to 0.10.2 (#253)
 * :pushpin: Automatic update of dependency thoth-common from 0.19.0 to 0.20.0 (#250)
 * :pushpin: Automatic update of dependency hypothesis from 5.35.4 to 5.36.0 (#251)
+
+## Release 0.4.10 (2020-09-25T05:55:49)
+### Features
+* correct the investigate_unresolved_package import (#259)
