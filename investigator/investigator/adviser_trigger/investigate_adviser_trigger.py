@@ -27,12 +27,13 @@ from ..common import wait_for_limit
 from .metrics_adviser_trigger import adviser_trigger_exceptions
 from .metrics_adviser_trigger import adviser_trigger_in_progress
 from .metrics_adviser_trigger import adviser_trigger_success
+from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
 
-@adviser_trigger_exceptions.count_exceptions()
-@adviser_trigger_in_progress.track_inprogress()
+@count_exceptions(adviser_trigger_exceptions)
+@track_inprogress(adviser_trigger_in_progress)
 async def parse_adviser_trigger_message(adviser_trigger: AdviserTriggerMessage, openshift: OpenShift) -> None:
     """Parse adviser trigger message."""
     await wait_for_limit(openshift)
