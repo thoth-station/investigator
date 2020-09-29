@@ -18,7 +18,6 @@
 """Investigate about SI analyzable packages."""
 
 import logging
-import os
 
 from .metrics_package_si_analyzable import package_si_analyzable_exceptions
 from .metrics_package_si_analyzable import package_si_analyzable_success
@@ -35,7 +34,7 @@ async def parse_package_si_analyzable_message(package_si_analyzable, graph):
         package_name=package_si_analyzable.package_name,
         package_version=package_si_analyzable.package_version,
         index_url=package_si_analyzable.index_url,
-        value=package_si_analyzable.value
+        value=package_si_analyzable.value,
     )
 
     _LOGGER.info(
@@ -43,7 +42,7 @@ async def parse_package_si_analyzable_message(package_si_analyzable, graph):
         package_si_analyzable.package_name,
         package_si_analyzable.package_version,
         package_si_analyzable.index_url,
-        package_si_analyzable.value
+        package_si_analyzable.value,
     )
 
     package_si_analyzable_success.inc()

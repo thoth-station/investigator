@@ -17,8 +17,7 @@
 
 """Set labels for package SI analyzable metrics."""
 
-from prometheus_client import Gauge
-from ..metrics import in_progress, success, exceptions, registry
+from ..metrics import in_progress, success, exceptions
 
 package_si_analyzable_in_progress = in_progress.labels(message_type="package_si_analyzable")
 package_si_analyzable_success = success.labels(message_type="package_si_analyzable")
