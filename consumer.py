@@ -27,6 +27,7 @@ from thoth.messaging import AdviseJustificationMessage
 from thoth.messaging import AdviserReRunMessage
 from thoth.messaging import AdviserTriggerMessage
 from thoth.messaging import HashMismatchMessage
+from thoth.messaging import IsPackageSIAnalyzableMessage
 from thoth.messaging import KebechetTriggerMessage
 from thoth.messaging import MissingPackageMessage
 from thoth.messaging import MissingVersionMessage
@@ -51,6 +52,7 @@ from investigator.investigator.missing_package import parse_missing_package
 from investigator.investigator.missing_version import parse_missing_version
 from investigator.investigator.package_extract_trigger import parse_package_extract_trigger_message
 from investigator.investigator.package_released import parse_package_released_message
+from investigator.investigator.package_si_analyzable import parse_package_si_analyzable_message
 from investigator.investigator.provenance_checker_trigger import parse_provenance_checker_trigger_message
 from investigator.investigator.qebhwt_trigger import parse_qebhwt_trigger_message
 from investigator.investigator.si_unanalyzed_package import parse_si_unanalyzed_package_message
@@ -90,6 +92,7 @@ advise_justification_message_topic = AdviseJustificationMessage().topic
 adviser_re_run_message_topic = AdviserReRunMessage().topic
 adviser_trigger_message_topic = AdviserTriggerMessage().topic
 hash_mismatch_message_topic = HashMismatchMessage().topic
+is_package_si_analyzable_message_topic = IsPackageSIAnalyzableMessage().topic
 kebechet_trigger_message_topic = KebechetTriggerMessage().topic
 missing_package_message_topic = MissingPackageMessage().topic
 missing_version_message_topic = MissingVersionMessage().topic
@@ -148,6 +151,13 @@ async def consume_hash_mismatch(hash_mismatches):
     """Loop when an hash mismatch message is received."""
     async for hash_mismatch in hash_mismatches:
         await parse_hash_mismatch(mismatch=hash_mismatch, openshift=openshift, graph=graph)
+
+
+@app.agent(is_package_si_analyzable_message_topic)
+async def consume_is_package_si_analyzable(is_package_si_analyzables):
+    """Loop when is_package_si_analyzable message is received."""
+    async for is_package_si_analyzable in is_package_si_analyzables:
+        await parse_package_si_analyzable_message(package_si_analyzable=is_package_si_analyzable, graph=graph)
 
 
 @app.agent(kebechet_trigger_message_topic)
