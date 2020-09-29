@@ -52,6 +52,8 @@ The following messages are sent by different Thoth components:
 
 - [SolvedPackageMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/solved_package/README.md).
 
+![IncreaseThothKnowledge](https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/IncreaseThothKnowledge.jpg)
+
 ### Monitor Thoth results and knowledge
 
 The following message is sent by [advise reporter producer](https://github.com/thoth-station/advise-reporter) to show the use of recomendations across all Thoth integrations:
