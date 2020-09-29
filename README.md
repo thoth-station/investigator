@@ -2,7 +2,7 @@
 
 Thoth Investigator is an agent sent out by Thoth to seek new information on packages, that will yield observations and knowledge to Thoth.
 
-Thoth Investigator is called by Thoth components to gather new nessages after investigations about possible observations on packages.
+Thoth Investigator is called by Thoth components to gather new messages after investigations about possible observations on packages.
 These messages produced are sent out using Kafka.
 
 Thoth Investigator centre of investigation receives those messages and after further investigation decides what actions need to be taken depending on the messages received,
