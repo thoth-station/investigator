@@ -52,6 +52,14 @@ The following messages are sent by different Thoth components:
 
 - [SolvedPackageMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/solved_package/README.md).
 
+![IncreaseThothKnowledge](https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/IncreaseThothKnowledge.jpg)
+
+The image above shows how Thoth keeps learning automatically using two fundamental components that produce messages described in this section:
+
+- [package release producer](https://github.com/thoth-station/package-releases-job) to acquire knowledge on newly released package version from a certain index.
+
+- [graph-refresh producer](https://github.com/thoth-station/graph-refresh-job) to allow Thoth continuosly learn and keep the internal knowledge up to date.
+
 ### Monitor Thoth results and knowledge
 
 The following message is sent by [advise reporter producer](https://github.com/thoth-station/advise-reporter) to show the use of recomendations across all Thoth integrations:
@@ -69,6 +77,26 @@ The following messages are sent by [package update producer](https://github.com/
 The following message is sent by [solver](https://github.com/thoth-station/solver) when Thoth acquired all missing knowledge required to provide advice to a user (human or bot):
 
 - [AdviserReRunMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/advise_justification/README.md).
+
+![FailedAdviceAdviserReRun](https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/FailedAdviceAdviserReRun.jpg)
+
+The image above shows how Thoth is able to self-heal itself when knowledge is missing in providing an advise:
+
+- When a user requests Thoth advice, but there is missing information to provide it, the adviser Argo workflow
+will send a message to Kafka ([UnresolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/unresolved_package.py))
+through one of its tasks which depends on [thoth-messaging](https://github.com/thoth-station/messaging) library.
+
+- investigator will consume these event messages and schedule solver workflows accordingly so that Thoth can learn about missing information.
+
+- During solver workflow two Kafka messages are sent out:
+  - [SolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/solved_package.py), used by investigator to schedule the next information that needs to be learned by Thoth e.g security information.
+  - [AdviserReRunMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/adviser_re_run.py), that contains all information required by investigator to reschedule an adviser that previously failed.
+
+- The loop is closed once the adviser workflow re-run is successful in providing advice.
+
+This self-learning data-driven pipeline with Argo and Kafka is fundamental for all Thoth integrations because it will make Thoth learn about new packages
+and keep its knowledge up to date to what users use in their software stacks.
+
 
 ### Trigger User requests
 
