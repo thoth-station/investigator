@@ -27,6 +27,15 @@ to Kafka for each package release to be solved using Thoth [Solver](https://gith
 
 ### Consumer
 
+#### Environment Variables
+
+- See [thoth-messaging](https://github.com/thoth-station/messaging)
+- `THOTH_GITHUB_PRIVATE_TOKEN`: token for authenticating actions on GitHub repositories
+- `THOTH_GITLAB_PRIVATE_TOKEN`: token for authenticating actions on GitLab repositories
+- Enforcing a workflow limit:
+  - `ARGO_PENDING_SLEEP_TIME`: amount of time we wait between checking the number of workflows in progress
+  - `ARGO_PENDING_WORKFLOW_LIMIT`: limit to enforce on argo for total number of pending workflows
+
 Consumer is currently able to handle the following Kafka messages focused on:
 
 ### Increase Thoth Knowledge
