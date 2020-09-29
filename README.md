@@ -54,6 +54,12 @@ The following messages are sent by different Thoth components:
 
 ![IncreaseThothKnowledge](https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/IncreaseThothKnowledge.jpg)
 
+The image above shows how Thoth keeps learning automatically using two fundamental components that produce messages:
+
+- [package release producer](https://github.com/thoth-station/package-releases-job) to acquire knowledge on newly released package version from a certain index.
+
+- [graph-refresh producer](https://github.com/thoth-station/graph-refresh-job) to allow Thoth continuosly learn and keep the internal knowledge up to date.
+
 ### Monitor Thoth results and knowledge
 
 The following message is sent by [advise reporter producer](https://github.com/thoth-station/advise-reporter) to show the use of recomendations across all Thoth integrations:
