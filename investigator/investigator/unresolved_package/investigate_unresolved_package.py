@@ -34,6 +34,8 @@ from thoth.python import Source
 
 from ..metrics import scheduled_workflows
 from .. import common
+from ..configuration import Configuration
+
 from .metrics_unresolved_package import unresolved_package_exceptions
 from .metrics_unresolved_package import unresolved_package_in_progress
 from .metrics_unresolved_package import unresolved_package_success
@@ -106,54 +108,54 @@ async def parse_unresolved_package_message(
     requested_indexes: Optional[List[str]] = unresolved_package.index_url
     solver = unresolved_package.solver
 
-    total_solver_wfs_scheduled = 0
+    if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER:
+        total_solver_wfs_scheduled = 0
 
-    # Select indexes
-    registered_indexes: List[str] = graph.get_python_package_index_urls_all()
+        # Select indexes
+        registered_indexes: List[str] = graph.get_python_package_index_urls_all()
 
-    indexes = registered_indexes
+        indexes = registered_indexes
 
-    if not requested_indexes:
-        _LOGGER.info("Using Thoth registered indexes...")
-    else:
-        if all(index_url in registered_indexes for index_url in requested_indexes):
-            indexes = requested_indexes
-            _LOGGER.info("Using requested indexes...")
-        else:
+        if not requested_indexes:
             _LOGGER.info("Using Thoth registered indexes...")
+        else:
+            if all(index_url in registered_indexes for index_url in requested_indexes):
+                indexes = requested_indexes
+                _LOGGER.info("Using requested indexes...")
+            else:
+                _LOGGER.info("Using Thoth registered indexes...")
 
-    # Parse package version for each index
-    for index_url in indexes:
+        # Parse package version for each index
+        for index_url in indexes:
 
-        versions = _check_package_version(
-            package_name=package_name, package_version=package_version, index_url=index_url
+            versions = _check_package_version(
+                package_name=package_name, package_version=package_version, index_url=index_url
+            )
+
+            # Loop versions from the latest one
+            for version in versions:
+
+                # Check if package version index exists in Thoth Knowledge Graph
+                is_present = graph.python_package_version_exists(
+                    package_name=package_name, package_version=version, index_url=index_url
+                )
+
+                # Solver logic
+                solver_wfs_scheduled = await common.learn_using_solver(
+                    openshift=openshift,
+                    graph=graph,
+                    is_present=is_present,
+                    package_name=package_name,
+                    index_url=index_url,
+                    package_version=version,
+                    solver=solver,
+                )
+
+                total_solver_wfs_scheduled += solver_wfs_scheduled
+
+        scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver").inc(
+            total_solver_wfs_scheduled
         )
-
-        # Loop versions from the latest one
-        for version in versions:
-
-            # Check if package version index exists in Thoth Knowledge Graph
-            is_present = graph.python_package_version_exists(
-                package_name=package_name, package_version=version, index_url=index_url
-            )
-
-            # Solver logic
-
-            solver_wfs_scheduled = await common.learn_using_solver(
-                openshift=openshift,
-                graph=graph,
-                is_present=is_present,
-                package_name=package_name,
-                index_url=index_url,
-                package_version=version,
-                solver=solver,
-            )
-
-            total_solver_wfs_scheduled += solver_wfs_scheduled
-
-    scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver").inc(
-        total_solver_wfs_scheduled
-    )
 
     unresolved_package_success.inc()
 

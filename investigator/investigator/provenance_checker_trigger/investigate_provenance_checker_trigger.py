@@ -23,6 +23,7 @@ from thoth.messaging import ProvenanceCheckerTriggerMessage
 from thoth.common import OpenShift
 
 from ..common import wait_for_limit
+from ..configuration import Configuration
 
 from .metrics_provenance_checker_trigger import provenance_checker_trigger_exceptions
 from .metrics_provenance_checker_trigger import provenance_checker_trigger_in_progress
@@ -38,7 +39,7 @@ async def parse_provenance_checker_trigger_message(
     provenance_checker_trigger: ProvenanceCheckerTriggerMessage, openshift: OpenShift
 ) -> None:
     """Parse provenance_checker_trigger message."""
-    await wait_for_limit(openshift)
+    await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
     workflow_name = openshift.schedule_provenance_checker(
         application_stack=provenance_checker_trigger.application_stack,
         origin=provenance_checker_trigger.origin,

@@ -2,7 +2,7 @@
 
 Thoth Investigator is an agent sent out by Thoth to seek new information on packages, that will yield observations and knowledge to Thoth.
 
-Thoth Investigator is called by Thoth components to gather new nessages after investigations about possible observations on packages.
+Thoth Investigator is called by Thoth components to gather new messages after investigations about possible observations on packages.
 These messages produced are sent out using Kafka.
 
 Thoth Investigator centre of investigation receives those messages and after further investigation decides what actions need to be taken depending on the messages received,
@@ -27,6 +27,15 @@ to Kafka for each package release to be solved using Thoth [Solver](https://gith
 
 ### Consumer
 
+#### Environment Variables
+
+- See [thoth-messaging](https://github.com/thoth-station/messaging)
+- `THOTH_GITHUB_PRIVATE_TOKEN`: token for authenticating actions on GitHub repositories
+- `THOTH_GITLAB_PRIVATE_TOKEN`: token for authenticating actions on GitLab repositories
+- Enforcing a workflow limit:
+  - `ARGO_PENDING_SLEEP_TIME`: amount of time we wait between checking the number of workflows in progress
+  - `ARGO_PENDING_WORKFLOW_LIMIT`: limit to enforce on argo for total number of pending workflows
+
 Consumer is currently able to handle the following Kafka messages focused on:
 
 ### Increase Thoth Knowledge
@@ -42,6 +51,14 @@ The following messages are sent by different Thoth components:
 - [SIUnanalyzedPackageMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/si_unanalyzed_package/README.md).
 
 - [SolvedPackageMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/solved_package/README.md).
+
+![IncreaseThothKnowledge](https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/IncreaseThothKnowledge.jpg)
+
+The image above shows how Thoth keeps learning automatically using two fundamental components that produce messages described in this section:
+
+- [package release producer](https://github.com/thoth-station/package-releases-job) to acquire knowledge on newly released package version from a certain index.
+
+- [graph-refresh producer](https://github.com/thoth-station/graph-refresh-job) to allow Thoth continuosly learn and keep the internal knowledge up to date.
 
 ### Monitor Thoth results and knowledge
 
@@ -61,6 +78,25 @@ The following message is sent by [solver](https://github.com/thoth-station/solve
 
 - [AdviserReRunMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/advise_justification/README.md).
 
+![FailedAdviceAdviserReRun](https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/FailedAdviceAdviserReRun.jpg)
+
+The image above shows how Thoth is able to self-heal itself when knowledge is missing in providing an advise:
+
+- When a user requests Thoth advice, but there is missing information to provide it, the adviser Argo workflow
+will send a message to Kafka ([UnresolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/unresolved_package.py))
+through one of its tasks which depends on [thoth-messaging](https://github.com/thoth-station/messaging) library.
+
+- investigator will consume these event messages and schedule solver workflows accordingly so that Thoth can learn about missing information.
+
+- During solver workflow two Kafka messages are sent out:
+  - [SolvedPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/solved_package.py), used by investigator to schedule the next information that needs to be learned by Thoth e.g security information.
+  - [AdviserReRunMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/adviser_re_run.py), that contains all information required by investigator to reschedule an adviser that previously failed.
+
+- The loop is closed once the adviser workflow re-run is successful in providing advice.
+
+This self-learning data-driven pipeline with Argo and Kafka is fundamental for all Thoth integrations because it will make Thoth learn about new packages
+and keep its knowledge up to date to what users use in their software stacks.
+
 ### Trigger User requests
 
 The following messages are sent by [User-API producer](https://github.com/thoth-station/user-api) when users (humans or bots)
@@ -75,6 +111,10 @@ interact with [Thoth integrations](https://github.com/thoth-station/adviser/blob
 - [ProvenanceCheckerTriggerMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/provenance_checker_trigger/README.md)
 
 - [QebHwtTriggerMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/qebhwt_trigger/README.md)
+
+![UserAPIKafkaProducer](https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/UserAPIKafkaProducer.jpg)
+
+The image above explains what happen when a User of Thoth (Human or Bot) interacts with one of Thoth integrations.
 
 ## Dev Guide
 

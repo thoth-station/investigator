@@ -25,6 +25,8 @@ from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
 from ..common import wait_for_limit
+from ..configuration import Configuration
+
 from .metrics_adviser_re_run import adviser_re_run_exceptions
 from .metrics_adviser_re_run import adviser_re_run_success
 from .metrics_adviser_re_run import adviser_re_run_in_progress
@@ -60,7 +62,7 @@ async def _re_schedule_adviser(openshift: OpenShift, parameters: MessageBase) ->
     source_type = parameters.source_type
 
     try:
-        await wait_for_limit(openshift)
+        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
         analysis_id = openshift.schedule_adviser(
             application_stack=application_stack,
             recommendation_type=recommendation_type,

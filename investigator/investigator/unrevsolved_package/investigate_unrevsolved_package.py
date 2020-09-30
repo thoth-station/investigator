@@ -24,6 +24,7 @@ from thoth.messaging import UnrevsolvedPackageMessage
 from thoth.common import OpenShift
 
 from .. import common
+from ..configuration import Configuration
 from ..metrics import scheduled_workflows
 from .metrics_unrevsolved_package import unrevsolved_package_exceptions
 from .metrics_unrevsolved_package import unrevsolved_package_in_progress
@@ -41,17 +42,17 @@ async def parse_revsolved_package_message(unrevsolved_package: MessageBase, open
     package_version = unrevsolved_package.package_version
 
     # Revsolver logic
+    if Configuration.THOTH_INVESTIGATOR_SCHEDULE_REVSOLVER:
+        revsolver_wfs_scheduled, _ = await common.learn_using_revsolver(
+            openshift=openshift,
+            is_present=True,
+            package_name=package_name,
+            package_version=package_version,
+            revsolver_packages_seen=[],
+        )
 
-    revsolver_wfs_scheduled, _ = await common.learn_using_revsolver(
-        openshift=openshift,
-        is_present=True,
-        package_name=package_name,
-        package_version=package_version,
-        revsolver_packages_seen=[],
-    )
-
-    scheduled_workflows.labels(message_type=UnrevsolvedPackageMessage.topic_name, workflow_type="revsolver").inc(
-        revsolver_wfs_scheduled
-    )
+        scheduled_workflows.labels(message_type=UnrevsolvedPackageMessage.topic_name, workflow_type="revsolver").inc(
+            revsolver_wfs_scheduled
+        )
 
     unrevsolved_package_success.inc()

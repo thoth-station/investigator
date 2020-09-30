@@ -19,7 +19,8 @@
 
 import logging
 
-from .. import common
+from ..common import wait_for_limit, git_source_from_url
+from ..configuration import Configuration
 from .metrics_hash_mismatch import hash_mismatch_exceptions
 from .metrics_hash_mismatch import hash_mismatch_success
 from .metrics_hash_mismatch import hash_mismatch_in_progress
@@ -33,7 +34,7 @@ _LOGGER = logging.getLogger(__name__)
 async def parse_hash_mismatch(mismatch, openshift, graph):
     """Process a hash mismatch message from package-update producer."""
     try:
-        await common.wait_for_limit(openshift)
+        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
         openshift.schedule_all_solvers(
             packages=f"{mismatch.package_name}==={mismatch.package_version}", indexes=[mismatch.index_url],
         )
@@ -69,7 +70,7 @@ async def parse_hash_mismatch(mismatch, openshift, graph):
         return "Automated message from package change detected by thoth.package-update"
 
     for repo in repositories:
-        gitservice_repo = common.git_source_from_url(repo)
+        gitservice_repo = git_source_from_url(repo)
         gitservice_repo.open_issue_if_not_exist(issue_title, issue_body)
 
     hash_mismatch_success.inc()

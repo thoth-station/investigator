@@ -41,6 +41,7 @@ from thoth.messaging import UnrevsolvedPackageMessage
 
 
 from investigator.investigator import __service_version__
+from investigator.investigator.configuration import Configuration
 from investigator.investigator.advise_justification import expose_advise_justification_metrics
 from investigator.investigator.adviser_re_run import parse_adviser_re_run_message
 from investigator.investigator.adviser_trigger import parse_adviser_trigger_message
@@ -63,6 +64,11 @@ from thoth.storages.graph import GraphDatabase
 from aiohttp import web
 from prometheus_client import generate_latest
 
+# initialize the application
+app = MessageBase().app
+
+init_logging()
+
 # set up logging
 DEBUG_LEVEL = bool(int(os.getenv("DEBUG_LEVEL", 0)))
 
@@ -74,8 +80,10 @@ else:
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
 
-# initialize the application
-app = MessageBase().app
+# Conditional scheduling, by default we schedule everything.
+_LOGGER.info("Schedule Solver Messages set to - %r", Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER)
+_LOGGER.info("Schedule Reverse Solver Messages set to - %r", Configuration.THOTH_INVESTIGATOR_SCHEDULE_REVSOLVER)
+_LOGGER.info("Schedule Unanalyzed SI Messages set to - %r", Configuration.THOTH_INVESTIGATOR_SCHEDULE_SECURITY)
 
 # Get all topics
 advise_justification_message_topic = AdviseJustificationMessage().topic
@@ -99,12 +107,6 @@ openshift = OpenShift()
 graph = GraphDatabase()
 
 graph.connect()
-
-
-@app.task()
-async def after_initialization():
-    """Run things after the app has started."""
-    init_logging()
 
 
 @app.page("/metrics")
