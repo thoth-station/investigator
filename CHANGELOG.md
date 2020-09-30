@@ -224,3 +224,8 @@ all the things that you see...
 * :pushpin: Automatic update of dependency thoth-storages from 0.25.11 to 0.25.12 (#276)
 * :pushpin: Automatic update of dependency pytest from 6.0.2 to 6.1.0 (#278)
 * :pushpin: Automatic update of dependency thoth-messaging from 0.7.6 to 0.7.7 (#277)
+
+## Release 0.4.14 (2020-09-30T10:05:06)
+### Features
+* Remove parameter not existing in message (#288)
+* Describe User-API Investigator interaction (#286)
