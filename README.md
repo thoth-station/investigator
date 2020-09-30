@@ -114,7 +114,7 @@ interact with [Thoth integrations](https://github.com/thoth-station/adviser/blob
 
 ![UserAPIKafkaProducer](https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/UserAPIKafkaProducer.jpg)
 
-The image above explain what happens when a User of Thoth (Human or Bot) interacts with one of Thoth integrations.
+The image above explains what happen when a User of Thoth (Human or Bot) interacts with one of Thoth integrations.
 
 ## Dev Guide
 
