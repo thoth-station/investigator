@@ -19,7 +19,7 @@
 
 import logging
 
-from ..common import wait_for_limit
+from ..common import wait_for_limit, git_source_from_url
 from ..configuration import Configuration
 from .metrics_hash_mismatch import hash_mismatch_exceptions
 from .metrics_hash_mismatch import hash_mismatch_success
@@ -69,7 +69,7 @@ async def parse_hash_mismatch(mismatch, openshift, graph):
         return "Automated message from package change detected by thoth.package-update"
 
     for repo in repositories:
-        gitservice_repo = common.git_source_from_url(repo)
+        gitservice_repo = git_source_from_url(repo)
         gitservice_repo.open_issue_if_not_exist(issue_title, issue_body)
 
     hash_mismatch_success.inc()

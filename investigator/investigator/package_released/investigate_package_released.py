@@ -24,6 +24,7 @@ from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
 from .. import common
+from ..configuration import Configuration
 from .metrics_package_released import package_released_exceptions
 from .metrics_package_released import package_released_in_progress
 from .metrics_package_released import package_released_success
@@ -53,7 +54,6 @@ async def parse_package_released_message(
         scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="solver").inc(
             solver_wf_scheduled
         )
-
 
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_REVSOLVER:
         # Revsolver logic

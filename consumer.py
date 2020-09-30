@@ -82,12 +82,8 @@ _LOGGER.info("Thoth Investigator consumer v%s", __service_version__)
 
 # Conditional scheduling, by default we schedule everything.
 _LOGGER.info("Schedule Solver Messages set to - %r", Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER)
-_LOGGER.info(
-    "Schedule Reverse Solver Messages set to - %r", Configuration.THOTH_INVESTIGATOR_SCHEDULE_REVSOLVER
-)
-_LOGGER.info(
-    "Schedule Unanalyzed SI Messages set to - %r", Configuration.THOTH_INVESTIGATOR_SCHEDULE_SECURITY
-)
+_LOGGER.info("Schedule Reverse Solver Messages set to - %r", Configuration.THOTH_INVESTIGATOR_SCHEDULE_REVSOLVER)
+_LOGGER.info("Schedule Unanalyzed SI Messages set to - %r", Configuration.THOTH_INVESTIGATOR_SCHEDULE_SECURITY)
 
 # Get all topics
 advise_justification_message_topic = AdviseJustificationMessage().topic

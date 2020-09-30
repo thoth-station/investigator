@@ -18,7 +18,6 @@
 
 """This is Thoth investigator common methods."""
 
-import os
 import logging
 from math import inf
 from urllib.parse import urlparse
@@ -36,7 +35,6 @@ from .configuration import Configuration
 _LOGGER = logging.getLogger(__name__)
 
 
-
 async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
     """Wait for pending workflow limit."""
     total_pending = inf
@@ -45,9 +43,7 @@ async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
     limit = int(Configuration._PENDING_WORKFLOW_LIMIT)
     while total_pending > limit:
         await sleep(Configuration.SLEEP_TIME)
-        total_pending = openshift.workflow_manager.get_pending_workflows(
-            workflow_namespace=workflow_namespace
-        )
+        total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
 
 
 async def learn_about_security(
@@ -247,9 +243,9 @@ def git_source_from_url(url: str) -> SourceManagement:
     service_name = service_url.split(".")[-2]
     service_type = ServiceType.by_name(service_name)
     if service_type == ServiceType.GITHUB:
-        token = GITHUB_PRIVATE_TOKEN
+        token = Configuration.GITHUB_PRIVATE_TOKEN
     elif service_type == ServiceType.GITLAB:
-        token = GITLAB_PRIVATE_TOKEN
+        token = Configuration.GITLAB_PRIVATE_TOKEN
     else:
         raise NotImplementedError("There is no token for this service type")
     return SourceManagement(service_type, res.scheme + "://" + res.netloc, token, res.path)
