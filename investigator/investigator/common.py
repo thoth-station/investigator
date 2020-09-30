@@ -38,9 +38,9 @@ _LOGGER = logging.getLogger(__name__)
 async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
     """Wait for pending workflow limit."""
     total_pending = inf
-    if Configuration._PENDING_WORKFLOW_LIMIT is None:
+    if Configuration.PENDING_WORKFLOW_LIMIT is None:
         return
-    limit = int(Configuration._PENDING_WORKFLOW_LIMIT)
+    limit = int(Configuration.PENDING_WORKFLOW_LIMIT)
     while total_pending > limit:
         await sleep(Configuration.SLEEP_TIME)
         total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
@@ -127,7 +127,7 @@ async def _schedule_revsolver(openshift: OpenShift, package_name: str, package_v
     try:
         await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
         analysis_id = openshift.schedule_revsolver(
-            package_name=package_name, package_version=package_version, debug=Configuration._LOG_REVSOLVER
+            package_name=package_name, package_version=package_version, debug=Configuration.LOG_REVSOLVER
         )
         _LOGGER.info(
             "Scheduled reverse solver for package %r in version %r, analysis is %r",
@@ -199,7 +199,7 @@ def _schedule_solver(
         packages = f"{package_name}==={package_version}"
 
         analysis_id = openshift.schedule_solver(
-            solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=Configuration._LOG_SOLVER
+            solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=Configuration.LOG_SOLVER
         )
         _LOGGER.info(
             "Scheduled solver %r for packages %r from indexes %r, analysis is %r",
