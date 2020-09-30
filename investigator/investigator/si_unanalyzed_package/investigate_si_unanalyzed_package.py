@@ -26,6 +26,8 @@ from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
 from .. import common
+from ..configuration import Configuration
+
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_in_progress
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_success
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_exceptions
@@ -44,18 +46,18 @@ async def parse_si_unanalyzed_package_message(
     index_url: str = si_unanalyzed_package.index_url
 
     # SI logic
+    if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SECURITY:
+        si_wfs_scheduled = await common.learn_about_security(
+            openshift=openshift,
+            graph=graph,
+            is_present=True,
+            package_name=package_name,
+            package_version=package_version,
+            index_url=index_url,
+        )
 
-    si_wfs_scheduled = await common.learn_about_security(
-        openshift=openshift,
-        graph=graph,
-        is_present=True,
-        package_name=package_name,
-        package_version=package_version,
-        index_url=index_url,
-    )
-
-    scheduled_workflows.labels(
-        message_type=SIUnanalyzedPackageMessage.topic_name, workflow_type="security-indicator"
-    ).inc(si_wfs_scheduled)
+        scheduled_workflows.labels(
+            message_type=SIUnanalyzedPackageMessage.topic_name, workflow_type="security-indicator"
+        ).inc(si_wfs_scheduled)
 
     si_unanalyzed_package_success.inc()

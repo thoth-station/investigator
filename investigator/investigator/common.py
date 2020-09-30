@@ -18,7 +18,6 @@
 
 """This is Thoth investigator common methods."""
 
-import os
 import logging
 from math import inf
 from urllib.parse import urlparse
@@ -31,26 +30,21 @@ from thoth.storages import GraphDatabase
 from thoth.sourcemanagement.sourcemanagement import SourceManagement
 from thoth.sourcemanagement.enums import ServiceType
 
-_LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
+from .configuration import Configuration
 
 _LOGGER = logging.getLogger(__name__)
 
-_LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
-GITHUB_PRIVATE_TOKEN = os.getenv("THOTH_GITHUB_PRIVATE_TOKEN")
-GITLAB_PRIVATE_TOKEN = os.getenv("THOTH_GITLAB_PRIVATE_TOKEN")
-SLEEP_TIME = int(os.getenv("ARGO_PENDING_SLEEP_TIME", 2))
-_PENDING_WORKFLOW_LIMIT = os.getenv("ARGO_PENDING_WORKFLOW_LIMIT", None)
 
-
-async def wait_for_limit(openshift: OpenShift):
+async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
     """Wait for pending workflow limit."""
     total_pending = inf
-    if _PENDING_WORKFLOW_LIMIT is None:
+    if Configuration.PENDING_WORKFLOW_LIMIT is None:
         return
-    limit = int(_PENDING_WORKFLOW_LIMIT)
+    limit = int(Configuration.PENDING_WORKFLOW_LIMIT)
+    total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
     while total_pending > limit:
-        await sleep(SLEEP_TIME)
-        total_pending = openshift.workflow_manager.get_pending_workflows()
+        await sleep(Configuration.SLEEP_TIME)
+        total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
 
 
 async def learn_about_security(
@@ -72,7 +66,7 @@ async def learn_about_security(
             return 0
 
     # Package never seen (schedule si workflow to collect knowledge for Thoth)
-    await wait_for_limit(openshift)
+    await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
     is_si_analyzer_scheduled = await _schedule_security_indicator(
         openshift=openshift, package_name=package_name, package_version=package_version, index_url=index_url
     )
@@ -85,7 +79,7 @@ async def _schedule_security_indicator(
 ) -> int:
     """Schedule Security Indicator."""
     try:
-        await wait_for_limit(openshift)
+        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
         analysis_id = openshift.schedule_security_indicator(
             python_package_name=package_name,
             python_package_version=package_version,
@@ -132,9 +126,9 @@ async def learn_using_revsolver(
 async def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version: str) -> int:
     """Schedule revsolver."""
     try:
-        await wait_for_limit(openshift)
+        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
         analysis_id = openshift.schedule_revsolver(
-            package_name=package_name, package_version=package_version, debug=_LOG_REVSOLVER
+            package_name=package_name, package_version=package_version, debug=Configuration.LOG_REVSOLVER
         )
         _LOGGER.info(
             "Scheduled reverse solver for package %r in version %r, analysis is %r",
@@ -206,7 +200,7 @@ def _schedule_solver(
         packages = f"{package_name}==={package_version}"
 
         analysis_id = openshift.schedule_solver(
-            solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=_LOG_SOLVER
+            solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=Configuration.LOG_SOLVER
         )
         _LOGGER.info(
             "Scheduled solver %r for packages %r from indexes %r, analysis is %r",
@@ -230,7 +224,7 @@ async def _schedule_all_solvers(
     try:
         packages = f"{package_name}==={package_version}"
 
-        await wait_for_limit(openshift)
+        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
         analysis_ids = openshift.schedule_all_solvers(packages=packages, indexes=indexes)
         _LOGGER.info(
             "Scheduled solvers %r for packages %r from indexes %r, analysis ids are %r", packages, indexes, analysis_ids
@@ -250,9 +244,9 @@ def git_source_from_url(url: str) -> SourceManagement:
     service_name = service_url.split(".")[-2]
     service_type = ServiceType.by_name(service_name)
     if service_type == ServiceType.GITHUB:
-        token = GITHUB_PRIVATE_TOKEN
+        token = Configuration.GITHUB_PRIVATE_TOKEN
     elif service_type == ServiceType.GITLAB:
-        token = GITLAB_PRIVATE_TOKEN
+        token = Configuration.GITLAB_PRIVATE_TOKEN
     else:
         raise NotImplementedError("There is no token for this service type")
     return SourceManagement(service_type, res.scheme + "://" + res.netloc, token, res.path)
