@@ -97,7 +97,6 @@ through one of its tasks which depends on [thoth-messaging](https://github.com/t
 This self-learning data-driven pipeline with Argo and Kafka is fundamental for all Thoth integrations because it will make Thoth learn about new packages
 and keep its knowledge up to date to what users use in their software stacks.
 
-
 ### Trigger User requests
 
 The following messages are sent by [User-API producer](https://github.com/thoth-station/user-api) when users (humans or bots)
@@ -112,6 +111,10 @@ interact with [Thoth integrations](https://github.com/thoth-station/adviser/blob
 - [ProvenanceCheckerTriggerMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/provenance_checker_trigger/README.md)
 
 - [QebHwtTriggerMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/qebhwt_trigger/README.md)
+
+![UserAPIKafkaProducer](https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/UserAPIKafkaProducer.jpg)
+
+The image above explain what happens when a User of Thoth (Human or Bot) interacts with one of Thoth integrations.
 
 ## Dev Guide
 
