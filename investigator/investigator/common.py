@@ -41,6 +41,7 @@ async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
     if Configuration.PENDING_WORKFLOW_LIMIT is None:
         return
     limit = int(Configuration.PENDING_WORKFLOW_LIMIT)
+    total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
     while total_pending > limit:
         await sleep(Configuration.SLEEP_TIME)
         total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
