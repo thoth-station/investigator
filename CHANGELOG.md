@@ -211,3 +211,16 @@ all the things that you see...
 * make func async (#269)
 ### Automatic Updates
 * :pushpin: Automatic update of dependency hypothesis from 5.36.0 to 5.36.1 (#268)
+
+## Release 0.4.13 (2020-09-30T07:11:26)
+### Features
+* Add images for Thoth Learning using Kafka (#282)
+* add all env variables to README (#273)
+### Bug Fixes
+* fixed a typo
+### Automatic Updates
+* :pushpin: Automatic update of dependency thoth-storages from 0.25.12 to 0.25.13 (#280)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.7.7 to 0.7.8 (#279)
+* :pushpin: Automatic update of dependency thoth-storages from 0.25.11 to 0.25.12 (#276)
+* :pushpin: Automatic update of dependency pytest from 6.0.2 to 6.1.0 (#278)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.7.6 to 0.7.7 (#277)
