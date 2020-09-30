@@ -23,6 +23,7 @@ from .metrics_missing_package import missing_package_exceptions
 from .metrics_missing_package import missing_package_success
 from .metrics_missing_package import missing_package_in_progress
 from ..common import git_source_from_url, wait_for_limit
+from ..configuration import Configuration
 
 
 @missing_package_exceptions.count_exceptions()
@@ -44,7 +45,7 @@ async def parse_missing_package(package, openshift, graph):
         if package.package_name in requirements:
             gitservice_repo.open_issue_if_not_exist(issue_title, issue_body)
         else:
-            await wait_for_limit(openshift)
+            await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
             openshift.schedule_kebechet_run_url(repo, gitservice_repo.service_type.name)
 
     missing_package_success.inc()

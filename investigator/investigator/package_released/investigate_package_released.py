@@ -39,44 +39,30 @@ async def parse_package_released_message(
     package_version = package_released.package_version
     index_url = package_released.index_url
 
-    # Solver logic
+    if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER:
+        # Solver logic
+        solver_wf_scheduled = await common.learn_using_solver(
+            openshift=openshift,
+            graph=graph,
+            is_present=False,
+            package_name=package_name,
+            index_url=index_url,
+            package_version=package_version,
+        )
 
-    solver_wf_scheduled = await common.learn_using_solver(
-        openshift=openshift,
-        graph=graph,
-        is_present=False,
-        package_name=package_name,
-        index_url=index_url,
-        package_version=package_version,
-    )
+        scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="solver").inc(
+            solver_wf_scheduled
+        )
 
-    # Revsolver logic
 
-    revsolver_wf_scheduled, _ = await common.learn_using_revsolver(
-        openshift=openshift, is_present=False, package_name=package_name, package_version=package_version,
-    )
+    if Configuration.THOTH_INVESTIGATOR_SCHEDULE_REVSOLVER:
+        # Revsolver logic
+        revsolver_wf_scheduled, _ = await common.learn_using_revsolver(
+            openshift=openshift, is_present=False, package_name=package_name, package_version=package_version,
+        )
 
-    # SI logic
-
-    si_wf_scheduled = await common.learn_about_security(
-        openshift=openshift,
-        graph=graph,
-        is_present=False,
-        package_name=package_name,
-        index_url=index_url,
-        package_version=package_version,
-    )
-
-    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="solver").inc(
-        solver_wf_scheduled
-    )
-
-    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="revsolver").inc(
-        revsolver_wf_scheduled
-    )
-
-    scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="security-indicator").inc(
-        si_wf_scheduled
-    )
+        scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="revsolver").inc(
+            revsolver_wf_scheduled
+        )
 
     package_released_success.inc()

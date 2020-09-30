@@ -26,6 +26,7 @@ from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
 from .. import common
+from ..configuration import Configuration
 
 from .metrics_solved_package import solved_package_exceptions
 from .metrics_solved_package import solved_package_success
@@ -42,19 +43,19 @@ async def parse_solved_package_message(solved_package: MessageBase, openshift: O
     package_version = solved_package.package_version
     index_url: str = solved_package.index_url
 
-    # SI logic
+    if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SECURITY:
+        # SI logic
+        si_wfs_scheduled = await common.learn_about_security(
+            openshift=openshift,
+            graph=graph,
+            is_present=True,
+            package_name=package_name,
+            package_version=package_version,
+            index_url=index_url,
+        )
 
-    si_wfs_scheduled = await common.learn_about_security(
-        openshift=openshift,
-        graph=graph,
-        is_present=True,
-        package_name=package_name,
-        package_version=package_version,
-        index_url=index_url,
-    )
-
-    scheduled_workflows.labels(message_type=SolvedPackageMessage.topic_name, workflow_type="security-indicator").inc(
-        si_wfs_scheduled
-    )
+        scheduled_workflows.labels(message_type=SolvedPackageMessage.topic_name, workflow_type="security-indicator").inc(
+            si_wfs_scheduled
+        )
 
     solved_package_success.inc()

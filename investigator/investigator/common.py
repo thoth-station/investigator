@@ -31,26 +31,23 @@ from thoth.storages import GraphDatabase
 from thoth.sourcemanagement.sourcemanagement import SourceManagement
 from thoth.sourcemanagement.enums import ServiceType
 
-_LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
+from .configuration import Configuration
 
 _LOGGER = logging.getLogger(__name__)
 
-_LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
-GITHUB_PRIVATE_TOKEN = os.getenv("THOTH_GITHUB_PRIVATE_TOKEN")
-GITLAB_PRIVATE_TOKEN = os.getenv("THOTH_GITLAB_PRIVATE_TOKEN")
-SLEEP_TIME = int(os.getenv("ARGO_PENDING_SLEEP_TIME", 2))
-_PENDING_WORKFLOW_LIMIT = os.getenv("ARGO_PENDING_WORKFLOW_LIMIT", None)
 
 
-async def wait_for_limit(openshift: OpenShift):
+async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
     """Wait for pending workflow limit."""
     total_pending = inf
-    if _PENDING_WORKFLOW_LIMIT is None:
+    if Configuration._PENDING_WORKFLOW_LIMIT is None:
         return
-    limit = int(_PENDING_WORKFLOW_LIMIT)
+    limit = int(Configuration._PENDING_WORKFLOW_LIMIT)
     while total_pending > limit:
-        await sleep(SLEEP_TIME)
-        total_pending = openshift.workflow_manager.get_pending_workflows()
+        await sleep(Configuration.SLEEP_TIME)
+        total_pending = openshift.workflow_manager.get_pending_workflows(
+            workflow_namespace=workflow_namespace
+        )
 
 
 async def learn_about_security(
@@ -72,7 +69,7 @@ async def learn_about_security(
             return 0
 
     # Package never seen (schedule si workflow to collect knowledge for Thoth)
-    await wait_for_limit(openshift)
+    await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
     is_si_analyzer_scheduled = await _schedule_security_indicator(
         openshift=openshift, package_name=package_name, package_version=package_version, index_url=index_url
     )
@@ -85,7 +82,7 @@ async def _schedule_security_indicator(
 ) -> int:
     """Schedule Security Indicator."""
     try:
-        await wait_for_limit(openshift)
+        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
         analysis_id = openshift.schedule_security_indicator(
             python_package_name=package_name,
             python_package_version=package_version,
@@ -132,9 +129,9 @@ async def learn_using_revsolver(
 async def _schedule_revsolver(openshift: OpenShift, package_name: str, package_version: str) -> int:
     """Schedule revsolver."""
     try:
-        await wait_for_limit(openshift)
+        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
         analysis_id = openshift.schedule_revsolver(
-            package_name=package_name, package_version=package_version, debug=_LOG_REVSOLVER
+            package_name=package_name, package_version=package_version, debug=Configuration._LOG_REVSOLVER
         )
         _LOGGER.info(
             "Scheduled reverse solver for package %r in version %r, analysis is %r",
@@ -206,7 +203,7 @@ def _schedule_solver(
         packages = f"{package_name}==={package_version}"
 
         analysis_id = openshift.schedule_solver(
-            solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=_LOG_SOLVER
+            solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=Configuration._LOG_SOLVER
         )
         _LOGGER.info(
             "Scheduled solver %r for packages %r from indexes %r, analysis is %r",
@@ -230,7 +227,7 @@ async def _schedule_all_solvers(
     try:
         packages = f"{package_name}==={package_version}"
 
-        await wait_for_limit(openshift)
+        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
         analysis_ids = openshift.schedule_all_solvers(packages=packages, indexes=indexes)
         _LOGGER.info(
             "Scheduled solvers %r for packages %r from indexes %r, analysis ids are %r", packages, indexes, analysis_ids
