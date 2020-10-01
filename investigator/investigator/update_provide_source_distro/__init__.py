@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""Set labels for package SI analyzable metrics."""
+"""The important parts for investigating if package provides source distro messages."""
 
-from ..metrics import in_progress, success, exceptions
+from .investigate_update_provide_source_distro import parse_update_provide_source_distro_message
 
-package_si_analyzable_in_progress = in_progress.labels(message_type="package_si_analyzable")
-package_si_analyzable_success = success.labels(message_type="package_si_analyzable")
-package_si_analyzable_exceptions = exceptions.labels(message_type="package_si_analyzable")
+__all__ = [
+    "parse_update_provide_source_distro_message",
+]
