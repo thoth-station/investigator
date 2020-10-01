@@ -30,7 +30,7 @@ _LOGGER = logging.getLogger(__name__)
 @update_provide_source_distro_in_progress.track_inprogress()
 async def parse_update_provide_source_distro_message(update_provide_source_distro, graph):
     """Parse update provide source distro message."""
-    graph.update_is_si_analyzable_flag_package_version(
+    graph.update_provides_source_distro_package_version(
         package_name=update_provide_source_distro.package_name,
         package_version=update_provide_source_distro.package_version,
         index_url=update_provide_source_distro.index_url,
