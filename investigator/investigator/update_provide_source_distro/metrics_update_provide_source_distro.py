@@ -15,21 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""This is Thoth investigator."""
+"""Set labels for update provides source distro metrics for SI."""
 
-from thoth.common import __version__ as __common__version__
-from thoth.common import init_logging
+from ..metrics import in_progress, success, exceptions
 
-from thoth.messaging import __version__ as __messaging__version__
-from thoth.storages import __version__ as __storages__version__
-from thoth.python import __version__ as __python__version__
-
-__version__ = "0.5.1"
-__service_version__ = (
-    f"{__version__}+"
-    f"messaging.{__messaging__version__}.storages.{__storages__version__}."
-    f"common.{__common__version__}.python.{__python__version__}"
-)
-
-# Init logging here when gunicorn import this application.
-init_logging()
+update_provide_source_distro_in_progress = in_progress.labels(message_type="update_provide_source_distro")
+update_provide_source_distro_success = success.labels(message_type="update_provide_source_distro")
+update_provide_source_distro_exceptions = exceptions.labels(message_type="update_provide_source_distro")

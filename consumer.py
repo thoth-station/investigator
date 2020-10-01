@@ -38,6 +38,7 @@ from thoth.messaging import SIUnanalyzedPackageMessage
 from thoth.messaging import SolvedPackageMessage
 from thoth.messaging import UnresolvedPackageMessage
 from thoth.messaging import UnrevsolvedPackageMessage
+from thoth.messaging import UpdateProvidesSourceDistroMessage
 
 
 from investigator.investigator import __service_version__
@@ -57,6 +58,8 @@ from investigator.investigator.si_unanalyzed_package import parse_si_unanalyzed_
 from investigator.investigator.solved_package import parse_solved_package_message
 from investigator.investigator.unrevsolved_package import parse_revsolved_package_message
 from investigator.investigator.unresolved_package import parse_unresolved_package_message
+from investigator.investigator.update_provide_source_distro import parse_update_provide_source_distro_message
+
 from investigator.investigator.metrics import registry
 
 from thoth.common import OpenShift, init_logging
@@ -95,14 +98,15 @@ kebechet_trigger_message_topic = KebechetTriggerMessage().topic
 missing_package_message_topic = MissingPackageMessage().topic
 missing_version_message_topic = MissingVersionMessage().topic
 package_extract_trigger_message_topic = PackageExtractTriggerMessage().topic
+package_released_message_topic = PackageReleasedMessage().topic
 provenance_checker_trigger_message_topic = ProvenanceCheckerTriggerMessage().topic
 qebhwt_trigger_message_topic = QebHwtTriggerMessage().topic
+si_unanalyzed_package_message_topic = SIUnanalyzedPackageMessage().topic
 solved_package_message_topic = SolvedPackageMessage().topic
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
 unrevsolved_package_message_topic = UnrevsolvedPackageMessage().topic
-si_unanalyzed_package_message_topic = SIUnanalyzedPackageMessage().topic
+update_provide_source_distro_message_topic = UpdateProvidesSourceDistroMessage().topic
 
-package_released_message_topic = PackageReleasedMessage().topic
 
 openshift = OpenShift()
 graph = GraphDatabase()
@@ -149,6 +153,15 @@ async def consume_hash_mismatch(hash_mismatches):
     """Loop when an hash mismatch message is received."""
     async for hash_mismatch in hash_mismatches:
         await parse_hash_mismatch(mismatch=hash_mismatch, openshift=openshift, graph=graph)
+
+
+@app.agent(update_provide_source_distro_message_topic)
+async def consume_update_provide_source_distro(updates_provide_source_distro):
+    """Loop when update_provide_source_distro message is received."""
+    async for update_provide_source_distro in updates_provide_source_distro:
+        await parse_update_provide_source_distro_message(
+            update_provide_source_distro=update_provide_source_distro, graph=graph
+        )
 
 
 @app.agent(kebechet_trigger_message_topic)
