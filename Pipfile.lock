@@ -296,6 +296,7 @@
                 "sha256:138016d519bf4dd55b22c682c904ed2fd0235c3612b2f8f65ce218ff358deed8",
                 "sha256:a03f728b49ce9597a6655793207c6ab0da55519368ff5961e4a74ae475b9fa8e"
             ],
+            "markers": "python_version >= '3.4'",
             "version": "==3.1.9"
         },
         "google-auth": {
@@ -527,6 +528,7 @@
                 "sha256:2a68605c4d6feb90185b22ec619a730701aae14e0c3f1c17234d646d0518d622",
                 "sha256:87d2a9005825e9b80cca8fefdb4f381326ae79578f06a41d892224317f73ec1e"
             ],
+            "markers": "python_version >= '3.6'",
             "version": "==0.16.0"
         },
         "openshift": {

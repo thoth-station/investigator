@@ -27,7 +27,6 @@ from thoth.messaging import AdviseJustificationMessage
 from thoth.messaging import AdviserReRunMessage
 from thoth.messaging import AdviserTriggerMessage
 from thoth.messaging import HashMismatchMessage
-from thoth.messaging import IsPackageSIAnalyzableMessage
 from thoth.messaging import KebechetTriggerMessage
 from thoth.messaging import MissingPackageMessage
 from thoth.messaging import MissingVersionMessage
@@ -39,6 +38,7 @@ from thoth.messaging import SIUnanalyzedPackageMessage
 from thoth.messaging import SolvedPackageMessage
 from thoth.messaging import UnresolvedPackageMessage
 from thoth.messaging import UnrevsolvedPackageMessage
+from thoth.messaging import UpdateProvidesSourceDistroMessage
 
 
 from investigator.investigator import __service_version__
@@ -52,13 +52,13 @@ from investigator.investigator.missing_package import parse_missing_package
 from investigator.investigator.missing_version import parse_missing_version
 from investigator.investigator.package_extract_trigger import parse_package_extract_trigger_message
 from investigator.investigator.package_released import parse_package_released_message
-from investigator.investigator.package_si_analyzable import parse_package_si_analyzable_message
 from investigator.investigator.provenance_checker_trigger import parse_provenance_checker_trigger_message
 from investigator.investigator.qebhwt_trigger import parse_qebhwt_trigger_message
 from investigator.investigator.si_unanalyzed_package import parse_si_unanalyzed_package_message
 from investigator.investigator.solved_package import parse_solved_package_message
 from investigator.investigator.unrevsolved_package import parse_revsolved_package_message
 from investigator.investigator.unresolved_package import parse_unresolved_package_message
+from investigator.investigator.update_provide_source_distro import parse_update_provide_source_distro_message
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -92,19 +92,19 @@ advise_justification_message_topic = AdviseJustificationMessage().topic
 adviser_re_run_message_topic = AdviserReRunMessage().topic
 adviser_trigger_message_topic = AdviserTriggerMessage().topic
 hash_mismatch_message_topic = HashMismatchMessage().topic
-is_package_si_analyzable_message_topic = IsPackageSIAnalyzableMessage().topic
 kebechet_trigger_message_topic = KebechetTriggerMessage().topic
 missing_package_message_topic = MissingPackageMessage().topic
 missing_version_message_topic = MissingVersionMessage().topic
 package_extract_trigger_message_topic = PackageExtractTriggerMessage().topic
+package_released_message_topic = PackageReleasedMessage().topic
 provenance_checker_trigger_message_topic = ProvenanceCheckerTriggerMessage().topic
 qebhwt_trigger_message_topic = QebHwtTriggerMessage().topic
+si_unanalyzed_package_message_topic = SIUnanalyzedPackageMessage().topic
 solved_package_message_topic = SolvedPackageMessage().topic
 unresolved_package_message_topic = UnresolvedPackageMessage().topic
 unrevsolved_package_message_topic = UnrevsolvedPackageMessage().topic
-si_unanalyzed_package_message_topic = SIUnanalyzedPackageMessage().topic
+update_provide_source_distro_message_topic = UpdateProvidesSourceDistroMessage().topic
 
-package_released_message_topic = PackageReleasedMessage().topic
 
 openshift = OpenShift()
 graph = GraphDatabase()
@@ -153,11 +153,13 @@ async def consume_hash_mismatch(hash_mismatches):
         await parse_hash_mismatch(mismatch=hash_mismatch, openshift=openshift, graph=graph)
 
 
-@app.agent(is_package_si_analyzable_message_topic)
-async def consume_is_package_si_analyzable(is_package_si_analyzables):
-    """Loop when is_package_si_analyzable message is received."""
-    async for is_package_si_analyzable in is_package_si_analyzables:
-        await parse_package_si_analyzable_message(package_si_analyzable=is_package_si_analyzable, graph=graph)
+@app.agent(update_provide_source_distro_message_topic)
+async def consume_update_provide_source_distro(updates_provide_source_distro):
+    """Loop when update_provide_source_distro message is received."""
+    async for update_provide_source_distro in updates_provide_source_distro:
+        await parse_update_provide_source_distro_message(
+            update_provide_source_distro=update_provide_source_distro, graph=graph
+        )
 
 
 @app.agent(kebechet_trigger_message_topic)
