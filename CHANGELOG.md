@@ -233,3 +233,10 @@ all the things that you see...
 ## Release 0.5.0 (2020-09-30T16:23:25)
 ### Features
 * Add workflow namespace variables for quota limit check (#291)
+
+## Release 0.5.1 (2020-10-01T10:20:19)
+### Features
+* Consume new message UpdateProvidesSourceDistroMessage (#281)
+### Automatic Updates
+* :pushpin: Automatic update of dependency thoth-messaging from 0.7.8 to 0.7.9 (#296)
+* :pushpin: Automatic update of dependency thoth-storages from 0.25.13 to 0.25.14 (#295)
