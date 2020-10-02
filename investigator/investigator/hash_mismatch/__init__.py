@@ -17,6 +17,8 @@
 
 """The important parts for parsing hash_mismatch messages."""
 
-from .investigate_hash_mismatch import parse_hash_mismatch
+from .investigate_hash_mismatch import handler_table
 
-__all__ = ["parse_hash_mismatch"]
+__all__ = [
+    "handler_table",
+]

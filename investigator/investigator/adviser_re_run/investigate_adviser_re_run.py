@@ -18,13 +18,15 @@
 """Investigate message to re schedule adviser."""
 
 import logging
+from typing import Dict, Callable
+
 
 from thoth.messaging import MessageBase
 from thoth.messaging import AdviserReRunMessage
 from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
-from ..common import wait_for_limit
+from ..common import wait_for_limit, register_handler
 from ..configuration import Configuration
 
 from .metrics_adviser_re_run import adviser_re_run_exceptions
@@ -33,7 +35,10 @@ from .metrics_adviser_re_run import adviser_re_run_in_progress
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @adviser_re_run_exceptions.count_exceptions()
 @adviser_re_run_in_progress.track_inprogress()
 async def parse_adviser_re_run_message(adviser_re_run: MessageBase, openshift: OpenShift) -> None:

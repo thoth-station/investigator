@@ -17,8 +17,8 @@
 
 """The important parts for parsing si_unanalyzed_package messages."""
 
-from .investigate_si_unanalyzed_package import parse_si_unanalyzed_package_message
+from .investigate_si_unanalyzed_package import handler_table
 
 __all__ = [
-    "parse_si_unanalyzed_package_message",
+    "handler_table",
 ]

@@ -17,8 +17,8 @@
 
 """The important parts for parsing missing_package messages."""
 
-from .investigate_missing_package import parse_missing_package
+from .investigate_missing_package import handler_table
 
 __all__ = [
-    "parse_missing_package",
+    "handler_table",
 ]

@@ -22,7 +22,7 @@ import logging
 import json
 import os
 
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Optional, Dict, Any, List, Tuple, Callable
 from pathlib import Path
 
 from thoth.storages.graph import GraphDatabase
@@ -35,12 +35,15 @@ from thoth.python import Source
 from ..metrics import scheduled_workflows
 from .. import common
 from ..configuration import Configuration
+from ..common import register_handler
 
 from .metrics_unresolved_package import unresolved_package_exceptions
 from .metrics_unresolved_package import unresolved_package_in_progress
 from .metrics_unresolved_package import unresolved_package_success
 
 _LOGGER = logging.getLogger(__name__)
+
+handler_table = {}  # type: Dict[str, Callable]
 
 
 def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tuple[Dict[Any, Any], Optional[str]]:
@@ -96,6 +99,7 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
     return (packages_to_solve, None)
 
 
+@register_handler(handler_table, ["v1"])
 @unresolved_package_exceptions.count_exceptions()
 @unresolved_package_in_progress.track_inprogress()
 async def parse_unresolved_package_message(

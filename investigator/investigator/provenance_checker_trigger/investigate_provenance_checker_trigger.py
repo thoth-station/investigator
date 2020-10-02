@@ -18,11 +18,12 @@
 """Investigate message to schedule provenance checker."""
 
 import logging
+from typing import Dict, Callable
 
 from thoth.messaging import ProvenanceCheckerTriggerMessage
 from thoth.common import OpenShift
 
-from ..common import wait_for_limit
+from ..common import wait_for_limit, register_handler
 from ..configuration import Configuration
 
 from .metrics_provenance_checker_trigger import provenance_checker_trigger_exceptions
@@ -31,7 +32,10 @@ from .metrics_provenance_checker_trigger import provenance_checker_trigger_succe
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @provenance_checker_trigger_exceptions.count_exceptions()
 @provenance_checker_trigger_in_progress.track_inprogress()
 async def parse_provenance_checker_trigger_message(

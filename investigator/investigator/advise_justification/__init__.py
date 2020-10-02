@@ -17,8 +17,8 @@
 
 """The important parts for exposing advise justification messages."""
 
-from .investigate_advise_justification import expose_advise_justification_metrics
+from .investigate_advise_justification import handler_table
 
 __all__ = [
-    "expose_advise_justification_metrics",
+    "handler_table",
 ]

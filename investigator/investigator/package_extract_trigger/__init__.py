@@ -17,8 +17,8 @@
 
 """The important parts for parsing package_extract_trigger messages."""
 
-from .investigate_package_extract_trigger import parse_package_extract_trigger_message
+from .investigate_package_extract_trigger import handler_table
 
 __all__ = [
-    "parse_package_extract_trigger_message",
+    "handler_table",
 ]

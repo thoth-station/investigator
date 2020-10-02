@@ -17,8 +17,8 @@
 
 """The important parts for parsing unrevsolved_package messages."""
 
-from .investigate_unrevsolved_package import parse_revsolved_package_message
+from .investigate_unrevsolved_package import handler_table
 
 __all__ = [
-    "parse_revsolved_package_message",
+    "handler_table",
 ]

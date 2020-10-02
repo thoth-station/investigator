@@ -18,11 +18,12 @@
 """Investigate message to schedule adviser."""
 
 import logging
+from typing import Dict, Callable
 
 from thoth.messaging import AdviserTriggerMessage
 from thoth.common import OpenShift
 
-from ..common import wait_for_limit
+from ..common import wait_for_limit, register_handler
 from ..configuration import Configuration
 
 from .metrics_adviser_trigger import adviser_trigger_exceptions
@@ -31,7 +32,10 @@ from .metrics_adviser_trigger import adviser_trigger_success
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @adviser_trigger_exceptions.count_exceptions()
 @adviser_trigger_in_progress.track_inprogress()
 async def parse_adviser_trigger_message(adviser_trigger: AdviserTriggerMessage, openshift: OpenShift) -> None:

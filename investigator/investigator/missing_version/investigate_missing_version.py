@@ -18,15 +18,20 @@
 """Logic for handling hash_version message."""
 
 import logging
+from typing import Dict, Callable
 
 from ..common import git_source_from_url
+from ..common import register_handler
 from .metrics_missing_version import missing_version_exceptions
 from .metrics_missing_version import missing_version_in_progress
 from .metrics_missing_version import missing_version_success
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @missing_version_exceptions.count_exceptions()
 @missing_version_in_progress.track_inprogress()
 async def parse_missing_version(version, openshift, graph):

@@ -18,8 +18,9 @@
 """Logic for handling hash_mismatch message."""
 
 import logging
+from typing import Dict, Callable
 
-from ..common import wait_for_limit, git_source_from_url
+from ..common import wait_for_limit, git_source_from_url, register_handler
 from ..configuration import Configuration
 from .metrics_hash_mismatch import hash_mismatch_exceptions
 from .metrics_hash_mismatch import hash_mismatch_success
@@ -27,7 +28,10 @@ from .metrics_hash_mismatch import hash_mismatch_in_progress
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @hash_mismatch_exceptions.count_exceptions()
 @hash_mismatch_in_progress.track_inprogress()
 async def parse_hash_mismatch(mismatch, openshift, graph):

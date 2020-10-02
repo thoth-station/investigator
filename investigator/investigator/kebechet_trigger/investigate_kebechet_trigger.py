@@ -18,11 +18,12 @@
 """Investigate message to schedule kebechet."""
 
 import logging
+from typing import Dict, Callable
 
 from thoth.messaging import KebechetTriggerMessage
 from thoth.common import OpenShift
 
-from ..common import wait_for_limit
+from ..common import wait_for_limit, register_handler
 from ..configuration import Configuration
 from .metrics_kebechet_trigger import kebechet_trigger_exceptions
 from .metrics_kebechet_trigger import kebechet_trigger_in_progress
@@ -30,7 +31,10 @@ from .metrics_kebechet_trigger import kebechet_trigger_success
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @kebechet_trigger_exceptions.count_exceptions()
 @kebechet_trigger_in_progress.track_inprogress()
 async def parse_kebechet_trigger_message(kebechet_trigger: KebechetTriggerMessage, openshift: OpenShift) -> None:

@@ -17,6 +17,8 @@
 
 """This file contains methods used by Thoth investigator to investigate on package released messages."""
 
+from typing import Dict, Callable
+
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
 from thoth.messaging import PackageReleasedMessage
@@ -28,8 +30,12 @@ from ..configuration import Configuration
 from .metrics_package_released import package_released_exceptions
 from .metrics_package_released import package_released_in_progress
 from .metrics_package_released import package_released_success
+from ..common import register_handler
+
+handler_table = {}  # type: Dict[str, Callable]
 
 
+@register_handler(handler_table, ["v1"])
 @package_released_exceptions.count_exceptions()
 @package_released_in_progress.track_inprogress()
 async def parse_package_released_message(

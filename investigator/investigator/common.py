@@ -23,7 +23,7 @@ from math import inf
 from urllib.parse import urlparse
 from asyncio import sleep
 
-from typing import List, Tuple, Optional
+from typing import Dict, List, Tuple, Callable, Optional
 
 from thoth.common import OpenShift
 from thoth.storages import GraphDatabase
@@ -33,6 +33,17 @@ from thoth.sourcemanagement.enums import ServiceType
 from .configuration import Configuration
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def register_handler(lookup_table: Dict[str, Callable], versions: List[str]):
+    """Register function to entry in handler table."""
+
+    def decorator(function: Callable):
+        for version in versions:
+            lookup_table[version] = function
+        return function
+
+    return decorator
 
 
 async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):

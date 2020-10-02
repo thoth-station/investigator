@@ -18,14 +18,19 @@
 """Investigate about SI analyzable packages due to missing source distro."""
 
 import logging
+from typing import Dict, Callable
 
 from .metrics_update_provide_source_distro import update_provide_source_distro_exceptions
 from .metrics_update_provide_source_distro import update_provide_source_distro_success
 from .metrics_update_provide_source_distro import update_provide_source_distro_in_progress
+from ..common import register_handler
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @update_provide_source_distro_exceptions.count_exceptions()
 @update_provide_source_distro_in_progress.track_inprogress()
 async def parse_update_provide_source_distro_message(update_provide_source_distro, graph):

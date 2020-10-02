@@ -17,8 +17,8 @@
 
 """The important parts for parsing provenance_checker_trigger messages."""
 
-from .investigate_provenance_checker_trigger import parse_provenance_checker_trigger_message
+from .investigate_provenance_checker_trigger import handler_table
 
 __all__ = [
-    "parse_provenance_checker_trigger_message",
+    "handler_table",
 ]

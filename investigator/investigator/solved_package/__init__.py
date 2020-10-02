@@ -17,8 +17,8 @@
 
 """The important parts for parsing solved_package messages."""
 
-from .investigate_solved_package import parse_solved_package_message
+from .investigate_solved_package import handler_table
 
 __all__ = [
-    "parse_solved_package_message",
+    "handler_table",
 ]

@@ -18,11 +18,12 @@
 """Investigate message to schedule qebhwt."""
 
 import logging
+from typing import Dict, Callable
 
 from thoth.common import OpenShift
 from thoth.messaging import QebHwtTriggerMessage
 
-from ..common import wait_for_limit
+from ..common import wait_for_limit, register_handler
 from ..configuration import Configuration
 
 from .metrics_qebhwt_trigger import qebhwt_trigger_exceptions
@@ -31,7 +32,10 @@ from .metrics_qebhwt_trigger import qebhwt_trigger_success
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @qebhwt_trigger_exceptions.count_exceptions()
 @qebhwt_trigger_in_progress.track_inprogress()
 async def parse_qebhwt_trigger_message(qebhwt_trigger: QebHwtTriggerMessage, openshift: OpenShift) -> None:

@@ -17,8 +17,8 @@
 
 """The important parts for parsing missing_version messages."""
 
-from .investigate_missing_version import parse_missing_version
+from .investigate_missing_version import handler_table
 
 __all__ = [
-    "parse_missing_version",
+    "handler_table",
 ]

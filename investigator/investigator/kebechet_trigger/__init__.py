@@ -17,8 +17,8 @@
 
 """The important parts for parsing kebechet_trigger messages."""
 
-from .investigate_kebechet_trigger import parse_kebechet_trigger_message
+from .investigate_kebechet_trigger import handler_table
 
 __all__ = [
-    "parse_kebechet_trigger_message",
+    "handler_table",
 ]

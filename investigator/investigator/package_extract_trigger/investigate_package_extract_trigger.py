@@ -18,11 +18,12 @@
 """Investigate message to schedule package extract."""
 
 import logging
+from typing import Dict, Callable
 
 from thoth.messaging import PackageExtractTriggerMessage
 from thoth.common import OpenShift
 
-from ..common import wait_for_limit
+from ..common import wait_for_limit, register_handler
 from ..configuration import Configuration
 
 from .metrics_package_extract_trigger import package_extract_trigger_exceptions
@@ -31,7 +32,10 @@ from .metrics_package_extract_trigger import package_extract_trigger_success
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @package_extract_trigger_exceptions.count_exceptions()
 @package_extract_trigger_in_progress.track_inprogress()
 async def parse_package_extract_trigger_message(

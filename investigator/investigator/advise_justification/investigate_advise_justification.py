@@ -19,17 +19,22 @@
 
 import logging
 import os
+from typing import Dict, Callable
 
 from .metrics_advise_justification import advise_justification_exceptions
 from .metrics_advise_justification import advise_justification_success
 from .metrics_advise_justification import advise_justification_in_progress
 from .metrics_advise_justification import advise_justification_type_number
+from ..common import register_handler
 
 _LOGGER = logging.getLogger(__name__)
 
 DEPLOYMENT_NAME = os.environ["THOTH_DEPLOYMENT_NAME"]
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @advise_justification_exceptions.count_exceptions()
 @advise_justification_in_progress.track_inprogress()
 async def expose_advise_justification_metrics(advise_justification):

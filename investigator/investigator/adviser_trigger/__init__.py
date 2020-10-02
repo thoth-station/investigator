@@ -17,8 +17,8 @@
 
 """The important parts for parsing adviser_trigger messages."""
 
-from .investigate_adviser_trigger import parse_adviser_trigger_message
+from .investigate_adviser_trigger import handler_table
 
 __all__ = [
-    "parse_adviser_trigger_message",
+    "handler_table",
 ]

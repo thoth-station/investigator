@@ -18,6 +18,7 @@
 """This file contains methods used by Thoth investigator to investigate on solved packages."""
 
 import logging
+from typing import Dict, Callable
 
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
@@ -27,6 +28,7 @@ from thoth.common import OpenShift
 from ..metrics import scheduled_workflows
 from .. import common
 from ..configuration import Configuration
+from ..common import register_handler
 
 from .metrics_solved_package import solved_package_exceptions
 from .metrics_solved_package import solved_package_success
@@ -34,7 +36,10 @@ from .metrics_solved_package import solved_package_in_progress
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @solved_package_exceptions.count_exceptions()
 @solved_package_in_progress.track_inprogress()
 async def parse_solved_package_message(solved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase) -> None:

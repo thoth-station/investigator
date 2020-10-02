@@ -17,8 +17,8 @@
 
 """The important parts for parsing qebhwt_trigger messages."""
 
-from .investigate_qebhwt_trigger import parse_qebhwt_trigger_message
+from .investigate_qebhwt_trigger import handler_table
 
 __all__ = [
-    "parse_qebhwt_trigger_message",
+    "handler_table",
 ]

@@ -18,6 +18,8 @@
 """This file contains methods used by Thoth investigator to investigate on si unanalyzed packages."""
 
 import logging
+from typing import Dict, Callable
+
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import MessageBase
 from thoth.messaging import SIUnanalyzedPackageMessage
@@ -27,6 +29,7 @@ from thoth.common import OpenShift
 from ..metrics import scheduled_workflows
 from .. import common
 from ..configuration import Configuration
+from ..common import register_handler
 
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_in_progress
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_success
@@ -34,7 +37,10 @@ from .metrics_si_unanalyzed_package import si_unanalyzed_package_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @si_unanalyzed_package_exceptions.count_exceptions()
 @si_unanalyzed_package_in_progress.track_inprogress()
 async def parse_si_unanalyzed_package_message(

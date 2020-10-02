@@ -17,8 +17,8 @@
 
 """The important parts for parsing package_released messages."""
 
-from .investigate_package_released import parse_package_released_message
+from .investigate_package_released import handler_table
 
 __all__ = [
-    "parse_package_released_message",
+    "handler_table",
 ]

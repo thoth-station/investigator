@@ -17,8 +17,8 @@
 
 """The important parts for investigating if package provides source distro messages."""
 
-from .investigate_update_provide_source_distro import parse_update_provide_source_distro_message
+from .investigate_update_provide_source_distro import handler_table
 
 __all__ = [
-    "parse_update_provide_source_distro_message",
+    "handler_table",
 ]

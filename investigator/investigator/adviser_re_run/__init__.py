@@ -17,8 +17,6 @@
 
 """The important parts for parsing adviser re run messages."""
 
-from .investigate_adviser_re_run import parse_adviser_re_run_message
+from .investigate_adviser_re_run import handler_table
 
-__all__ = [
-    "parse_adviser_re_run_message",
-]
+__all__ = ["handler_table"]

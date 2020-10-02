@@ -18,12 +18,14 @@
 """This file contains methods used by Thoth investigator to investigate on unrevsolved packages."""
 
 import logging
+from typing import Dict, Callable
 
 from thoth.messaging import MessageBase
 from thoth.messaging import UnrevsolvedPackageMessage
 from thoth.common import OpenShift
 
 from .. import common
+from ..common import register_handler
 from ..configuration import Configuration
 from ..metrics import scheduled_workflows
 from .metrics_unrevsolved_package import unrevsolved_package_exceptions
@@ -32,7 +34,10 @@ from .metrics_unrevsolved_package import unrevsolved_package_success
 
 _LOGGER = logging.getLogger(__name__)
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @unrevsolved_package_exceptions.count_exceptions()
 @unrevsolved_package_in_progress.track_inprogress()
 async def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift: OpenShift) -> None:

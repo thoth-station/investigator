@@ -18,14 +18,18 @@
 """Logic for handling missing_package message."""
 
 import re
+from typing import Dict, Callable
 
 from .metrics_missing_package import missing_package_exceptions
 from .metrics_missing_package import missing_package_success
 from .metrics_missing_package import missing_package_in_progress
-from ..common import git_source_from_url, wait_for_limit
+from ..common import git_source_from_url, wait_for_limit, register_handler
 from ..configuration import Configuration
 
+handler_table = {}  # type: Dict[str, Callable]
 
+
+@register_handler(handler_table, ["v1"])
 @missing_package_exceptions.count_exceptions()
 @missing_package_in_progress.track_inprogress()
 async def parse_missing_package(package, openshift, graph):
