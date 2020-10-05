@@ -60,6 +60,8 @@ from investigator.investigator.unrevsolved_package import parse_revsolved_packag
 from investigator.investigator.unresolved_package import parse_unresolved_package_message
 from investigator.investigator.update_provide_source_distro import parse_update_provide_source_distro_message
 
+from investigator.investigator.metrics import registry
+
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
 
@@ -115,7 +117,7 @@ graph.connect()
 @app.page("/metrics")
 async def get_metrics(self, request):
     """Serve the metrics from the consumer registry."""
-    return web.Response(text=generate_latest().decode("utf-8"))
+    return web.Response(text=generate_latest(registry=registry).decode("utf-8"))
 
 
 @app.page("/_health")

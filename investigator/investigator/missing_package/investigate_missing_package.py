@@ -23,11 +23,12 @@ from .metrics_missing_package import missing_package_exceptions
 from .metrics_missing_package import missing_package_success
 from .metrics_missing_package import missing_package_in_progress
 from ..common import git_source_from_url, wait_for_limit
+from prometheus_async.aio import track_inprogress, count_exceptions
 from ..configuration import Configuration
 
 
-@missing_package_exceptions.count_exceptions()
-@missing_package_in_progress.track_inprogress()
+@count_exceptions(missing_package_exceptions)
+@track_inprogress(missing_package_in_progress)
 async def parse_missing_package(package, openshift, graph):
     """Process a missing package message from package-update producer."""
     repositories = graph.get_adviser_run_origins_all(
