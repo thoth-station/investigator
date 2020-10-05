@@ -240,3 +240,11 @@ all the things that you see...
 ### Automatic Updates
 * :pushpin: Automatic update of dependency thoth-messaging from 0.7.8 to 0.7.9 (#296)
 * :pushpin: Automatic update of dependency thoth-storages from 0.25.13 to 0.25.14 (#295)
+
+## Release 0.5.2 (2020-10-05T07:03:44)
+### Improvements
+* use async prometheus (#275)
+### Automatic Updates
+* :pushpin: Automatic update of dependency hypothesis from 5.36.1 to 5.37.0 (#304)
+* :pushpin: Automatic update of dependency pytest from 6.1.0 to 6.1.1 (#303)
+* :pushpin: Automatic update of dependency thoth-storages from 0.25.14 to 0.25.15 (#302)
