@@ -19,12 +19,15 @@
 
 import logging
 
-from ..common import wait_for_limit, git_source_from_url
+from ..common import git_source_from_url, learn_using_solver
 from ..configuration import Configuration
+from ..metrics import scheduled_workflows
+
 from .metrics_hash_mismatch import hash_mismatch_exceptions
 from .metrics_hash_mismatch import hash_mismatch_success
 from .metrics_hash_mismatch import hash_mismatch_in_progress
 from prometheus_async.aio import track_inprogress, count_exceptions
+from thoth.messaging import HashMismatchMessage
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,18 +36,19 @@ _LOGGER = logging.getLogger(__name__)
 @track_inprogress(hash_mismatch_in_progress)
 async def parse_hash_mismatch(mismatch, openshift, graph):
     """Process a hash mismatch message from package-update producer."""
-    try:
-        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
-        openshift.schedule_all_solvers(
-            packages=f"{mismatch.package_name}==={mismatch.package_version}", indexes=[mismatch.index_url],
+    if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER:
+        # Solver logic
+        solver_wf_scheduled = await learn_using_solver(
+            openshift=openshift,
+            graph=graph,
+            is_present=False,
+            package_name=mismatch.package_name,
+            index_url=mismatch.index_url,
+            package_version=mismatch.package_version,
         )
-    except Exception:
-        # If we get some errors from OpenShift master - do not retry. Rather schedule the remaining
-        # ones and try to schedule the given package in the next run.
-        _LOGGER.exception(
-            f"Failed to schedule new solver to solve package {mismatch.package_name} in version"
-            f" {mismatch.package_version}, the graph refresh job will not fail but will try to reschedule"
-            " this in next run",
+
+        scheduled_workflows.labels(message_type=HashMismatchMessage.topic_name, workflow_type="solver").inc(
+            solver_wf_scheduled
         )
 
     if mismatch.missing_from_source != []:
