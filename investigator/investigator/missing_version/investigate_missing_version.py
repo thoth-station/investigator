@@ -20,9 +20,12 @@
 import logging
 
 from ..common import git_source_from_url, schedule_kebechet_run_url
+from ..metrics import scheduled_workflows
+
 from .metrics_missing_version import missing_version_exceptions
 from .metrics_missing_version import missing_version_in_progress
 from .metrics_missing_version import missing_version_success
+
 from prometheus_async.aio import track_inprogress, count_exceptions
 from thoth.messaging import MissingVersionMessage
 

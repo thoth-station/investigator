@@ -25,7 +25,6 @@ from .metrics_missing_package import missing_package_in_progress
 from ..common import git_source_from_url, schedule_kebechet_run_url
 from ..metrics import scheduled_workflows
 from prometheus_async.aio import track_inprogress, count_exceptions
-from ..configuration import Configuration
 from thoth.messaging import MissingPackageMessage
 
 

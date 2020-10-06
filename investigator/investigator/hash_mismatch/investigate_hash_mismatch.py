@@ -19,7 +19,7 @@
 
 import logging
 
-from ..common import wait_for_limit, git_source_from_url
+from ..common import git_source_from_url, learn_using_solver
 from ..configuration import Configuration
 from ..metrics import scheduled_workflows
 
@@ -38,7 +38,7 @@ async def parse_hash_mismatch(mismatch, openshift, graph):
     """Process a hash mismatch message from package-update producer."""
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER:
         # Solver logic
-        solver_wf_scheduled = await common.learn_using_solver(
+        solver_wf_scheduled = await learn_using_solver(
             openshift=openshift,
             graph=graph,
             is_present=False,
