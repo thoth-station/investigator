@@ -253,3 +253,11 @@ all the things that you see...
 ### Features
 * Update readme si (#299)
 * Add missing metrics (#308)
+
+## Release 0.5.4 (2020-10-06T19:16:52)
+### Features
+* Add metrics to see what workflows are scheduled (#313)
+### Automatic Updates
+* :pushpin: Automatic update of dependency thoth-messaging from 0.7.10 to 0.7.11 (#318)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.7.10 to 0.7.11 (#317)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.7.10 to 0.7.11 (#316)
