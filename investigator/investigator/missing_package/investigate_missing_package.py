@@ -22,9 +22,11 @@ import re
 from .metrics_missing_package import missing_package_exceptions
 from .metrics_missing_package import missing_package_success
 from .metrics_missing_package import missing_package_in_progress
-from ..common import git_source_from_url, wait_for_limit
+from ..common import git_source_from_url, schedule_kebechet_run_url
+from ..metrics import scheduled_workflows
 from prometheus_async.aio import track_inprogress, count_exceptions
 from ..configuration import Configuration
+from thoth.messaging import MissingPackageMessage
 
 
 @count_exceptions(missing_package_exceptions)
@@ -40,13 +42,19 @@ async def parse_missing_package(package, openshift, graph):
     def issue_body():
         return "Automated message from package change detected by thoth.package-update"
 
+    kebechet_wf_scheduled = 0
     for repo in repositories:
         gitservice_repo = git_source_from_url(repo)
         requirements = re.split("\n| ", gitservice_repo.service.get_project().get_file_content("Pipfile"))
+
         if package.package_name in requirements:
             gitservice_repo.open_issue_if_not_exist(issue_title, issue_body)
         else:
-            await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
-            openshift.schedule_kebechet_run_url(repo, gitservice_repo.service_type.name)
+            is_scheduled = schedule_kebechet_run_url(repo=repo, gitservice_repo_name=gitservice_repo.service_type.name)
+            kebechet_wf_scheduled += is_scheduled
+
+    scheduled_workflows.labels(message_type=MissingPackageMessage.topic_name, workflow_type="kebechet").inc(
+        kebechet_wf_scheduled
+    )
 
     missing_package_success.inc()

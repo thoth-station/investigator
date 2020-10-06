@@ -46,6 +46,18 @@ async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
         await sleep(Configuration.SLEEP_TIME)
         total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
 
+async def schedule_kebechet_run_url(
+    openshift: OpenShift, repo: str, gitservice_repo_name: str, indexes: List[str]
+) -> int:
+    """Schedule all solvers."""
+    try:
+        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
+        is_scheduled = openshift.schedule_kebechet_run_url(repo, gitservice_repo_name)
+    except Exception as e:
+        _LOGGER.exception(f"Failed to schedule kebechet for repo {repo} named {gitservice_repo_name}: {e}")
+        is_scheduled = 0
+
+    return is_scheduled
 
 async def learn_about_security(
     openshift: OpenShift,

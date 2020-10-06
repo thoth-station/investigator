@@ -19,11 +19,12 @@
 
 import logging
 
-from ..common import git_source_from_url
+from ..common import git_source_from_url, schedule_kebechet_run_url
 from .metrics_missing_version import missing_version_exceptions
 from .metrics_missing_version import missing_version_in_progress
 from .metrics_missing_version import missing_version_success
 from prometheus_async.aio import track_inprogress, count_exceptions
+from thoth.messaging import MissingVersionMessage
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -52,9 +53,18 @@ async def parse_missing_version(version, openshift, graph):
     def issue_body():
         return "Automated message from package change detected by thoth.package-update"
 
+    kebechet_wf_scheduled = 0
+
     for repo in repositories:
         gitservice_repo = git_source_from_url(repo)
-        openshift.schedule_kebechet_run_url(repo, gitservice_repo.service_type.name)
+
+        is_scheduled = schedule_kebechet_run_url(repo=repo, gitservice_repo_name=gitservice_repo.service_type.name)
+        kebechet_wf_scheduled += is_scheduled
+
         gitservice_repo.open_issue_if_not_exist(issue_title, issue_body)
+
+    scheduled_workflows.labels(message_type=MissingVersionMessage.topic_name, workflow_type="kebechet").inc(
+        kebechet_wf_scheduled
+    )
 
     missing_version_success.inc()
