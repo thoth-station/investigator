@@ -32,12 +32,15 @@ from .metrics_package_released import package_released_in_progress
 from .metrics_package_released import package_released_success
 from ..common import register_handler
 
+from prometheus_async.aio import track_inprogress, count_exceptions
+
+
 handler_table = {}  # type: Dict[str, Callable]
 
 
 @register_handler(handler_table, ["v1"])
-@package_released_exceptions.count_exceptions()
-@package_released_in_progress.track_inprogress()
+@count_exceptions(package_released_exceptions)
+@track_inprogress(package_released_in_progress)
 async def parse_package_released_message(
     package_released: MessageBase, openshift: OpenShift, graph: GraphDatabase
 ) -> None:

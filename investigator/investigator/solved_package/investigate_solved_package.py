@@ -33,6 +33,7 @@ from ..common import register_handler
 from .metrics_solved_package import solved_package_exceptions
 from .metrics_solved_package import solved_package_success
 from .metrics_solved_package import solved_package_in_progress
+from prometheus_async.aio import count_exceptions, track_inprogress
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,8 +41,8 @@ handler_table = {}  # type: Dict[str, Callable]
 
 
 @register_handler(handler_table, ["v1"])
-@solved_package_exceptions.count_exceptions()
-@solved_package_in_progress.track_inprogress()
+@count_exceptions(solved_package_exceptions)
+@track_inprogress(solved_package_in_progress)
 async def parse_solved_package_message(solved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase) -> None:
     """Parse solved package message."""
     package_name = solved_package.package_name

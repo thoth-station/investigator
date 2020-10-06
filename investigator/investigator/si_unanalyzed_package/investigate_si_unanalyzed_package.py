@@ -34,6 +34,7 @@ from ..common import register_handler
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_in_progress
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_success
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_exceptions
+from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -41,8 +42,8 @@ handler_table = {}  # type: Dict[str, Callable]
 
 
 @register_handler(handler_table, ["v1"])
-@si_unanalyzed_package_exceptions.count_exceptions()
-@si_unanalyzed_package_in_progress.track_inprogress()
+@count_exceptions(si_unanalyzed_package_exceptions)
+@track_inprogress(si_unanalyzed_package_in_progress)
 async def parse_si_unanalyzed_package_message(
     si_unanalyzed_package: MessageBase, openshift: OpenShift, graph: GraphDatabase
 ) -> None:

@@ -31,6 +31,7 @@ from ..metrics import scheduled_workflows
 from .metrics_unrevsolved_package import unrevsolved_package_exceptions
 from .metrics_unrevsolved_package import unrevsolved_package_in_progress
 from .metrics_unrevsolved_package import unrevsolved_package_success
+from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,8 +39,8 @@ handler_table = {}  # type: Dict[str, Callable]
 
 
 @register_handler(handler_table, ["v1"])
-@unrevsolved_package_exceptions.count_exceptions()
-@unrevsolved_package_in_progress.track_inprogress()
+@count_exceptions(unrevsolved_package_exceptions)
+@track_inprogress(unrevsolved_package_in_progress)
 async def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift: OpenShift) -> None:
     """Parse soolved package message."""
     package_name = unrevsolved_package.package_name

@@ -25,6 +25,7 @@ from ..configuration import Configuration
 from .metrics_hash_mismatch import hash_mismatch_exceptions
 from .metrics_hash_mismatch import hash_mismatch_success
 from .metrics_hash_mismatch import hash_mismatch_in_progress
+from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,8 +33,8 @@ handler_table = {}  # type: Dict[str, Callable]
 
 
 @register_handler(handler_table, ["v1"])
-@hash_mismatch_exceptions.count_exceptions()
-@hash_mismatch_in_progress.track_inprogress()
+@count_exceptions(hash_mismatch_exceptions)
+@track_inprogress(hash_mismatch_in_progress)
 async def parse_hash_mismatch(mismatch, openshift, graph):
     """Process a hash mismatch message from package-update producer."""
     try:

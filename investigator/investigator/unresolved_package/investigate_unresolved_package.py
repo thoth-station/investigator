@@ -40,6 +40,7 @@ from ..common import register_handler
 from .metrics_unresolved_package import unresolved_package_exceptions
 from .metrics_unresolved_package import unresolved_package_in_progress
 from .metrics_unresolved_package import unresolved_package_success
+from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -100,8 +101,8 @@ def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tup
 
 
 @register_handler(handler_table, ["v1"])
-@unresolved_package_exceptions.count_exceptions()
-@unresolved_package_in_progress.track_inprogress()
+@count_exceptions(unresolved_package_exceptions)
+@track_inprogress(unresolved_package_in_progress)
 async def parse_unresolved_package_message(
     unresolved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase
 ) -> None:

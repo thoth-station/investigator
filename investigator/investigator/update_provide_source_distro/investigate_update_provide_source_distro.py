@@ -25,14 +25,16 @@ from .metrics_update_provide_source_distro import update_provide_source_distro_s
 from .metrics_update_provide_source_distro import update_provide_source_distro_in_progress
 from ..common import register_handler
 
+from prometheus_async.aio import track_inprogress, count_exceptions
+
 _LOGGER = logging.getLogger(__name__)
 
 handler_table = {}  # type: Dict[str, Callable]
 
 
 @register_handler(handler_table, ["v1"])
-@update_provide_source_distro_exceptions.count_exceptions()
-@update_provide_source_distro_in_progress.track_inprogress()
+@count_exceptions(update_provide_source_distro_exceptions)
+@track_inprogress(update_provide_source_distro_in_progress)
 async def parse_update_provide_source_distro_message(update_provide_source_distro, graph):
     """Parse update provide source distro message."""
     graph.update_provides_source_distro_package_version(

@@ -29,6 +29,7 @@ from ..configuration import Configuration
 from .metrics_qebhwt_trigger import qebhwt_trigger_exceptions
 from .metrics_qebhwt_trigger import qebhwt_trigger_in_progress
 from .metrics_qebhwt_trigger import qebhwt_trigger_success
+from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,8 +37,8 @@ handler_table = {}  # type: Dict[str, Callable]
 
 
 @register_handler(handler_table, ["v1"])
-@qebhwt_trigger_exceptions.count_exceptions()
-@qebhwt_trigger_in_progress.track_inprogress()
+@count_exceptions(qebhwt_trigger_exceptions)
+@track_inprogress(qebhwt_trigger_in_progress)
 async def parse_qebhwt_trigger_message(qebhwt_trigger: QebHwtTriggerMessage, openshift: OpenShift) -> None:
     """Parse qebhwt_trigger message."""
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)

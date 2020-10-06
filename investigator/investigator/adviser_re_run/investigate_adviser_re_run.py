@@ -32,6 +32,7 @@ from ..configuration import Configuration
 from .metrics_adviser_re_run import adviser_re_run_exceptions
 from .metrics_adviser_re_run import adviser_re_run_success
 from .metrics_adviser_re_run import adviser_re_run_in_progress
+from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,8 +40,8 @@ handler_table = {}  # type: Dict[str, Callable]
 
 
 @register_handler(handler_table, ["v1"])
-@adviser_re_run_exceptions.count_exceptions()
-@adviser_re_run_in_progress.track_inprogress()
+@count_exceptions(adviser_re_run_exceptions)
+@track_inprogress(adviser_re_run_in_progress)
 async def parse_adviser_re_run_message(adviser_re_run: MessageBase, openshift: OpenShift) -> None:
     """Parse adviser re run message."""
     adviser_wfs_scheduled = await _re_schedule_adviser(openshift=openshift, parameters=adviser_re_run,)

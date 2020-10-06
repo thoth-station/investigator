@@ -25,6 +25,7 @@ from ..common import register_handler
 from .metrics_missing_version import missing_version_exceptions
 from .metrics_missing_version import missing_version_in_progress
 from .metrics_missing_version import missing_version_success
+from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,8 +33,8 @@ handler_table = {}  # type: Dict[str, Callable]
 
 
 @register_handler(handler_table, ["v1"])
-@missing_version_exceptions.count_exceptions()
-@missing_version_in_progress.track_inprogress()
+@count_exceptions(missing_version_exceptions)
+@track_inprogress(missing_version_in_progress)
 async def parse_missing_version(version, openshift, graph):
     """Process a missing version message from package-update producer."""
     graph.update_missing_flag_package_version(

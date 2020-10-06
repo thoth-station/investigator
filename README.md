@@ -74,6 +74,21 @@ The following messages are sent by [package update producer](https://github.com/
 
 - [MissingVersionMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/missing_version/README.md)
 
+- [UpdateProvidesSourceDistroMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/update_provide_source_distro/README.md)
+
+![UpdateProvidesSourceDistro](https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/UpdateProvidesSourceDistro.jpg)
+
+The image above shows how Thoth is able to self-learn and act on known errors during knowledge acquisition about Security for a certain package:
+
+- if a package, version from a certain index cannot be downloaded because the source distro is missing or the package is missing SI workflow will send messages
+([UpdateProvidesSourceDistroMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/update_provide_source_distro/README.md) or
+[MissingVersionMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/missing_version/README.md) respectively)
+
+- Investigator takes the messages and acts setting flags for those packages in Thoth knowledge graph so that next time Thoth is not going to schedule security analysis
+for that package. (In the image below what the Grafana dashboard will show)
+
+![SIAnalysisOverview](https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/SIAnalysisOverview.png)
+
 The following message is sent by [solver](https://github.com/thoth-station/solver) when Thoth acquired all missing knowledge required to provide advice to a user (human or bot):
 
 - [AdviserReRunMessage](https://github.com/thoth-station/investigator/blob/master/investigator/investigator/advise_justification/README.md).
