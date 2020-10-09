@@ -261,3 +261,8 @@ all the things that you see...
 * :pushpin: Automatic update of dependency thoth-messaging from 0.7.10 to 0.7.11 (#318)
 * :pushpin: Automatic update of dependency thoth-messaging from 0.7.10 to 0.7.11 (#317)
 * :pushpin: Automatic update of dependency thoth-messaging from 0.7.10 to 0.7.11 (#316)
+
+## Release 0.5.5 (2020-10-09T16:33:25)
+### Automatic Updates
+* :pushpin: Automatic update of dependency hypothesis from 5.37.0 to 5.37.1 (#323)
+* :pushpin: Automatic update of dependency thoth-common from 0.20.0 to 0.20.1 (#322)
