@@ -17,13 +17,15 @@
 
 """This file contains methods used by Thoth investigator to investigate on package released messages."""
 
+from typing import Dict, Any
+
 from thoth.storages.graph import GraphDatabase
-from thoth.messaging import MessageBase
 from thoth.messaging import PackageReleasedMessage
 from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
 from .. import common
+from ..common import register_handler
 from ..configuration import Configuration
 from .metrics_package_released import package_released_exceptions
 from .metrics_package_released import package_released_in_progress
@@ -33,13 +35,14 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 
 @count_exceptions(package_released_exceptions)
 @track_inprogress(package_released_in_progress)
+@register_handler(PackageReleasedMessage().topic_name, ["v1"])
 async def parse_package_released_message(
-    package_released: MessageBase, openshift: OpenShift, graph: GraphDatabase
+    package_released: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase
 ) -> None:
     """Parse package released message."""
-    package_name = package_released.package_name
-    package_version = package_released.package_version
-    index_url = package_released.index_url
+    package_name = package_released["package_name"]
+    package_version = package_released["package_version"]
+    index_url = package_released["index_url"]
 
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER:
         # Solver logic
@@ -52,7 +55,7 @@ async def parse_package_released_message(
             package_version=package_version,
         )
 
-        scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="solver").inc(
+        scheduled_workflows.labels(message_type=PackageReleasedMessage.base_name, workflow_type="solver").inc(
             solver_wf_scheduled
         )
 
@@ -62,7 +65,7 @@ async def parse_package_released_message(
             openshift=openshift, is_present=False, package_name=package_name, package_version=package_version,
         )
 
-        scheduled_workflows.labels(message_type=PackageReleasedMessage.topic_name, workflow_type="revsolver").inc(
+        scheduled_workflows.labels(message_type=PackageReleasedMessage.base_name, workflow_type="revsolver").inc(
             revsolver_wf_scheduled
         )
 

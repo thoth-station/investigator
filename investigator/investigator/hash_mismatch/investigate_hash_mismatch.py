@@ -19,7 +19,7 @@
 
 import logging
 
-from ..common import git_source_from_url, learn_using_solver
+from ..common import git_source_from_url, learn_using_solver, register_handler
 from ..configuration import Configuration
 from ..metrics import scheduled_workflows
 
@@ -34,6 +34,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @count_exceptions(hash_mismatch_exceptions)
 @track_inprogress(hash_mismatch_in_progress)
+@register_handler(HashMismatchMessage().topic_name, ["v1"])
 async def parse_hash_mismatch(mismatch, openshift, graph):
     """Process a hash mismatch message from package-update producer."""
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER:
@@ -42,33 +43,35 @@ async def parse_hash_mismatch(mismatch, openshift, graph):
             openshift=openshift,
             graph=graph,
             is_present=False,
-            package_name=mismatch.package_name,
-            index_url=mismatch.index_url,
-            package_version=mismatch.package_version,
+            package_name=mismatch["package_name"],
+            index_url=mismatch["index_url"],
+            package_version=mismatch["package_version"],
         )
 
         scheduled_workflows.labels(message_type=HashMismatchMessage.topic_name, workflow_type="solver").inc(
             solver_wf_scheduled
         )
 
-    if mismatch.missing_from_source != []:
-        for h in mismatch.missing_from_source:
+    if mismatch["missing_from_source"] != []:
+        for h in mismatch["missing_from_source"]:
             graph.update_python_package_hash_present_flag(
-                package_name=mismatch.package_name,
-                package_version=mismatch.package_version,
-                index_url=mismatch.index_url,
+                package_name=mismatch["package_name"],
+                package_version=mismatch["package_version"],
+                index_url=mismatch["index_url"],
                 sha256=h,
             )
 
     repositories = graph.get_adviser_run_origins_all(
-        index_url=mismatch.index_url,
-        package_name=mismatch.package_name,
-        package_version=mismatch.package_version,
+        index_url=mismatch["index_url"],
+        package_name=mismatch["package_name"],
+        package_version=mismatch["package_version"],
         count=None,
         distinct=True,
     )
 
-    issue_title = f"Hash mismatch for {mismatch.package_name}=={mismatch.package_version} on {mismatch.index_url}"
+    issue_title = (
+        f"Hash mismatch for {mismatch['package_name']}=={mismatch['package_version']} on {mismatch['index_url']}"
+    )
 
     def issue_body():
         return "Automated message from package change detected by thoth.package-update"

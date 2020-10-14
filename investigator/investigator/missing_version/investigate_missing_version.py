@@ -18,8 +18,9 @@
 """Logic for handling hash_version message."""
 
 import logging
+from typing import Dict, Any
 
-from ..common import git_source_from_url, schedule_kebechet_run_url
+from ..common import git_source_from_url, schedule_kebechet_run_url, register_handler
 from ..metrics import scheduled_workflows
 
 from .metrics_missing_version import missing_version_exceptions
@@ -28,30 +29,35 @@ from .metrics_missing_version import missing_version_success
 
 from prometheus_async.aio import track_inprogress, count_exceptions
 from thoth.messaging import MissingVersionMessage
+from thoth.common import OpenShift
+from thoth.storages import GraphDatabase
 
 _LOGGER = logging.getLogger(__name__)
 
 
 @count_exceptions(missing_version_exceptions)
 @track_inprogress(missing_version_in_progress)
-async def parse_missing_version(version, openshift, graph):
+@register_handler(MissingVersionMessage().topic_name, ["v1"])
+async def parse_missing_version(version: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase):
     """Process a missing version message from package-update producer."""
     graph.update_missing_flag_package_version(
-        index_url=version.index_url,
-        package_name=version.package_name,
-        package_version=version.package_version,
+        index_url=version["index_url"],
+        package_name=version["package_name"],
+        package_version=version["package_version"],
         value=True,
     )
 
     repositories = graph.get_adviser_run_origins_all(
-        index_url=version.index_url,
-        package_name=version.package_name,
-        package_version=version.package_version,
+        index_url=version["index_url"],
+        package_name=version["package_name"],
+        package_version=version["package_version"],
         count=None,
         distinct=True,
     )
 
-    issue_title = f"Missing package version {version.package_name}=={version.package_version} on {version.index_url}"
+    issue_title = (
+        f"Missing package version {version['package_name']}=={version['package_version']} on {version['index_url']}"
+    )
 
     def issue_body():
         return "Automated message from package change detected by thoth.package-update"
@@ -61,12 +67,14 @@ async def parse_missing_version(version, openshift, graph):
     for repo in repositories:
         gitservice_repo = git_source_from_url(repo)
 
-        is_scheduled = schedule_kebechet_run_url(repo=repo, gitservice_repo_name=gitservice_repo.service_type.name)
+        is_scheduled = await schedule_kebechet_run_url(
+            openshift=openshift, repo=repo, gitservice_repo_name=gitservice_repo.service_type.name
+        )
         kebechet_wf_scheduled += is_scheduled
 
         gitservice_repo.open_issue_if_not_exist(issue_title, issue_body)
 
-    scheduled_workflows.labels(message_type=MissingVersionMessage.topic_name, workflow_type="kebechet").inc(
+    scheduled_workflows.labels(message_type=MissingVersionMessage.base_name, workflow_type="kebechet").inc(
         kebechet_wf_scheduled
     )
 

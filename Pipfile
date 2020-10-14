@@ -9,8 +9,9 @@ thoth-storages = "*"
 prometheus-client = "<0.7.0"
 thoth-python = "*"
 thoth-sourcemanagement = "*"
-thoth-messaging = "*"
 prometheus-async = "*"
+confluent-kafka = "*"
+thoth-messaging = {path = "./../messaging"}
 
 [dev-packages]
 pytest = "*"

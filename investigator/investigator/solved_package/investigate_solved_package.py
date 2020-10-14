@@ -18,15 +18,16 @@
 """This file contains methods used by Thoth investigator to investigate on solved packages."""
 
 import logging
+from typing import Dict, Any
 
 from thoth.storages.graph import GraphDatabase
-from thoth.messaging import MessageBase
 from thoth.messaging import SolvedPackageMessage
 from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
 from .. import common
 from ..configuration import Configuration
+from ..common import register_handler
 
 from .metrics_solved_package import solved_package_exceptions
 from .metrics_solved_package import solved_package_success
@@ -38,11 +39,14 @@ _LOGGER = logging.getLogger(__name__)
 
 @count_exceptions(solved_package_exceptions)
 @track_inprogress(solved_package_in_progress)
-async def parse_solved_package_message(solved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase) -> None:
+@register_handler(SolvedPackageMessage().topic_name, ["v1"])
+async def parse_solved_package_message(
+    solved_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase
+) -> None:
     """Parse solved package message."""
-    package_name = solved_package.package_name
-    package_version = solved_package.package_version
-    index_url: str = solved_package.index_url
+    package_name = solved_package["package_name"]
+    package_version = solved_package["package_version"]
+    index_url: str = solved_package["index_url"]
 
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SECURITY:
         # SI logic
@@ -55,8 +59,8 @@ async def parse_solved_package_message(solved_package: MessageBase, openshift: O
             index_url=index_url,
         )
 
-        scheduled_workflows.labels(
-            message_type=SolvedPackageMessage.topic_name, workflow_type="security-indicator"
-        ).inc(si_wfs_scheduled)
+        scheduled_workflows.labels(message_type=SolvedPackageMessage.base_name, workflow_type="security-indicator").inc(
+            si_wfs_scheduled
+        )
 
     solved_package_success.inc()

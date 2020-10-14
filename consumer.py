@@ -21,55 +21,44 @@
 
 import logging
 import os
+import asyncio
+import json
+import signal
+from runpy import run_module
+from aiohttp import web
 
-from thoth.messaging import MessageBase
-from thoth.messaging import AdviseJustificationMessage
-from thoth.messaging import AdviserReRunMessage
-from thoth.messaging import AdviserTriggerMessage
-from thoth.messaging import HashMismatchMessage
-from thoth.messaging import KebechetTriggerMessage
-from thoth.messaging import MissingPackageMessage
-from thoth.messaging import MissingVersionMessage
-from thoth.messaging import PackageExtractTriggerMessage
-from thoth.messaging import PackageReleasedMessage
-from thoth.messaging import ProvenanceCheckerTriggerMessage
-from thoth.messaging import QebHwtTriggerMessage
-from thoth.messaging import SIUnanalyzedPackageMessage
-from thoth.messaging import SolvedPackageMessage
-from thoth.messaging import UnresolvedPackageMessage
-from thoth.messaging import UnrevsolvedPackageMessage
-from thoth.messaging import UpdateProvidesSourceDistroMessage
-
+import thoth.messaging.consumer as consumer
+import thoth.messaging.admin_client as admin
 
 from investigator.investigator import __service_version__
 from investigator.investigator.configuration import Configuration
-from investigator.investigator.advise_justification import expose_advise_justification_metrics
-from investigator.investigator.adviser_re_run import parse_adviser_re_run_message
-from investigator.investigator.adviser_trigger import parse_adviser_trigger_message
-from investigator.investigator.hash_mismatch import parse_hash_mismatch
-from investigator.investigator.kebechet_trigger import parse_kebechet_trigger_message
-from investigator.investigator.missing_package import parse_missing_package
-from investigator.investigator.missing_version import parse_missing_version
-from investigator.investigator.package_extract_trigger import parse_package_extract_trigger_message
-from investigator.investigator.package_released import parse_package_released_message
-from investigator.investigator.provenance_checker_trigger import parse_provenance_checker_trigger_message
-from investigator.investigator.qebhwt_trigger import parse_qebhwt_trigger_message
-from investigator.investigator.si_unanalyzed_package import parse_si_unanalyzed_package_message
-from investigator.investigator.solved_package import parse_solved_package_message
-from investigator.investigator.unrevsolved_package import parse_revsolved_package_message
-from investigator.investigator.unresolved_package import parse_unresolved_package_message
-from investigator.investigator.update_provide_source_distro import parse_update_provide_source_distro_message
-
+from investigator.investigator.common import handler_table
 from investigator.investigator.metrics import registry
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
 
-from aiohttp import web
 from prometheus_client import generate_latest
+from confluent_kafka import KafkaError
+from confluent_kafka import KafkaException
 
-# initialize the application
-app = MessageBase().app
+# We run all the modules so that their metrics and handlers get registered
+run_module("investigator.investigator.advise_justification.investigate_advise_justification")
+run_module("investigator.investigator.adviser_re_run.investigate_adviser_re_run")
+run_module("investigator.investigator.adviser_trigger.investigate_adviser_trigger")
+run_module("investigator.investigator.hash_mismatch.investigate_hash_mismatch")
+run_module("investigator.investigator.kebechet_trigger.investigate_kebechet_trigger")
+run_module("investigator.investigator.missing_package.investigate_missing_package")
+run_module("investigator.investigator.missing_version.investigate_missing_version")
+run_module("investigator.investigator.package_extract_trigger.investigate_package_extract_trigger")
+run_module("investigator.investigator.package_released.investigate_package_released")
+run_module("investigator.investigator.provenance_checker_trigger.investigate_provenance_checker_trigger")
+run_module("investigator.investigator.qebhwt_trigger.investigate_qebhwt_trigger")
+run_module("investigator.investigator.si_unanalyzed_package.investigate_si_unanalyzed_package")
+run_module("investigator.investigator.solved_package.investigate_solved_package")
+run_module("investigator.investigator.unresolved_package.investigate_unresolved_package")
+run_module("investigator.investigator.unrevsolved_package.investigate_unrevsolved_package")
+run_module("investigator.investigator.update_provide_source_distro.investigate_update_provide_source_distro")
 
 init_logging()
 
@@ -89,163 +78,106 @@ _LOGGER.info("Schedule Solver Messages set to - %r", Configuration.THOTH_INVESTI
 _LOGGER.info("Schedule Reverse Solver Messages set to - %r", Configuration.THOTH_INVESTIGATOR_SCHEDULE_REVSOLVER)
 _LOGGER.info("Schedule Unanalyzed SI Messages set to - %r", Configuration.THOTH_INVESTIGATOR_SCHEDULE_SECURITY)
 
-# Get all topics
-advise_justification_message_topic = AdviseJustificationMessage().topic
-adviser_re_run_message_topic = AdviserReRunMessage().topic
-adviser_trigger_message_topic = AdviserTriggerMessage().topic
-hash_mismatch_message_topic = HashMismatchMessage().topic
-kebechet_trigger_message_topic = KebechetTriggerMessage().topic
-missing_package_message_topic = MissingPackageMessage().topic
-missing_version_message_topic = MissingVersionMessage().topic
-package_extract_trigger_message_topic = PackageExtractTriggerMessage().topic
-package_released_message_topic = PackageReleasedMessage().topic
-provenance_checker_trigger_message_topic = ProvenanceCheckerTriggerMessage().topic
-qebhwt_trigger_message_topic = QebHwtTriggerMessage().topic
-si_unanalyzed_package_message_topic = SIUnanalyzedPackageMessage().topic
-solved_package_message_topic = SolvedPackageMessage().topic
-unresolved_package_message_topic = UnresolvedPackageMessage().topic
-unrevsolved_package_message_topic = UnrevsolvedPackageMessage().topic
-update_provide_source_distro_message_topic = UpdateProvidesSourceDistroMessage().topic
-
-
 openshift = OpenShift()
 graph = GraphDatabase()
 
 graph.connect()
 
+running = True
 
-@app.page("/metrics")
-async def get_metrics(self, request):
-    """Serve the metrics from the consumer registry."""
+num_workers = int(os.getenv("THOTH_CONSUMER_WORKERS", 5))
+
+routes = web.RouteTableDef()
+
+
+def _handler_lookup(topic_name, version):
+    return handler_table[topic_name][version]
+
+
+@routes.get("/metrics")
+async def get_metrics(request):
+    """Display prometheus metrics."""
     return web.Response(text=generate_latest(registry=registry).decode("utf-8"))
 
 
-@app.page("/_health")
-async def get_health(self, request):
-    """Serve a readiness/liveness probe endpoint."""
+@routes.get("/_health")
+async def get_health(request):
+    """Display readiness probe."""
     data = {"status": "ready", "version": __service_version__}
     return web.json_response(data)
 
 
-@app.agent(advise_justification_message_topic)
-async def consume_advise_justification(advise_justifications):
-    """Loop when an advise justification message is received."""
-    async for advise_justification in advise_justifications:
-        await expose_advise_justification_metrics(advise_justification=advise_justification)
+async def _worker(c: consumer.Consumer, q: asyncio.Queue):
+    while True:
+        val = await q.get()
+        if val is None:
+            break
+        func, msg = val
+        print(f"Processing {msg.topic()}.")
+        contents = json.loads(msg.value().decode("utf-8"))
+        try:
+            await func(contents, openshift=openshift, graph=graph)
+        except Exception as e:
+            print(e)
+        finally:
+            c.commit(message=msg)
+            await asyncio.sleep(0)  # allow another green thread to take control
 
 
-@app.agent(adviser_re_run_message_topic)
-async def consume_adviser_re_run(adviser_re_runs):
-    """Loop when an adviser re run message is received."""
-    async for adviser_re_run in adviser_re_runs:
-        await parse_adviser_re_run_message(adviser_re_run=adviser_re_run, openshift=openshift)
+# this consumers from Kafka, but produces to async queue
+async def _confluent_consumer_loop(c: consumer.Consumer, q: asyncio.Queue):
+    a = admin.create_admin_client()
+    admin.create_all_topics(a)
+    c = consumer.create_consumer()
+    try:
+        consumer.subscribe_to_all(c)
+        while running:
+            print("loop")
+            msg = c.poll(0)
+            if msg is None:
+                await asyncio.sleep(1.0)
+            elif msg.error():
+                if msg.error().code() == KafkaError._PARTITION_EOF:
+                    _LOGGER.warning("%s [%d] reached end at offset %d", msg.topic(), msg.partition(), msg.offset())
+                else:
+                    raise KafkaException(msg.error())
+            else:
+                contents = json.loads(msg.value().decode("utf-8"))  # type: dict
+                v = contents.get("version", "v1")
+                func = _handler_lookup(msg.topic(), v)
+                await q.put((func, msg))
+            await asyncio.sleep(0)
+    finally:
+        c.close()
+        print("closing")
+        for _ in range(num_workers):
+            await q.put(None)  # each worker can receive this value exactly once
 
 
-@app.agent(adviser_trigger_message_topic)
-async def consume_adviser_trigger(adviser_triggers):
-    """Loop when an adviser trigger message is received."""
-    async for adviser_trigger in adviser_triggers:
-        await parse_adviser_trigger_message(adviser_trigger=adviser_trigger, openshift=openshift)
-
-
-@app.agent(hash_mismatch_message_topic)
-async def consume_hash_mismatch(hash_mismatches):
-    """Loop when an hash mismatch message is received."""
-    async for hash_mismatch in hash_mismatches:
-        await parse_hash_mismatch(mismatch=hash_mismatch, openshift=openshift, graph=graph)
-
-
-@app.agent(update_provide_source_distro_message_topic)
-async def consume_update_provide_source_distro(updates_provide_source_distro):
-    """Loop when update_provide_source_distro message is received."""
-    async for update_provide_source_distro in updates_provide_source_distro:
-        await parse_update_provide_source_distro_message(
-            update_provide_source_distro=update_provide_source_distro, graph=graph
-        )
-
-
-@app.agent(kebechet_trigger_message_topic)
-async def consume_kebechet_trigger(kebechet_triggers):
-    """Loop when a kebechet_trigger message is received."""
-    async for kebechet_trigger in kebechet_triggers:
-        await parse_kebechet_trigger_message(kebechet_trigger=kebechet_trigger, openshift=openshift)
-
-
-@app.agent(missing_package_message_topic)
-async def consume_missing_package(missing_packages):
-    """Loop when an missing package message is received."""
-    async for missing_package in missing_packages:
-        await parse_missing_package(package=missing_package, openshift=openshift, graph=graph)
-
-
-@app.agent(missing_version_message_topic)
-async def consume_missing_version(missing_versions):
-    """Loop when an missing version message is received."""
-    async for missing_version in missing_versions:
-        await parse_missing_version(version=missing_version, openshift=openshift, graph=graph)
-
-
-@app.agent(package_extract_trigger_message_topic)
-async def consume_package_extract_trigger(package_extract_triggers):
-    """Loop when a package_extract_trigger message is received."""
-    async for package_extract_trigger in package_extract_triggers:
-        await parse_package_extract_trigger_message(
-            package_extract_trigger=package_extract_trigger, openshift=openshift
-        )
-
-
-@app.agent(package_released_message_topic)
-async def consume_package_released(package_releases) -> None:
-    """Loop when a package released message is received."""
-    async for package_released in package_releases:
-        await parse_package_released_message(package_released=package_released, openshift=openshift, graph=graph)
-
-
-@app.agent(provenance_checker_trigger_message_topic)
-async def consume_provenance_checker_trigger(provenance_checker_triggers):
-    """Loop when a provenance_checker_trigger message is received."""
-    async for provenance_checker_trigger in provenance_checker_triggers:
-        await parse_provenance_checker_trigger_message(
-            provenance_checker_trigger=provenance_checker_trigger, openshift=openshift,
-        )
-
-
-@app.agent(qebhwt_trigger_message_topic)
-async def consume_qebhwt_trigger(qebhwt_triggers):
-    """Loop when a qebhwt_trigger message is received."""
-    async for qebhwt_trigger in qebhwt_triggers:
-        await parse_qebhwt_trigger_message(qebhwt_trigger=qebhwt_trigger, openshift=openshift)
-
-
-@app.agent(si_unanalyzed_package_message_topic)
-async def consume_si_unanalyzed_package(si_unanalyzed_packages) -> None:
-    """Loop when an SI Unanalyzed package message is received."""
-    async for si_unanalyzed_package in si_unanalyzed_packages:
-        await parse_si_unanalyzed_package_message(
-            si_unanalyzed_package=si_unanalyzed_package, openshift=openshift, graph=graph
-        )
-
-
-@app.agent(solved_package_message_topic)
-async def consume_solved_package(solved_packages) -> None:
-    """Loop when an unresolved package message is received."""
-    async for solved_package in solved_packages:
-        await parse_solved_package_message(solved_package=solved_package, openshift=openshift, graph=graph)
-
-
-@app.agent(unresolved_package_message_topic)
-async def consume_unresolved_package(unresolved_packages) -> None:
-    """Loop when an unresolved package message is received."""
-    async for unresolved_package in unresolved_packages:
-        await parse_unresolved_package_message(unresolved_package=unresolved_package, openshift=openshift, graph=graph)
-
-
-@app.agent(unrevsolved_package_message_topic)
-async def consume_unrevsolved_package(unrevsolved_packages) -> None:
-    """Loop when an unresolved package message is received."""
-    async for unrevsolved_package in unrevsolved_packages:
-        await parse_revsolved_package_message(unrevsolved_package=unrevsolved_package, openshift=openshift)
+async def _shutdown(app, bar):
+    global running
+    running = False
 
 
 if __name__ == "__main__":
-    app.main()
+    loop = asyncio.get_event_loop()
+    c = consumer.create_consumer()
+    queue = asyncio.Queue(maxsize=10, loop=loop)  # type: asyncio.Queue
+
+    tasks = []
+    tasks.append(_confluent_consumer_loop(c=c, q=queue))
+    for _ in range(num_workers):
+        tasks.append(_worker(c=c, q=queue))
+
+    signal.signal(signal.SIGINT, _shutdown)
+
+    app = web.Application()
+    app.add_routes(routes)
+
+    runner = web.AppRunner(app, handle_signals=True)
+    loop.run_until_complete(runner.setup())
+
+    site = web.TCPSite(runner, port=6066)
+    tasks.append(site.start())
+
+    loop.run_until_complete(asyncio.gather(*tasks))
