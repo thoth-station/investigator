@@ -12,18 +12,9 @@ This agent relies mainly on [thoth-messaging](https://github.com/thoth-station/m
 
 ## Goals
 
-This agent has two main goals:
+This agent has two one main goal:
 
-- Produce event messages inside a workflow when some task related to a package release needs to be performed. (Producer)
 - Receive messages from different components and take action depending on the info about a package. (Consumer)
-
-### Producer
-
-Producer is currently used in the following components in Thoth:
-
-- [Adviser](https://github.com/thoth-station/adviser/tree/master/thoth/adviser) workflow, where it checks for any unresolved packages in the adviser report.
-When the unresolved packages are present, it sends an [UnresolvedPackageMessage](https://github.com/thoth-station/messaging/blob/a579a480819a9b35123e9002243f4bba6d082929/thoth/messaging/unresolved_package.py#L35)
-to Kafka for each package release to be solved using Thoth [Solver](https://github.com/thoth-station/solver) workflow.
 
 ### Consumer
 
