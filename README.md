@@ -12,7 +12,7 @@ This agent relies mainly on [thoth-messaging](https://github.com/thoth-station/m
 
 ## Goals
 
-This agent has two one main goal:
+This agent has one main goal:
 
 - Receive messages from different components and take action depending on the info about a package. (Consumer)
 
