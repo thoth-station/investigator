@@ -73,7 +73,6 @@ async def learn_about_security(
             return 0
 
     # Package never seen (schedule si workflow to collect knowledge for Thoth)
-    await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
     is_si_analyzer_scheduled = await _schedule_security_indicator(
         openshift=openshift, package_name=package_name, package_version=package_version, index_url=index_url
     )
