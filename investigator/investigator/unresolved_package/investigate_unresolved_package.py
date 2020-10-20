@@ -17,18 +17,13 @@
 
 """This file contains methods used by Thoth investigator to investigate on unresolved packages."""
 
-import sys
 import logging
-import json
-import os
 
-from typing import Optional, Dict, Any, List, Tuple
-from pathlib import Path
+from typing import Optional, List, Dict, Any
 
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import UnresolvedPackageMessage
 from thoth.common import OpenShift
-from thoth.python import Pipfile
 from thoth.python import Source
 
 from ..metrics import scheduled_workflows
@@ -42,59 +37,6 @@ from .metrics_unresolved_package import unresolved_package_success
 from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def investigate_unresolved_package(file_test_path: Optional[Path] = None) -> Tuple[Dict[Any, Any], Optional[str]]:
-    """Investigate on unresolved packages."""
-    if file_test_path:
-        _LOGGER.debug("Dry run..")
-        adviser_run_path = file_test_path
-    else:
-        adviser_run_path = Path(os.environ["JSON_FILE_PATH"])
-
-    if not adviser_run_path.exists():
-        raise FileNotFoundError(f"Cannot find the file on this path: {adviser_run_path}")
-
-    with open(adviser_run_path, "r") as f:
-        content = json.load(f)
-
-    unresolved_packages = []
-    report = content["result"]["report"]
-    if report:
-        errors_details = report.get("_ERROR_DETAILS")
-        if errors_details:
-            unresolved_packages = errors_details["unresolved"]
-
-    if not unresolved_packages:
-        _LOGGER.warning("No packages to be solved with priority identified.")
-        sys.exit(2)
-
-    parameters = content["result"]["parameters"]
-    runtime_environment = parameters["project"].get("runtime_environment")
-
-    solver = OpenShift.obtain_solver_from_runtime_environment(runtime_environment=runtime_environment)
-
-    requirements = parameters["project"].get("requirements")
-
-    pipfile = Pipfile.from_dict(requirements)
-    packages = pipfile.packages.packages
-    dev_packages = pipfile.dev_packages.packages
-
-    packages_to_solve = {}
-    for package_name in unresolved_packages:
-
-        if package_name in packages:
-            packages_to_solve[package_name] = packages[package_name]
-
-        if package_name in dev_packages:
-            packages_to_solve[package_name] = dev_packages[package_name]
-
-    _LOGGER.info(f"Unresolved packages identified.. {packages_to_solve}")
-
-    if solver:
-        return (packages_to_solve, solver)
-
-    return (packages_to_solve, None)
 
 
 @count_exceptions(unresolved_package_exceptions)

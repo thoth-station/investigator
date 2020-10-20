@@ -18,9 +18,7 @@
 """The important parts for parsing unresolved_package messages."""
 
 from .investigate_unresolved_package import parse_unresolved_package_message
-from .investigate_unresolved_package import investigate_unresolved_package
 
 __all__ = [
     "parse_unresolved_package_message",
-    "investigate_unresolved_package",
 ]
