@@ -3,7 +3,7 @@ Introduction to Thoth's Investigator
 
 Thoth Investigator is the sorting centre in Thoth where all messages received by different components are handled after investigation.
 
-It has monitoring system in places that allow Thoth team to see what is happening in Thoth in terms of Kafka, Openshift, Argo for the different components 
+It has monitoring system in places that allow Thoth team to see what is happening in Thoth in terms of Kafka, Openshift, Argo for the different components
 and act when some alarms are received.
 
 This agent relies mainly on:
