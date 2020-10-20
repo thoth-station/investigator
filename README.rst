@@ -22,9 +22,11 @@ Goals
 Environment variables
 =====================
 
-See `thoth-kebechet <https://github.com/thoth-station/kebechet>`__
+See `thoth-kebechet <https://github.com/thoth-station/kebechet>`__:
 * `THOTH_GITHUB_PRIVATE_TOKEN`: token for authenticating actions on GitHub repositories
+
 * `THOTH_GITLAB_PRIVATE_TOKEN`: token for authenticating actions on GitLab repositories
+
 * Enforcing a workflow limit:
   * `ARGO_PENDING_SLEEP_TIME`: amount of time we wait between checking the number of workflows in progress
   * `ARGO_PENDING_WORKFLOW_LIMIT`: limit to enforce on argo for total number of pending workflows
@@ -74,7 +76,8 @@ The following message is sent by `solver <https://github.com/thoth-station/solve
 
 * `AdviserReRunMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/advise_justification/README.md>`__.
 
-### Trigger User requests
+Trigger User requests
+=====================
 
 The following messages are sent by `User-API producer <https://github.com/thoth-station/user-api>`__ when users (humans or bots)
 interact with `Thoth integrations <https://github.com/thoth-station/adviser/blob/master/docs/source/integration.rst>`__:
@@ -93,12 +96,12 @@ interact with `Thoth integrations <https://github.com/thoth-station/adviser/blob
 Investigator scenarios description
 ==================================
 
-Thoth knowledge increase description using investigator
-=======================================================
+Thoth knowledge increase using investigator
+===========================================
 
 .. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/IncreaseThothKnowledge.jpg
    :align: center
-   :alt: Thoth knowledge increase description using investigator.
+   :alt: Thoth knowledge increase using investigator.
 
 The image above shows how Thoth keeps learning automatically using two fundamental components that produce messages described in this section:
 
@@ -187,7 +190,7 @@ The implentation of this portion is highly specific to your own problem so not m
 and regulations. In general calling the function `parse_<message_name>_message` is best practice.  Make sure to include
 the three basic metrics to your function:
 
-.. code:: python
+.. code-block:: python
   @foo_exceptions.count_exceptions()
   @foo_in_progress.track_inprogress()
   def parse_foo_message(message):
@@ -210,7 +213,7 @@ These are extensions of the metrics in `thoth/investigator/metrics.py`
 
 The following is an example of a basic metrics file for a message `foo`:
 
-.. code:: python
+.. code-block:: python
   from ..metrics import in_progress, success, exceptions
 
   foo_in_progress = in_progress.labels(message_type="foo")
