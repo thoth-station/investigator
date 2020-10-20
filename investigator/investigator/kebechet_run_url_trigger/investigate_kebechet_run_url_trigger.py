@@ -25,9 +25,9 @@ from thoth.common import OpenShift
 from ..common import wait_for_limit
 from ..configuration import Configuration
 
-from .metrics_kebechet_trigger import kebechet_run_url_trigger_success
-from .metrics_kebechet_trigger import kebechet_run_url_trigger_in_progress
-from .metrics_kebechet_trigger import kebechet_run_url_trigger_exceptions
+from .metrics_kebechet_run_url_trigger import kebechet_run_url_trigger_success
+from .metrics_kebechet_run_url_trigger import kebechet_run_url_trigger_in_progress
+from .metrics_kebechet_run_url_trigger import kebechet_run_url_trigger_exceptions
 from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""The important parts for parsing kebechet_trigger messages."""
+"""The important parts for parsing kebechet_run_url_trigger messages."""
 
 from .investigate_kebechet_run_url_trigger import parse_kebechet_run_url_trigger_message
 
