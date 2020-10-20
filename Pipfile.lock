@@ -886,11 +886,11 @@
         },
         "thoth-messaging": {
             "hashes": [
-                "sha256:861a44398ded145dc83c6d805c4524f24bc838bfe4a501dd34dce69e3f46e13a",
-                "sha256:f5de111d4f78d77f403109f6c360f416b882f818e668b37bcec31a2065ae0ef8"
+                "sha256:cf523ea7a09fcb91ab91e9a5137c3302878c36a64c04ae3729d251433c762ff3",
+                "sha256:dc7451e2ae0c05b38839eca7ba0b5c040b2fc2fdd40fbc720e3e48de6371e3a1"
             ],
             "index": "pypi",
-            "version": "==0.7.13"
+            "version": "==0.8.0"
         },
         "thoth-python": {
             "hashes": [
