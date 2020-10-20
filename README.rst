@@ -23,13 +23,16 @@ Environment variables
 =====================
 
 See `thoth-kebechet <https://github.com/thoth-station/kebechet>`__:
+
 * `THOTH_GITHUB_PRIVATE_TOKEN`: token for authenticating actions on GitHub repositories
 
 * `THOTH_GITLAB_PRIVATE_TOKEN`: token for authenticating actions on GitLab repositories
 
-* Enforcing a workflow limit:
-  * `ARGO_PENDING_SLEEP_TIME`: amount of time we wait between checking the number of workflows in progress
-  * `ARGO_PENDING_WORKFLOW_LIMIT`: limit to enforce on argo for total number of pending workflows
+Enforcing a workflow limit:
+
+* `ARGO_PENDING_SLEEP_TIME`: amount of time we wait between checking the number of workflows in progress
+
+* `ARGO_PENDING_WORKFLOW_LIMIT`: limit to enforce on argo for total number of pending workflows
 
 
 Kafka/Argo combination in Project Thoth
@@ -191,6 +194,7 @@ and regulations. In general calling the function `parse_<message_name>_message` 
 the three basic metrics to your function:
 
 .. code-block:: python
+
   @foo_exceptions.count_exceptions()
   @foo_in_progress.track_inprogress()
   def parse_foo_message(message):
@@ -214,6 +218,7 @@ These are extensions of the metrics in `thoth/investigator/metrics.py`
 The following is an example of a basic metrics file for a message `foo`:
 
 .. code-block:: python
+
   from ..metrics import in_progress, success, exceptions
 
   foo_in_progress = in_progress.labels(message_type="foo")
