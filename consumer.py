@@ -113,7 +113,6 @@ async def _worker(c: consumer.Consumer, q: asyncio.Queue):
         if val is None:
             break
         func, msg = val
-        print(f"Processing {msg.topic()}.")
         contents = json.loads(msg.value().decode("utf-8"))
         try:
             await func(contents, openshift=openshift, graph=graph)
@@ -121,7 +120,7 @@ async def _worker(c: consumer.Consumer, q: asyncio.Queue):
             print(e)
         finally:
             c.commit(message=msg)
-            await asyncio.sleep(0)  # allow another green thread to take control
+            await asyncio.sleep(0)  # allow another coroutine to take control
 
 
 # this consumers from Kafka, but produces to async queue
@@ -132,7 +131,6 @@ async def _confluent_consumer_loop(c: consumer.Consumer, q: asyncio.Queue):
     try:
         consumer.subscribe_to_all(c)
         while running:
-            print("loop")
             msg = c.poll(0)
             if msg is None:
                 await asyncio.sleep(1.0)
@@ -149,7 +147,6 @@ async def _confluent_consumer_loop(c: consumer.Consumer, q: asyncio.Queue):
             await asyncio.sleep(0)
     finally:
         c.close()
-        print("closing")
         for _ in range(num_workers):
             await q.put(None)  # each worker can receive this value exactly once
 
