@@ -7,6 +7,7 @@ It has monitoring system in places that allow Thoth team to see what is happenin
 and act when some alarms are received.
 
 This agent relies mainly on:
+
 * `thoth-messaging <https://github.com/thoth-station/messaging>`__ to handle Kafka messages.
 
 * `thoth-common <https://github.com/thoth-station/common>`__ to schedule Argo workflows.
