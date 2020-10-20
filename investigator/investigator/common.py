@@ -39,7 +39,6 @@ _LOGGER = logging.getLogger(__name__)
 def _create_base_handler_table():
     table = dict()
     for i in ALL_MESSAGES:
-        print(i().topic_name)
         table[i().topic_name] = dict()
     return table
 
@@ -51,9 +50,9 @@ def register_handler(topic_name: str, version_strings: List[str]):
     """Register function to specific message versions."""
 
     def wrapper_func(func: Callable):
-        print(handler_table)
         for v in version_strings:
             handler_table[topic_name][v] = func
+            _LOGGER.debug("Registering handler for %s==%s", topic_name, v)
 
         async def innner_func(*args, **kwargs):
             return await func(*args, **kwargs)
@@ -70,7 +69,7 @@ async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
         return
     limit = int(Configuration.PENDING_WORKFLOW_LIMIT)
     total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
-    print(total_pending)
+    _LOGGER.debug("Current number pending = %d", total_pending)
     while total_pending > limit:
         await sleep(Configuration.SLEEP_TIME)
         total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)

@@ -117,7 +117,7 @@ async def _worker(c: consumer.Consumer, q: asyncio.Queue):
         try:
             await func(contents, openshift=openshift, graph=graph)
         except Exception as e:
-            print(e)
+            _LOGGER.warn(e)
         finally:
             c.commit(message=msg)
             await asyncio.sleep(0)  # allow another coroutine to take control
@@ -127,6 +127,7 @@ async def _worker(c: consumer.Consumer, q: asyncio.Queue):
 async def _confluent_consumer_loop(c: consumer.Consumer, q: asyncio.Queue):
     a = admin.create_admin_client()
     admin.create_all_topics(a)
+    await asyncio.sleep(1.0)  # wait here so that kafka has time to finish creating topics
     c = consumer.create_consumer()
     try:
         consumer.subscribe_to_all(c)
