@@ -1,18 +1,25 @@
-Welcome to Thoth's investigator documentation
----------------------------------------------
+.. include:: ../../README.rst
 
-Thoth's investigator is a Kafka based component that consumes all messages produced by Thoth components.
+Crossroad
+=========
 
-This documentation corresponds to a component called "investigator". Sources can be
-found on `GitHub <https://github.com/thoth-station/investigator>`_.
-
-See `thoth-station <https://thoth-station.ninja>`_ website and `Thoth-Station
-organization on GitHub <https://github.com/thoth-station>`_.
-
-Introductory sections
-=====================
+* `Documentation for thamos <../thamos>`_
+* `Documentation for thoth-adviser <../adviser>`_
+* `Documentation for thoth-analyzer <../analyzer>`_
+* `Documentation for thoth-common <../common>`_
+* `Documentation for thoth-lab <../lab>`_
+* `Documentation for thoth-package-analyzer <../package-analyzer>`_
+* `Documentation for thoth-package-extract <../package-extract>`_
+* `Documentation for thoth-python <../python>`_
+* `Documentation for thoth-solver <../solver>`_
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
 
-   introduction
+   thoth.investigator
+
+This documentation corresponds to implementation in version |version|,
+documentation was generated on |today|.

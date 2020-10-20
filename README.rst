@@ -1,7 +1,7 @@
-Introduction to Thoth's Investigator
--------------------------------------
+Welcome to Thoth's investigator documentation
+---------------------------------------------
 
-Thoth Investigator is the sorting centre in Thoth where all messages received by different components are handled after investigation.
+Thoth's investigator is a Kafka based component that consumes all messages produced by Thoth components.
 
 It has monitoring system in places that allow Thoth team to see what is happening in Thoth in terms of Kafka, Openshift, Argo for the different components
 and act when some alarms are received.
@@ -14,6 +14,12 @@ This agent relies mainly on:
 
 * `thoth-storages <https://github.com/thoth-station/storages>`__ to set/verify content in database.
 
+
+This documentation corresponds to a component called "investigator". Sources can be
+found on `GitHub <https://github.com/thoth-station/investigator>`_.
+
+See `thoth-station <https://thoth-station.ninja>`_ website and `Thoth-Station
+organization on GitHub <https://github.com/thoth-station>`_.
 
 Goals
 =====
