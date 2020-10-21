@@ -19,6 +19,7 @@
 
 import logging
 import os
+from typing import Dict, Any
 
 from .metrics_advise_justification import advise_justification_exceptions
 from .metrics_advise_justification import advise_justification_success
@@ -38,18 +39,18 @@ DEPLOYMENT_NAME = os.environ["THOTH_DEPLOYMENT_NAME"]
 @count_exceptions(advise_justification_exceptions)
 @track_inprogress(advise_justification_in_progress)
 @register_handler(AdviseJustificationMessage().topic_name, ["v1"])
-async def expose_advise_justification_metrics(advise_justification):
+async def expose_advise_justification_metrics(advise_justification: Dict[str, Any]):
     """Retrieve adviser reports justifications."""
     advise_justification_type_number.labels(
-        advise_message=advise_justification.message,
-        justification_type=advise_justification.justification_type,
+        advise_message=advise_justification["message"],
+        justification_type=advise_justification["justification_type"],
         thoth_environment=DEPLOYMENT_NAME,
-    ).inc(advise_justification.count)
+    ).inc(advise_justification["count"])
     _LOGGER.info(
         "advise_justification_type_number(%r, %r)=%r",
-        advise_justification.message,
-        advise_justification.justification_type,
-        advise_justification.count,
+        advise_justification["message"],
+        advise_justification["justification_type"],
+        advise_justification["count"],
     )
 
     advise_justification_success.inc()

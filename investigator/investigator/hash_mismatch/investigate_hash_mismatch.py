@@ -18,6 +18,7 @@
 """Logic for handling hash_mismatch message."""
 
 import logging
+from typing import Dict, Any
 
 from ..common import git_source_from_url, learn_using_solver, register_handler
 from ..configuration import Configuration
@@ -28,6 +29,8 @@ from .metrics_hash_mismatch import hash_mismatch_success
 from .metrics_hash_mismatch import hash_mismatch_in_progress
 from prometheus_async.aio import track_inprogress, count_exceptions
 from thoth.messaging import HashMismatchMessage
+from thoth.common import OpenShift
+from thoth.storages import GraphDatabase
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +38,7 @@ _LOGGER = logging.getLogger(__name__)
 @count_exceptions(hash_mismatch_exceptions)
 @track_inprogress(hash_mismatch_in_progress)
 @register_handler(HashMismatchMessage().topic_name, ["v1"])
-async def parse_hash_mismatch(mismatch, openshift, graph):
+async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase):
     """Process a hash mismatch message from package-update producer."""
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER:
         # Solver logic
@@ -48,7 +51,7 @@ async def parse_hash_mismatch(mismatch, openshift, graph):
             package_version=mismatch["package_version"],
         )
 
-        scheduled_workflows.labels(message_type=HashMismatchMessage.topic_name, workflow_type="solver").inc(
+        scheduled_workflows.labels(message_type=HashMismatchMessage.base_name, workflow_type="solver").inc(
             solver_wf_scheduled
         )
 

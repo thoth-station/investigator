@@ -47,6 +47,7 @@ run_module("investigator.investigator.advise_justification.investigate_advise_ju
 run_module("investigator.investigator.adviser_re_run.investigate_adviser_re_run")
 run_module("investigator.investigator.adviser_trigger.investigate_adviser_trigger")
 run_module("investigator.investigator.hash_mismatch.investigate_hash_mismatch")
+run_module("investigator.investigator.kebechet_run_url_trigger.investigate_kebechet_run_url_trigger")
 run_module("investigator.investigator.kebechet_trigger.investigate_kebechet_trigger")
 run_module("investigator.investigator.missing_package.investigate_missing_package")
 run_module("investigator.investigator.missing_version.investigate_missing_version")

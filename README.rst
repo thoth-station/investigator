@@ -102,6 +102,10 @@ interact with `Thoth integrations <https://github.com/thoth-station/adviser/blob
 
 * `QebHwtTriggerMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/qebhwt_trigger/README.md>`__
 
+The following message is triggered internally to keep user repositories fresh when new Thoth knowledge is encountered:
+
+* `KebechetRunUrlTriggerMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/kebechet_run_url_trigger/README.md>`__
+
 
 Investigator scenarios description
 ==================================

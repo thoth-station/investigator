@@ -73,6 +73,7 @@ async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
     while total_pending > limit:
         await sleep(Configuration.SLEEP_TIME)
         total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
+        _LOGGER.debug("Current number pending = %d", total_pending)
 
 
 async def schedule_kebechet_run_url(openshift: OpenShift, repo: str, gitservice_repo_name: str) -> int:
