@@ -39,6 +39,7 @@ from thoth.messaging import SolvedPackageMessage
 from thoth.messaging import UnresolvedPackageMessage
 from thoth.messaging import UnrevsolvedPackageMessage
 from thoth.messaging import UpdateProvidesSourceDistroMessage
+from thoth.messaging.kebechet_run_url import KebechetRunUrlTriggerMessage
 
 
 from investigator.investigator import __service_version__
@@ -48,6 +49,7 @@ from investigator.investigator.adviser_re_run import parse_adviser_re_run_messag
 from investigator.investigator.adviser_trigger import parse_adviser_trigger_message
 from investigator.investigator.hash_mismatch import parse_hash_mismatch
 from investigator.investigator.kebechet_trigger import parse_kebechet_trigger_message
+from investigator.investigator.kebechet_run_url_trigger import parse_kebechet_run_url_trigger_message
 from investigator.investigator.missing_package import parse_missing_package
 from investigator.investigator.missing_version import parse_missing_version
 from investigator.investigator.package_extract_trigger import parse_package_extract_trigger_message
@@ -95,6 +97,7 @@ adviser_re_run_message_topic = AdviserReRunMessage().topic
 adviser_trigger_message_topic = AdviserTriggerMessage().topic
 hash_mismatch_message_topic = HashMismatchMessage().topic
 kebechet_trigger_message_topic = KebechetTriggerMessage().topic
+kebechet_run_url_trigger_message_topic = KebechetRunUrlTriggerMessage().topic
 missing_package_message_topic = MissingPackageMessage().topic
 missing_version_message_topic = MissingVersionMessage().topic
 package_extract_trigger_message_topic = PackageExtractTriggerMessage().topic
@@ -169,6 +172,15 @@ async def consume_kebechet_trigger(kebechet_triggers):
     """Loop when a kebechet_trigger message is received."""
     async for kebechet_trigger in kebechet_triggers:
         await parse_kebechet_trigger_message(kebechet_trigger=kebechet_trigger, openshift=openshift)
+
+
+@app.agent(kebechet_run_url_trigger_message_topic)
+async def consume_kebechet_run_url_trigger(kebechet_run_url_triggers):
+    """Loop when a kebechet_run_url_trigger message is received."""
+    async for kebechet_run_url_trigger in kebechet_run_url_triggers:
+        await parse_kebechet_run_url_trigger_message(
+            kebechet_run_url_trigger=kebechet_run_url_trigger, openshift=openshift
+        )
 
 
 @app.agent(missing_package_message_topic)
