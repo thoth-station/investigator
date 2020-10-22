@@ -29,7 +29,25 @@ Goals
 Environment variables
 =====================
 
+**bold** indicates required, *italicized* indicates optional
+
 See `thoth-kebechet <https://github.com/thoth-station/kebechet>`__:
+
+* **KAFKA_BOOTSTRAP_SERVERS**: a comma seperated list of Kafka bootstrap servers.
+* *KAFKA_SECURITY_PROTOCOL*: specify what security protocol to use.
+
+  * *KAFKA_SSL_CERTIFICATE_LOCATION* (if security protocol is `SSL`).
+  * *KAFKA_SASL_USERNAME* and *KAFKA_SASL_PASSWORD* (if security protocol is `SASL`).
+
+* **KAFKA_CONSUMER_GROUP_ID**: specify Kafka consumer group, if two consumers have the same group then message
+  partitions are split between them. You can have a number of consumers equal to the number of message partitions.
+* *KAFKA_CONSUMER_MAX_POLL_INTERVAL_MS*: This is a timeout, if the consumer does not poll for messages for **N** seconds
+  then throws an error, when blocking for workflow limits this should be set moderately high. The default value is `300000`.
+* **KAFKA_CONSUMER_ENABLE_AUTOCOMMIT**: This should be set to `False` so that we don't commit messages which have not
+  been fully processed yet. Investigator will handle commiting messages.
+
+
+Git Services:
 
 * `THOTH_GITHUB_PRIVATE_TOKEN`: token for authenticating actions on GitHub repositories
 
