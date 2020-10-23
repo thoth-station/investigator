@@ -18,14 +18,15 @@
 """This file contains methods used by Thoth investigator to investigate on unrevsolved packages."""
 
 import logging
+from typing import Dict, Any
 
-from thoth.messaging import MessageBase
 from thoth.messaging import UnrevsolvedPackageMessage
 from thoth.common import OpenShift
 
 from .. import common
 from ..configuration import Configuration
 from ..metrics import scheduled_workflows
+from ..common import register_handler
 from .metrics_unrevsolved_package import unrevsolved_package_exceptions
 from .metrics_unrevsolved_package import unrevsolved_package_in_progress
 from .metrics_unrevsolved_package import unrevsolved_package_success
@@ -36,10 +37,11 @@ _LOGGER = logging.getLogger(__name__)
 
 @count_exceptions(unrevsolved_package_exceptions)
 @track_inprogress(unrevsolved_package_in_progress)
-async def parse_revsolved_package_message(unrevsolved_package: MessageBase, openshift: OpenShift) -> None:
+@register_handler(UnrevsolvedPackageMessage().topic_name, ["v1"])
+async def parse_revsolved_package_message(unrevsolved_package: Dict[str, Any], openshift: OpenShift) -> None:
     """Parse soolved package message."""
-    package_name = unrevsolved_package.package_name
-    package_version = unrevsolved_package.package_version
+    package_name = unrevsolved_package["package_name"]
+    package_version = unrevsolved_package["package_version"]
 
     # Revsolver logic
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_REVSOLVER:
@@ -51,7 +53,7 @@ async def parse_revsolved_package_message(unrevsolved_package: MessageBase, open
             revsolver_packages_seen=[],
         )
 
-        scheduled_workflows.labels(message_type=UnrevsolvedPackageMessage.topic_name, workflow_type="revsolver").inc(
+        scheduled_workflows.labels(message_type=UnrevsolvedPackageMessage.base_name, workflow_type="revsolver").inc(
             revsolver_wfs_scheduled
         )
 

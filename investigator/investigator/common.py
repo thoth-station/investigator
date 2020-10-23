@@ -23,16 +23,43 @@ from math import inf
 from urllib.parse import urlparse
 from asyncio import sleep
 
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Callable
 
 from thoth.common import OpenShift
 from thoth.storages import GraphDatabase
 from thoth.sourcemanagement.sourcemanagement import SourceManagement
 from thoth.sourcemanagement.enums import ServiceType
+from thoth.messaging import ALL_MESSAGES
 
 from .configuration import Configuration
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _create_base_handler_table():
+    table = dict()
+    for i in ALL_MESSAGES:
+        table[i().topic_name] = dict()
+    return table
+
+
+handler_table = _create_base_handler_table()
+
+
+def register_handler(topic_name: str, version_strings: List[str]):
+    """Register function to specific message versions."""
+
+    def wrapper_func(func: Callable):
+        for v in version_strings:
+            handler_table[topic_name][v] = func
+            _LOGGER.debug("Registering handler for %s==%s", topic_name, v)
+
+        async def innner_func(*args, **kwargs):
+            return await func(*args, **kwargs)
+
+        return innner_func
+
+    return wrapper_func
 
 
 async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
@@ -42,9 +69,11 @@ async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
         return
     limit = int(Configuration.PENDING_WORKFLOW_LIMIT)
     total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
+    _LOGGER.debug("Current number pending = %d", total_pending)
     while total_pending > limit:
         await sleep(Configuration.SLEEP_TIME)
         total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
+        _LOGGER.debug("Current number pending = %d", total_pending)
 
 
 async def schedule_kebechet_run_url(openshift: OpenShift, repo: str, gitservice_repo_name: str) -> int:
@@ -233,7 +262,7 @@ async def _schedule_all_solvers(
         await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
         analysis_ids = openshift.schedule_all_solvers(packages=packages, indexes=indexes)
         _LOGGER.info(
-            "Scheduled solvers %r for packages %r from indexes %r, analysis ids are %r", packages, indexes, analysis_ids
+            "Scheduled solvers for packages %r from indexes %r, analysis ids are %r", packages, indexes, analysis_ids
         )
         are_scheduled = len(analysis_ids)
     except Exception as e:

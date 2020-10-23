@@ -19,10 +19,9 @@
 
 import logging
 
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 from thoth.storages.graph import GraphDatabase
-from thoth.messaging import MessageBase
 from thoth.messaging import UnresolvedPackageMessage
 from thoth.common import OpenShift
 from thoth.python import Source
@@ -30,6 +29,7 @@ from thoth.python import Source
 from ..metrics import scheduled_workflows
 from .. import common
 from ..configuration import Configuration
+from ..common import register_handler
 
 from .metrics_unresolved_package import unresolved_package_exceptions
 from .metrics_unresolved_package import unresolved_package_in_progress
@@ -41,14 +41,15 @@ _LOGGER = logging.getLogger(__name__)
 
 @count_exceptions(unresolved_package_exceptions)
 @track_inprogress(unresolved_package_in_progress)
+@register_handler(UnresolvedPackageMessage().topic_name, ["v1"])
 async def parse_unresolved_package_message(
-    unresolved_package: MessageBase, openshift: OpenShift, graph: GraphDatabase
+    unresolved_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase
 ) -> None:
     """Parse unresolved package message."""
-    package_name = unresolved_package.package_name
-    package_version = unresolved_package.package_version
-    requested_indexes: Optional[List[str]] = unresolved_package.index_url
-    solver = unresolved_package.solver
+    package_name = unresolved_package["package_name"]
+    package_version = unresolved_package["package_version"]
+    requested_indexes: Optional[List[str]] = unresolved_package["index_url"]
+    solver = unresolved_package["solver"]
 
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER:
         total_solver_wfs_scheduled = 0
@@ -95,7 +96,7 @@ async def parse_unresolved_package_message(
 
                 total_solver_wfs_scheduled += solver_wfs_scheduled
 
-        scheduled_workflows.labels(message_type=UnresolvedPackageMessage.topic_name, workflow_type="solver").inc(
+        scheduled_workflows.labels(message_type=UnresolvedPackageMessage.base_name, workflow_type="solver").inc(
             total_solver_wfs_scheduled
         )
 

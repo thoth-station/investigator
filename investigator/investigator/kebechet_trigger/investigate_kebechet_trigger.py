@@ -18,11 +18,12 @@
 """Investigate message to schedule kebechet."""
 
 import logging
+from typing import Dict, Any
 
 from thoth.messaging import KebechetTriggerMessage
 from thoth.common import OpenShift
 
-from ..common import wait_for_limit
+from ..common import wait_for_limit, register_handler
 from ..configuration import Configuration
 
 from .metrics_kebechet_trigger import kebechet_trigger_exceptions
@@ -35,11 +36,12 @@ _LOGGER = logging.getLogger(__name__)
 
 @count_exceptions(kebechet_trigger_exceptions)
 @track_inprogress(kebechet_trigger_in_progress)
-async def parse_kebechet_trigger_message(kebechet_trigger: KebechetTriggerMessage, openshift: OpenShift) -> None:
+@register_handler(KebechetTriggerMessage().topic_name, ["v1"])
+async def parse_kebechet_trigger_message(kebechet_trigger: Dict[str, Any], openshift: OpenShift) -> None:
     """Parse kebechet_trigger message."""
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
     workflow_name = openshift.schedule_kebechet_workflow(
-        webhook_payload=kebechet_trigger.webhook_payload, job_id=kebechet_trigger.job_id,
+        webhook_payload=kebechet_trigger["webhook_payload"], job_id=kebechet_trigger["job_id"],
     )
     _LOGGER.debug(f"Scheduled kebechet workflow {workflow_name}")
     kebechet_trigger_success.inc()

@@ -4,13 +4,14 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-thoth-common = "*"
 thoth-storages = "*"
 prometheus-client = "<0.7.0"
 thoth-python = "*"
 thoth-sourcemanagement = "*"
-thoth-messaging = "*"
 prometheus-async = "*"
+confluent-kafka = "*"
+thoth-common = "*"
+thoth-messaging = ">=0.8"
 
 [dev-packages]
 pytest = "*"

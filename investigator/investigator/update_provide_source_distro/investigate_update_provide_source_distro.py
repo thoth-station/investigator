@@ -17,7 +17,13 @@
 
 """Investigate about SI analyzable packages due to missing source distro."""
 
+from typing import Dict, Any
 import logging
+
+from thoth.messaging import UpdateProvidesSourceDistroMessage
+from thoth.storages import GraphDatabase
+
+from ..common import register_handler
 
 from .metrics_update_provide_source_distro import update_provide_source_distro_exceptions
 from .metrics_update_provide_source_distro import update_provide_source_distro_success
@@ -29,21 +35,24 @@ _LOGGER = logging.getLogger(__name__)
 
 @count_exceptions(update_provide_source_distro_exceptions)
 @track_inprogress(update_provide_source_distro_in_progress)
-async def parse_update_provide_source_distro_message(update_provide_source_distro, graph):
+@register_handler(UpdateProvidesSourceDistroMessage().topic_name, ["v1"])
+async def parse_update_provide_source_distro_message(
+    update_provide_source_distro: Dict[str, Any], graph: GraphDatabase
+):
     """Parse update provide source distro message."""
     graph.update_provides_source_distro_package_version(
-        package_name=update_provide_source_distro.package_name,
-        package_version=update_provide_source_distro.package_version,
-        index_url=update_provide_source_distro.index_url,
-        value=update_provide_source_distro.value,
+        package_name=update_provide_source_distro["package_name"],
+        package_version=update_provide_source_distro["package_version"],
+        index_url=update_provide_source_distro["index_url"],
+        value=update_provide_source_distro["value"],
     )
 
     _LOGGER.info(
         "package %r version %r from %r provides source distro? %r",
-        update_provide_source_distro.package_name,
-        update_provide_source_distro.package_version,
-        update_provide_source_distro.index_url,
-        update_provide_source_distro.value,
+        update_provide_source_distro["package_name"],
+        update_provide_source_distro["package_version"],
+        update_provide_source_distro["index_url"],
+        update_provide_source_distro["value"],
     )
 
     update_provide_source_distro_success.inc()

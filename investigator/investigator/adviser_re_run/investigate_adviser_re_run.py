@@ -18,13 +18,13 @@
 """Investigate message to re schedule adviser."""
 
 import logging
+from typing import Dict, Any
 
-from thoth.messaging import MessageBase
 from thoth.messaging import AdviserReRunMessage
 from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
-from ..common import wait_for_limit
+from ..common import wait_for_limit, register_handler
 from ..configuration import Configuration
 
 from .metrics_adviser_re_run import adviser_re_run_exceptions
@@ -37,29 +37,30 @@ _LOGGER = logging.getLogger(__name__)
 
 @count_exceptions(adviser_re_run_exceptions)
 @track_inprogress(adviser_re_run_in_progress)
-async def parse_adviser_re_run_message(adviser_re_run: MessageBase, openshift: OpenShift) -> None:
+@register_handler(AdviserReRunMessage().topic_name, ["v1"])
+async def parse_adviser_re_run_message(adviser_re_run: Dict[str, Any], openshift: OpenShift) -> None:
     """Parse adviser re run message."""
     adviser_wfs_scheduled = await _re_schedule_adviser(openshift=openshift, parameters=adviser_re_run,)
 
-    scheduled_workflows.labels(message_type=AdviserReRunMessage.topic_name, workflow_type="adviser").inc(
+    scheduled_workflows.labels(message_type=AdviserReRunMessage.base_name, workflow_type="adviser").inc(
         adviser_wfs_scheduled
     )
 
     adviser_re_run_success.inc()
 
 
-async def _re_schedule_adviser(openshift: OpenShift, parameters: MessageBase) -> int:
+async def _re_schedule_adviser(openshift: OpenShift, parameters: Dict[str, Any]) -> int:
     """Re-Schedule Adviser."""
-    re_run_adviser_id = parameters.adviser_id
-    application_stack = parameters.application_stack
-    recommendation_type = parameters.recommendation_type
-    runtime_environment = parameters.runtime_environment
-    origin = parameters.origin
-    github_event_type = parameters.github_event_type
-    github_check_run_id = parameters.github_check_run_id
-    github_installation_id = parameters.github_installation_id
-    github_base_repo_url = parameters.github_base_repo_url
-    source_type = parameters.source_type
+    re_run_adviser_id = parameters["adviser_id"]
+    application_stack = parameters["application_stack"]
+    recommendation_type = parameters["recommendation_type"]
+    runtime_environment = parameters["runtime_environment"]
+    origin = parameters["origin"]
+    github_event_type = parameters["github_event_type"]
+    github_check_run_id = parameters["github_check_run_id"]
+    github_installation_id = parameters["github_installation_id"]
+    github_base_repo_url = parameters["github_base_repo_url"]
+    source_type = parameters["source_type"]
 
     try:
         await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)

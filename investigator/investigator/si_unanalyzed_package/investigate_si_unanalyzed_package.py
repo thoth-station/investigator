@@ -18,8 +18,9 @@
 """This file contains methods used by Thoth investigator to investigate on si unanalyzed packages."""
 
 import logging
+from typing import Dict, Any
+
 from thoth.storages.graph import GraphDatabase
-from thoth.messaging import MessageBase
 from thoth.messaging import SIUnanalyzedPackageMessage
 from thoth.common import OpenShift
 
@@ -27,6 +28,7 @@ from thoth.common import OpenShift
 from ..metrics import scheduled_workflows
 from .. import common
 from ..configuration import Configuration
+from ..common import register_handler
 
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_in_progress
 from .metrics_si_unanalyzed_package import si_unanalyzed_package_success
@@ -38,13 +40,14 @@ _LOGGER = logging.getLogger(__name__)
 
 @count_exceptions(si_unanalyzed_package_exceptions)
 @track_inprogress(si_unanalyzed_package_in_progress)
+@register_handler(SIUnanalyzedPackageMessage().topic_name, ["v1"])
 async def parse_si_unanalyzed_package_message(
-    si_unanalyzed_package: MessageBase, openshift: OpenShift, graph: GraphDatabase
+    si_unanalyzed_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase
 ) -> None:
     """Parse SI Unanalyzed package messages."""
-    package_name: str = si_unanalyzed_package.package_name
-    package_version: str = si_unanalyzed_package.package_version
-    index_url: str = si_unanalyzed_package.index_url
+    package_name: str = si_unanalyzed_package["package_name"]
+    package_version: str = si_unanalyzed_package["package_version"]
+    index_url: str = si_unanalyzed_package["index_url"]
 
     # SI logic
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SECURITY:
@@ -58,7 +61,7 @@ async def parse_si_unanalyzed_package_message(
         )
 
         scheduled_workflows.labels(
-            message_type=SIUnanalyzedPackageMessage.topic_name, workflow_type="security-indicator"
+            message_type=SIUnanalyzedPackageMessage.base_name, workflow_type="security-indicator"
         ).inc(si_wfs_scheduled)
 
     si_unanalyzed_package_success.inc()
