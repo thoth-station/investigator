@@ -31,7 +31,7 @@ Environment variables
 
 **bold** indicates required, *italicized* indicates optional
 
-See `thoth-kebechet <https://github.com/thoth-station/kebechet>`__:
+See `thoth-messaging <https://github.com/thoth-station/messaging>`__:
 
 * **KAFKA_BOOTSTRAP_SERVERS**: a comma seperated list of Kafka bootstrap servers.
 * *KAFKA_SECURITY_PROTOCOL*: specify what security protocol to use.
