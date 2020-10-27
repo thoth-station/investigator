@@ -76,11 +76,10 @@ async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
         _LOGGER.debug("Current number pending = %d", total_pending)
 
 
-async def schedule_kebechet_run_url(openshift: OpenShift, repo: str, gitservice_repo_name: str) -> int:
-    """Schedule Kebechet from repo url and service."""
-    # TODO: Add method to schedule kebechet
-
-    return 0
+async def schedule_kebechet_administrator(openshift: OpenShift, message_info: dict, message_name: str) -> int:
+    """Schedule Kebechet Administrator from a particular message."""
+    workflow_id = openshift.schedule_kebechet_administrator(message_info=message_info, message_type=message_name)
+    return workflow_id
 
 
 async def learn_about_security(

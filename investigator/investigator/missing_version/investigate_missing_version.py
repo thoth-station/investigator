@@ -20,7 +20,7 @@
 import logging
 from typing import Dict, Any
 
-from ..common import git_source_from_url, schedule_kebechet_run_url, register_handler
+from ..common import schedule_kebechet_administrator, register_handler
 from ..metrics import scheduled_workflows
 
 from .metrics_missing_version import missing_version_exceptions
@@ -31,6 +31,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 from thoth.messaging import MissingVersionMessage
 from thoth.common import OpenShift
 from thoth.storages import GraphDatabase
+from ..configuration import Configuration
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -47,35 +48,21 @@ async def parse_missing_version(version: Dict[str, Any], openshift: OpenShift, g
         value=True,
     )
 
-    repositories = graph.get_adviser_run_origins_all(
-        index_url=version["index_url"],
-        package_name=version["package_name"],
-        package_version=version["package_version"],
-        count=None,
-        distinct=True,
-    )
+    if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
+        message_info = {
+            "PACKAGE_NAME": version["package_name"],
+            "THOTH_PACKAGE_VERSION": version["package_version"],
+            "THOTH_PACKAGE_INDEX": version["index_url"],
+        }
 
-    issue_title = (
-        f"Missing package version {version['package_name']}=={version['package_version']} on {version['index_url']}"
-    )
-
-    def issue_body():
-        return "Automated message from package change detected by thoth.package-update"
-
-    kebechet_wf_scheduled = 0
-
-    for repo in repositories:
-        gitservice_repo = git_source_from_url(repo)
-
-        is_scheduled = await schedule_kebechet_run_url(
-            openshift=openshift, repo=repo, gitservice_repo_name=gitservice_repo.service_type.name
+        # We schedule Kebechet Administrator workflow here -
+        workflow_id = await schedule_kebechet_administrator(
+            openshift=openshift, message_info=message_info, message_name=MissingVersionMessage.__name__,
         )
-        kebechet_wf_scheduled += is_scheduled
 
-        gitservice_repo.open_issue_if_not_exist(issue_title, issue_body)
+        _LOGGER.info(f"Scheduled kebechet administrator workflow {workflow_id}")
 
-    scheduled_workflows.labels(message_type=MissingVersionMessage.base_name, workflow_type="kebechet").inc(
-        kebechet_wf_scheduled
-    )
-
+        scheduled_workflows.labels(
+            message_type=MissingVersionMessage.base_name, workflow_type="kebechet-administrator"
+        ).inc()
     missing_version_success.inc()

@@ -20,7 +20,7 @@
 import logging
 from typing import Dict, Any
 
-from ..common import git_source_from_url, learn_using_solver, register_handler
+from ..common import schedule_kebechet_administrator, learn_using_solver, register_handler
 from ..configuration import Configuration
 from ..metrics import scheduled_workflows
 
@@ -64,23 +64,18 @@ async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, gr
                 sha256=h,
             )
 
-    repositories = graph.get_adviser_run_origins_all(
-        index_url=mismatch["index_url"],
-        package_name=mismatch["package_name"],
-        package_version=mismatch["package_version"],
-        count=None,
-        distinct=True,
-    )
+    if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
+        message_info = {
+            "PACKAGE_NAME": mismatch["package_name"],
+            "THOTH_PACKAGE_VERSION": mismatch["package_version"],
+            "THOTH_PACKAGE_INDEX": mismatch["index_url"],
+        }
 
-    issue_title = (
-        f"Hash mismatch for {mismatch['package_name']}=={mismatch['package_version']} on {mismatch['index_url']}"
-    )
+        # We schedule Kebechet Administrator workflow here -
+        workflow_id = await schedule_kebechet_administrator(
+            openshift=openshift, message_info=message_info, message_name=HashMismatchMessage.__name__,
+        )
 
-    def issue_body():
-        return "Automated message from package change detected by thoth.package-update"
-
-    for repo in repositories:
-        gitservice_repo = git_source_from_url(repo)
-        gitservice_repo.open_issue_if_not_exist(issue_title, issue_body)
+        _LOGGER.info(f"Scheduled kebechet administrator workflow {workflow_id}")
 
     hash_mismatch_success.inc()
