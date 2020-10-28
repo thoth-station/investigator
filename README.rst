@@ -83,6 +83,8 @@ The following messages are sent by different Thoth components:
 
 * `SolvedPackageMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/solved_package/README.md>`__.
 
+* `CVEProvidedMessage <https://github.com/thoth-station/messaging/blob/master/thoth/messaging/cve_provided.py>`__.
+
 Monitor Thoth results and knowledge
 ===================================
 

@@ -269,18 +269,3 @@ async def _schedule_all_solvers(
         are_scheduled = 0
 
     return are_scheduled
-
-
-def git_source_from_url(url: str) -> SourceManagement:
-    """Parse URL to get SourceManagement object."""
-    res = urlparse(url)
-    service_url = res.netloc
-    service_name = service_url.split(".")[-2]
-    service_type = ServiceType.by_name(service_name)
-    if service_type == ServiceType.GITHUB:
-        token = Configuration.GITHUB_PRIVATE_TOKEN
-    elif service_type == ServiceType.GITLAB:
-        token = Configuration.GITLAB_PRIVATE_TOKEN
-    else:
-        raise NotImplementedError("There is no token for this service type")
-    return SourceManagement(service_type, res.scheme + "://" + res.netloc, token, res.path)

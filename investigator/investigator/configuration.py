@@ -41,9 +41,6 @@ class Configuration:
     LOG_SOLVER = os.environ.get("THOTH_LOG_SOLVER") == "DEBUG"
     LOG_REVSOLVER = os.environ.get("THOTH_LOG_REVSOLVER") == "DEBUG"
 
-    GITHUB_PRIVATE_TOKEN = os.getenv("THOTH_GITHUB_PRIVATE_TOKEN")
-    GITLAB_PRIVATE_TOKEN = os.getenv("THOTH_GITLAB_PRIVATE_TOKEN")
-
     # Quota handling
     SLEEP_TIME = int(os.getenv("ARGO_PENDING_SLEEP_TIME", 2))
     PENDING_WORKFLOW_LIMIT = os.getenv("ARGO_PENDING_WORKFLOW_LIMIT", None)
