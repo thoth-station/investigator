@@ -266,3 +266,23 @@ all the things that you see...
 ### Automatic Updates
 * :pushpin: Automatic update of dependency hypothesis from 5.37.0 to 5.37.1 (#323)
 * :pushpin: Automatic update of dependency thoth-common from 0.20.0 to 0.20.1 (#322)
+
+## Release 0.6.0 (2020-10-28T15:40:09)
+### Features
+* add KPostOffice to list of maintainers (#349)
+* Correct link (#345)
+* Confluent rework (#344)
+* Add kebechet run url (#342)
+* Add docs for Thoth investigator (#330)
+* Remove producer from investigator (#329)
+### Automatic Updates
+* :pushpin: Automatic update of dependency hypothesis from 5.38.0 to 5.38.1 (#354)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.8.0 to 0.8.2 (#353)
+* :pushpin: Automatic update of dependency hypothesis from 5.37.4 to 5.38.0 (#347)
+* :pushpin: Automatic update of dependency hypothesis from 5.37.3 to 5.37.4 (#341)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.7.13 to 0.8.0 (#340)
+* :pushpin: Automatic update of dependency thoth-common from 0.20.1 to 0.20.2 (#338)
+* :pushpin: Automatic update of dependency hypothesis from 5.37.1 to 5.37.3 (#332)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.7.12 to 0.7.13 (#331)
+* :pushpin: Automatic update of dependency mypy from 0.782 to 0.790 (#328)
+* :pushpin: Automatic update of dependency thoth-messaging from 0.7.11 to 0.7.12 (#327)
