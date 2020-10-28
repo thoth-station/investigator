@@ -10,4 +10,4 @@ package_name: str
 package_version: str
 ```
 
-If we receive an CVEProvidedMessage we schedule KebechetAdministrator on all the affected repositories. 
+If we receive an CVEProvidedMessage we schedule KebechetAdministrator on all the affected repositories.

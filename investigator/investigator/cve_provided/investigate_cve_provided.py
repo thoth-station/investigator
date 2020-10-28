@@ -40,9 +40,9 @@ _LOGGER = logging.getLogger(__name__)
 @register_handler(CVEProvidedMessage().topic_name, ["v1"])
 async def parse_cve_provided(cve_provided: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase):
     """Process a cve provided message."""
-    # Add more logic if neccessary. 
+    # Add more logic if neccessary.
 
-    # Schedule Kebechet administrator. 
+    # Schedule Kebechet administrator.
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
         message_info = {
             "PACKAGE_NAME": cve_provided["package_name"],
@@ -55,6 +55,9 @@ async def parse_cve_provided(cve_provided: Dict[str, Any], openshift: OpenShift,
             openshift=openshift, message_info=message_info, message_name=CVEProvidedMessage.__name__,
         )
 
+        scheduled_workflows.labels(
+            message_type=CVEProvidedMessage.base_name, workflow_type="kebechet-administrator"
+        ).inc()
         _LOGGER.info(f"Scheduled kebechet administrator workflow {workflow_id}")
 
     cve_provided_success.inc()

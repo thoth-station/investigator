@@ -20,15 +20,12 @@
 
 import logging
 from math import inf
-from urllib.parse import urlparse
 from asyncio import sleep
 
 from typing import List, Tuple, Optional, Callable
 
 from thoth.common import OpenShift
 from thoth.storages import GraphDatabase
-from thoth.sourcemanagement.sourcemanagement import SourceManagement
-from thoth.sourcemanagement.enums import ServiceType
 from thoth.messaging import ALL_MESSAGES
 
 from .configuration import Configuration
