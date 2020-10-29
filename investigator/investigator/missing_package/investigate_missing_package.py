@@ -23,7 +23,8 @@ from .metrics_missing_package import missing_package_exceptions
 from .metrics_missing_package import missing_package_success
 from .metrics_missing_package import missing_package_in_progress
 from ..common import register_handler
-from ..metrics import scheduled_workflows
+
+# from ..metrics import scheduled_workflows
 
 from prometheus_async.aio import track_inprogress, count_exceptions
 from thoth.messaging import MissingPackageMessage
@@ -39,8 +40,8 @@ async def parse_missing_package(package: Dict[str, Any], openshift: OpenShift, g
     # TODO call kebechet with the missing package name, which would call kebechet on the individual
     # repositories with a different subcommand that would just create an issue.
 
-    scheduled_workflows.labels(
-        message_type=MissingPackageMessage.base_name, workflow_type="kebechet-administrator"
-    ).inc()
+    # scheduled_workflows.labels(
+    #     message_type=MissingPackageMessage.base_name, workflow_type="kebechet-administrator"
+    # ).inc()
 
     missing_package_success.inc()
