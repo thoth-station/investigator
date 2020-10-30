@@ -28,14 +28,12 @@ from ..common import register_handler
 
 from prometheus_async.aio import track_inprogress, count_exceptions
 from thoth.messaging import MissingPackageMessage
-from thoth.common import OpenShift
-from thoth.storages import GraphDatabase
 
 
 @count_exceptions(missing_package_exceptions)
 @track_inprogress(missing_package_in_progress)
 @register_handler(MissingPackageMessage().topic_name, ["v1"])
-async def parse_missing_package(package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase):
+async def parse_missing_package(package: Dict[str, Any]):
     """Process a missing package message from package-update producer."""
     # TODO call kebechet with the missing package name, which would call kebechet on the individual
     # repositories with a different subcommand that would just create an issue.

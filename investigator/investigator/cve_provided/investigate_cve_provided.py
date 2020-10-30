@@ -30,7 +30,6 @@ from .metrics_cve_provided import cve_provided_in_progress
 from prometheus_async.aio import track_inprogress, count_exceptions
 from thoth.messaging import CVEProvidedMessage
 from thoth.common import OpenShift
-from thoth.storages import GraphDatabase
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,7 +37,7 @@ _LOGGER = logging.getLogger(__name__)
 @count_exceptions(cve_provided_exceptions)
 @track_inprogress(cve_provided_in_progress)
 @register_handler(CVEProvidedMessage().topic_name, ["v1"])
-async def parse_cve_provided(cve_provided: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase):
+async def parse_cve_provided(cve_provided: Dict[str, Any], openshift: OpenShift):
     """Process a cve provided message."""
     # Add more logic if neccessary.
 
