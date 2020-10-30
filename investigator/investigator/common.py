@@ -20,15 +20,12 @@
 
 import logging
 from math import inf
-from urllib.parse import urlparse
 from asyncio import sleep
 
 from typing import List, Tuple, Optional, Callable
 
 from thoth.common import OpenShift
 from thoth.storages import GraphDatabase
-from thoth.sourcemanagement.sourcemanagement import SourceManagement
-from thoth.sourcemanagement.enums import ServiceType
 from thoth.messaging import ALL_MESSAGES
 
 from .configuration import Configuration
@@ -76,11 +73,18 @@ async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
         _LOGGER.debug("Current number pending = %d", total_pending)
 
 
-async def schedule_kebechet_run_url(openshift: OpenShift, repo: str, gitservice_repo_name: str) -> int:
-    """Schedule Kebechet from repo url and service."""
-    # TODO: Add method to schedule kebechet
-
-    return 0
+async def schedule_kebechet_administrator(openshift: OpenShift, message_info: dict, message_name: str) -> int:
+    """Schedule Kebechet Administrator from a particular message."""
+    workflow_id = 0
+    try:
+        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
+        workflow_id = openshift.schedule_kebechet_administrator(message_info=message_info, message_type=message_name)
+        _LOGGER.info(
+            f"Scheduled Kebechet Administrator worflow for message type {message_name} with workflow id - {workflow_id}"
+        )
+    except Exception as e:
+        _LOGGER.exception(f"Failed to schedule Kebechet Administrator worflow for message type {message_name}: {e}")
+    return workflow_id
 
 
 async def learn_about_security(
@@ -270,18 +274,3 @@ async def _schedule_all_solvers(
         are_scheduled = 0
 
     return are_scheduled
-
-
-def git_source_from_url(url: str) -> SourceManagement:
-    """Parse URL to get SourceManagement object."""
-    res = urlparse(url)
-    service_url = res.netloc
-    service_name = service_url.split(".")[-2]
-    service_type = ServiceType.by_name(service_name)
-    if service_type == ServiceType.GITHUB:
-        token = Configuration.GITHUB_PRIVATE_TOKEN
-    elif service_type == ServiceType.GITLAB:
-        token = Configuration.GITLAB_PRIVATE_TOKEN
-    else:
-        raise NotImplementedError("There is no token for this service type")
-    return SourceManagement(service_type, res.scheme + "://" + res.netloc, token, res.path)

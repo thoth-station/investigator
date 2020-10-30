@@ -63,4 +63,22 @@ async def parse_solved_package_message(
             si_wfs_scheduled
         )
 
+    if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
+        # Schedule Kebechet Administrator
+        message_info = {
+            "PACKAGE_NAME": package_name,
+            "THOTH_PACKAGE_VERSION": package_version,
+            "THOTH_PACKAGE_INDEX": index_url,
+            "SOLVER_NAME": solved_package.get("solver"),  # We pass the solver name also.
+        }
+
+        # We schedule Kebechet Administrator workflow here -
+        workflow_id = await common.schedule_kebechet_administrator(
+            openshift=openshift, message_info=message_info, message_name=SolvedPackageMessage.__name__,
+        )
+        _LOGGER.info(f"Schedule Kebechet Administrator with id = {workflow_id}")
+        scheduled_workflows.labels(
+            message_type=SolvedPackageMessage.base_name, workflow_type="kebechet-administrator"
+        ).inc()
+
     solved_package_success.inc()
