@@ -30,10 +30,10 @@ from aiohttp import web
 import thoth.messaging.consumer as consumer
 import thoth.messaging.admin_client as admin
 
-from investigator.investigator import __service_version__
-from investigator.investigator.configuration import Configuration
-from investigator.investigator.common import handler_table
-from investigator.investigator.metrics import registry
+from thoth.investigator import __service_version__
+from thoth.investigator.configuration import Configuration
+from thoth.investigator.common import handler_table
+from thoth.investigator.metrics import registry
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -43,24 +43,24 @@ from confluent_kafka import KafkaError
 from confluent_kafka import KafkaException
 
 # We run all the modules so that their metrics and handlers get registered
-run_module("investigator.investigator.advise_justification.investigate_advise_justification")
-run_module("investigator.investigator.adviser_re_run.investigate_adviser_re_run")
-run_module("investigator.investigator.adviser_trigger.investigate_adviser_trigger")
-run_module("investigator.investigator.cve_provided.investigate_cve_provided")
-run_module("investigator.investigator.hash_mismatch.investigate_hash_mismatch")
-run_module("investigator.investigator.kebechet_run_url_trigger.investigate_kebechet_run_url_trigger")
-run_module("investigator.investigator.kebechet_trigger.investigate_kebechet_trigger")
-run_module("investigator.investigator.missing_package.investigate_missing_package")
-run_module("investigator.investigator.missing_version.investigate_missing_version")
-run_module("investigator.investigator.package_extract_trigger.investigate_package_extract_trigger")
-run_module("investigator.investigator.package_released.investigate_package_released")
-run_module("investigator.investigator.provenance_checker_trigger.investigate_provenance_checker_trigger")
-run_module("investigator.investigator.qebhwt_trigger.investigate_qebhwt_trigger")
-run_module("investigator.investigator.si_unanalyzed_package.investigate_si_unanalyzed_package")
-run_module("investigator.investigator.solved_package.investigate_solved_package")
-run_module("investigator.investigator.unresolved_package.investigate_unresolved_package")
-run_module("investigator.investigator.unrevsolved_package.investigate_unrevsolved_package")
-run_module("investigator.investigator.update_provide_source_distro.investigate_update_provide_source_distro")
+run_module("thoth.investigator.advise_justification.investigate_advise_justification")
+run_module("thoth.investigator.adviser_re_run.investigate_adviser_re_run")
+run_module("thoth.investigator.adviser_trigger.investigate_adviser_trigger")
+run_module("thoth.investigator.cve_provided.investigate_cve_provided")
+run_module("thoth.investigator.hash_mismatch.investigate_hash_mismatch")
+run_module("thoth.investigator.kebechet_run_url_trigger.investigate_kebechet_run_url_trigger")
+run_module("thoth.investigator.kebechet_trigger.investigate_kebechet_trigger")
+run_module("thoth.investigator.missing_package.investigate_missing_package")
+run_module("thoth.investigator.missing_version.investigate_missing_version")
+run_module("thoth.investigator.package_extract_trigger.investigate_package_extract_trigger")
+run_module("thoth.investigator.package_released.investigate_package_released")
+run_module("thoth.investigator.provenance_checker_trigger.investigate_provenance_checker_trigger")
+run_module("thoth.investigator.qebhwt_trigger.investigate_qebhwt_trigger")
+run_module("thoth.investigator.si_unanalyzed_package.investigate_si_unanalyzed_package")
+run_module("thoth.investigator.solved_package.investigate_solved_package")
+run_module("thoth.investigator.unresolved_package.investigate_unresolved_package")
+run_module("thoth.investigator.unrevsolved_package.investigate_unrevsolved_package")
+run_module("thoth.investigator.update_provide_source_distro.investigate_update_provide_source_distro")
 
 init_logging()
 
