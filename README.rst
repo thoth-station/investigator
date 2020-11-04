@@ -73,15 +73,15 @@ Increase Thoth Knowledge
 
 The following messages are sent by different Thoth components:
 
-* `PackageReleasedMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/package_released/README.md>`__.
+* `PackageReleasedMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/package_released/README.md>`__.
 
-* `UnresolvedPackageMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/unresolved_package/README.md>`__.
+* `UnresolvedPackageMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/unresolved_package/README.md>`__.
 
-* `UnrevsolvedPackageMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/unrevsolved_package/README.md>`__.
+* `UnrevsolvedPackageMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/unrevsolved_package/README.md>`__.
 
-* `SIUnanalyzedPackageMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/si_unanalyzed_package/README.md>`__.
+* `SIUnanalyzedPackageMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/si_unanalyzed_package/README.md>`__.
 
-* `SolvedPackageMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/solved_package/README.md>`__.
+* `SolvedPackageMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/solved_package/README.md>`__.
 
 * `CVEProvidedMessage <https://github.com/thoth-station/messaging/blob/master/thoth/messaging/cve_provided.py>`__.
 
@@ -90,21 +90,21 @@ Monitor Thoth results and knowledge
 
 The following message is sent by `advise reporter producer <https://github.com/thoth-station/advise-reporter>`__ to show the use of recomendations across all Thoth integrations:
 
-* `AdviseJustificationMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/advise_justification/README.md>`__.
+* `AdviseJustificationMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/advise_justification/README.md>`__.
 
 The following messages are sent by `package update producer <https://github.com/thoth-station/package-update-job>`__ to keep knowledge in the database up to date:
 
-* `HashMismatchMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/hash_mismatch/README.md>`__.
+* `HashMismatchMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/hash_mismatch/README.md>`__.
 
-* `MissingPackageMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/missing_package/README.md>`__
+* `MissingPackageMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/missing_package/README.md>`__
 
-* `MissingVersionMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/missing_version/README.md>`__
+* `MissingVersionMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/missing_version/README.md>`__
 
-* `UpdateProvidesSourceDistroMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/update_provide_source_distro/README.md>`__
+* `UpdateProvidesSourceDistroMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/update_provide_source_distro/README.md>`__
 
 The following message is sent by `solver <https://github.com/thoth-station/solver>`__ when Thoth acquired all missing knowledge required to provide advice to a user (human or bot):
 
-* `AdviserReRunMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/advise_justification/README.md>`__.
+* `AdviserReRunMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/advise_justification/README.md>`__.
 
 Trigger User requests
 =====================
@@ -112,19 +112,19 @@ Trigger User requests
 The following messages are sent by `User-API producer <https://github.com/thoth-station/user-api>`__ when users (humans or bots)
 interact with `Thoth integrations <https://github.com/thoth-station/adviser/blob/master/docs/source/integration.rst>`__:
 
-* `AdviserTriggerMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/adviser_trigger/README.md>`__.
+* `AdviserTriggerMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/adviser_trigger/README.md>`__.
 
-* `KebechetTriggerMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/kebechet_trigger/README.md>`__
+* `KebechetTriggerMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/kebechet_trigger/README.md>`__
 
-* `PackageExtractTriggerMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/package_extract_trigger/README.md>`__
+* `PackageExtractTriggerMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/package_extract_trigger/README.md>`__
 
-* `ProvenanceCheckerTriggerMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/provenance_checker_trigger/README.md>`__
+* `ProvenanceCheckerTriggerMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/provenance_checker_trigger/README.md>`__
 
-* `QebHwtTriggerMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/qebhwt_trigger/README.md>`__
+* `QebHwtTriggerMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/qebhwt_trigger/README.md>`__
 
 The following message is triggered internally to keep user repositories fresh when new Thoth knowledge is encountered:
 
-* `KebechetRunUrlTriggerMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/kebechet_run_url_trigger/README.md>`__
+* `KebechetRunUrlTriggerMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/kebechet_run_url_trigger/README.md>`__
 
 
 Investigator scenarios description
@@ -133,7 +133,7 @@ Investigator scenarios description
 Thoth knowledge increase using investigator
 ===========================================
 
-.. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/IncreaseThothKnowledge.jpg
+.. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/thoth/investigator/images/IncreaseThothKnowledge.jpg
    :align: center
    :alt: Thoth knowledge increase using investigator.
 
@@ -146,27 +146,27 @@ The image above shows how Thoth keeps learning automatically using two fundament
 Thoth self-learn on errors during knowledge acquisition
 ========================================================
 
-.. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/UpdateProvidesSourceDistro.jpg
+.. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/thoth/investigator/images/UpdateProvidesSourceDistro.jpg
    :align: center
    :alt: Thoth self-learn on errors during knowledge acquisition.
 
 The image above shows how Thoth is able to self-learn and act on known errors during knowledge acquisition about Security for a certain package:
 
 * if a package, version from a certain index cannot be downloaded because the source distro is missing or the package is missing SI workflow will send messages
-(`UpdateProvidesSourceDistroMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/update_provide_source_distro/README.md>`__ or
-`MissingVersionMessage <https://github.com/thoth-station/investigator/blob/master/investigator/investigator/missing_version/README.md>`__ respectively)
+(`UpdateProvidesSourceDistroMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/update_provide_source_distro/README.md>`__ or
+`MissingVersionMessage <https://github.com/thoth-station/investigator/blob/master/thoth/investigator/missing_version/README.md>`__ respectively)
 
 * Investigator takes the messages and acts setting flags for those packages in Thoth knowledge graph so that next time Thoth is not going to schedule security analysis
 for that package. (In the image below what Grafana dashboard shows)
 
-.. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/SIAnalysisOverview.png
+.. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/thoth/investigator/images/SIAnalysisOverview.png
    :align: center
    :alt: Thoth SI Analysis monitoring.
 
 Thoth self-heal when knowledge is missing in providing an advise
 =================================================================
 
-.. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/FailedAdviceAdviserReRun.jpg
+.. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/thoth/investigator/images/FailedAdviceAdviserReRun.jpg
    :align: center
    :alt: Thoth self-heal when knowledge is missing in providing an advise.
 
@@ -190,7 +190,7 @@ and keep its knowledge up to date to what users use in their software stacks.
 Users interaction with Thoth services
 =====================================
 
-.. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/investigator/investigator/images/UserAPIKafkaProducer.jpg
+.. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/thoth/investigator/images/UserAPIKafkaProducer.jpg
    :align: center
    :alt: Users interaction with Thoth services.
 
@@ -257,9 +257,9 @@ The following is an example of a basic metrics file for a message `foo`:
   foo_exceptions = exceptions.labels(message_type="foo")
 
 You can add metrics as you see fit, but if the metric is not specific only to your messages please move it to
-investigator/investigator/metrics.py and set the proper labels to differentiate between messages.
+thoth/investigator/metrics.py and set the proper labels to differentiate between messages.
 
 Other additions
 ================
 
-* `investigator/investigator/<message_name>/__init__.py`, please add the function for parsing messages
+* `thoth/investigator/<message_name>/__init__.py`, please add the function for parsing messages
