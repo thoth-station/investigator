@@ -37,7 +37,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 @track_inprogress(package_released_in_progress)
 @register_handler(PackageReleasedMessage().topic_name, ["v1"])
 async def parse_package_released_message(
-    package_released: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase
+    package_released: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs
 ) -> None:
     """Parse package released message."""
     package_name = package_released["package_name"]

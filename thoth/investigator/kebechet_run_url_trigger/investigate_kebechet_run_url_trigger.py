@@ -38,7 +38,7 @@ _LOGGER = logging.getLogger(__name__)
 @track_inprogress(kebechet_run_url_trigger_in_progress)
 @register_handler(KebechetRunUrlTriggerMessage().topic_name, ["v1"])
 async def parse_kebechet_run_url_trigger_message(
-    kebechet_run_url_trigger: Dict[str, Any], openshift: OpenShift
+    kebechet_run_url_trigger: Dict[str, Any], openshift: OpenShift, **kwargs
 ) -> None:
     """Parse kebechet_run_url_trigger message."""
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)

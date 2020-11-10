@@ -37,7 +37,7 @@ _LOGGER = logging.getLogger(__name__)
 @count_exceptions(cve_provided_exceptions)
 @track_inprogress(cve_provided_in_progress)
 @register_handler(CVEProvidedMessage().topic_name, ["v1"])
-async def parse_cve_provided(cve_provided: Dict[str, Any], openshift: OpenShift):
+async def parse_cve_provided(cve_provided: Dict[str, Any], openshift: OpenShift, **kwargs):
     """Process a cve provided message."""
     # Add more logic if neccessary.
 

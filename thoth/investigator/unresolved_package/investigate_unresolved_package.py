@@ -43,7 +43,7 @@ _LOGGER = logging.getLogger(__name__)
 @track_inprogress(unresolved_package_in_progress)
 @register_handler(UnresolvedPackageMessage().topic_name, ["v1"])
 async def parse_unresolved_package_message(
-    unresolved_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase
+    unresolved_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs
 ) -> None:
     """Parse unresolved package message."""
     package_name = unresolved_package["package_name"]

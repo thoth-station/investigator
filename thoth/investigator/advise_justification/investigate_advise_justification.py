@@ -39,7 +39,7 @@ DEPLOYMENT_NAME = os.environ["THOTH_DEPLOYMENT_NAME"]
 @count_exceptions(advise_justification_exceptions)
 @track_inprogress(advise_justification_in_progress)
 @register_handler(AdviseJustificationMessage().topic_name, ["v1"])
-async def expose_advise_justification_metrics(advise_justification: Dict[str, Any]):
+async def expose_advise_justification_metrics(advise_justification: Dict[str, Any], **kwargs):
     """Retrieve adviser reports justifications."""
     advise_justification_type_number.labels(
         advise_message=advise_justification["message"],
