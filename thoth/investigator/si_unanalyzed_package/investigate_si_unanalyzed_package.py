@@ -42,7 +42,7 @@ _LOGGER = logging.getLogger(__name__)
 @track_inprogress(si_unanalyzed_package_in_progress)
 @register_handler(SIUnanalyzedPackageMessage().topic_name, ["v1"])
 async def parse_si_unanalyzed_package_message(
-    si_unanalyzed_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase
+    si_unanalyzed_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs
 ) -> None:
     """Parse SI Unanalyzed package messages."""
     package_name: str = si_unanalyzed_package["package_name"]

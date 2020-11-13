@@ -41,7 +41,7 @@ _LOGGER = logging.getLogger(__name__)
 @track_inprogress(solved_package_in_progress)
 @register_handler(SolvedPackageMessage().topic_name, ["v1"])
 async def parse_solved_package_message(
-    solved_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase
+    solved_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs
 ) -> None:
     """Parse solved package message."""
     package_name = solved_package["package_name"]

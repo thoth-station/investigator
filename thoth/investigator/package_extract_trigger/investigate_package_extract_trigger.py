@@ -37,7 +37,9 @@ _LOGGER = logging.getLogger(__name__)
 @count_exceptions(package_extract_trigger_exceptions)
 @track_inprogress(package_extract_trigger_in_progress)
 @register_handler(PackageExtractTriggerMessage().topic_name, ["v1"])
-async def parse_package_extract_trigger_message(package_extract_trigger: Dict[str, Any], openshift: OpenShift) -> None:
+async def parse_package_extract_trigger_message(
+    package_extract_trigger: Dict[str, Any], openshift: OpenShift, **kwargs
+) -> None:
     """Parse package_extract_trigger message."""
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
     workflow_name = openshift.schedule_package_extract(

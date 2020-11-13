@@ -38,7 +38,7 @@ _LOGGER = logging.getLogger(__name__)
 @track_inprogress(provenance_checker_trigger_in_progress)
 @register_handler(ProvenanceCheckerTriggerMessage().topic_name, ["v1"])
 async def parse_provenance_checker_trigger_message(
-    provenance_checker_trigger: Dict[str, Any], openshift: OpenShift
+    provenance_checker_trigger: Dict[str, Any], openshift: OpenShift, **kwargs
 ) -> None:
     """Parse provenance_checker_trigger message."""
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)

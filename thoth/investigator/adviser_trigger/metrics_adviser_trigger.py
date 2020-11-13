@@ -19,6 +19,6 @@
 
 from ..metrics import in_progress, success, exceptions
 
-adviser_trigger_in_progress = in_progress.labels(message_type="adviser_re_run")
-adviser_trigger_success = success.labels(message_type="adviser_re_run")
-adviser_trigger_exceptions = exceptions.labels(message_type="adviser_re_run")
+adviser_trigger_in_progress = in_progress.labels(message_type="adviser_trigger")
+adviser_trigger_success = success.labels(message_type="adviser_trigger")
+adviser_trigger_exceptions = exceptions.labels(message_type="adviser_trigger")

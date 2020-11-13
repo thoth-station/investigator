@@ -39,7 +39,7 @@ _LOGGER = logging.getLogger(__name__)
 @count_exceptions(missing_version_exceptions)
 @track_inprogress(missing_version_in_progress)
 @register_handler(MissingVersionMessage().topic_name, ["v1"])
-async def parse_missing_version(version: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase):
+async def parse_missing_version(version: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs):
     """Process a missing version message from package-update producer."""
     graph.update_missing_flag_package_version(
         index_url=version["index_url"],

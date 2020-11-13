@@ -37,7 +37,7 @@ _LOGGER = logging.getLogger(__name__)
 @count_exceptions(kebechet_trigger_exceptions)
 @track_inprogress(kebechet_trigger_in_progress)
 @register_handler(KebechetTriggerMessage().topic_name, ["v1"])
-async def parse_kebechet_trigger_message(kebechet_trigger: Dict[str, Any], openshift: OpenShift) -> None:
+async def parse_kebechet_trigger_message(kebechet_trigger: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:
     """Parse kebechet_trigger message."""
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
     workflow_name = openshift.schedule_kebechet_workflow(
