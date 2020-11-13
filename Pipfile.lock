@@ -853,11 +853,11 @@
         },
         "thoth-sourcemanagement": {
             "hashes": [
-                "sha256:150b2b3e0e0c0ee1f86d62fd060f93e08137320e0af7ef6c3b8cbef267d2f864",
-                "sha256:9930f87cbd67fb9ee28d133ca3148a7ddfb687d46ec96bb25317d6d3c0c0cfd0"
+                "sha256:151f3048f7f4867e1de6e56272272de26914ff6e73badf5f600badf6d2ce4107",
+                "sha256:eee2ca4a3729ddf07043804b27f7b76346a1d34829eabc6a85a76d3bd12c9050"
             ],
             "index": "pypi",
-            "version": "==0.3.3"
+            "version": "==0.4.0"
         },
         "thoth-storages": {
             "hashes": [
