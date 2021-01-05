@@ -84,6 +84,7 @@ async def schedule_kebechet_administrator(openshift: OpenShift, message_info: di
         )
     except Exception as e:
         _LOGGER.exception(f"Failed to schedule Kebechet Administrator worflow for message type {message_name}: {e}")
+        raise e
     return workflow_id
 
 
@@ -137,7 +138,7 @@ async def _schedule_security_indicator(
         _LOGGER.exception(
             f"Failed to schedule SI for package {package_name} in version {package_version} from index {index_url}: {e}"
         )
-        is_scheduled = 0
+        raise e
 
     return is_scheduled
 
@@ -180,7 +181,7 @@ async def _schedule_revsolver(openshift: OpenShift, package_name: str, package_v
         _LOGGER.exception(
             "Failed to schedule reverse solver for %r in version %r: %r", package_name, package_version, e
         )
-        is_scheduled = 0
+        raise e
 
     return is_scheduled
 
@@ -251,7 +252,7 @@ def _schedule_solver(
         is_scheduled = 1
     except Exception as e:
         _LOGGER.exception(f"Failed to schedule solver {solver_name} for package {packages} from {indexes}: {e}")
-        is_scheduled = 0
+        raise e
 
     return is_scheduled
 
@@ -271,6 +272,6 @@ async def _schedule_all_solvers(
         are_scheduled = len(analysis_ids)
     except Exception as e:
         _LOGGER.exception(f"Failed to schedule solvers for package {packages} from {indexes}: {e}")
-        are_scheduled = 0
+        raise e
 
     return are_scheduled

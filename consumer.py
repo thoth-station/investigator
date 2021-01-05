@@ -26,14 +26,18 @@ import json
 import signal
 from runpy import run_module
 from aiohttp import web
+from time import sleep
+
+from typing import Optional
 
 import thoth.messaging.consumer as consumer
 import thoth.messaging.admin_client as admin
+from thoth.messaging import ALL_MESSAGES
 
 from thoth.investigator import __service_version__
 from thoth.investigator.configuration import Configuration
 from thoth.investigator.common import handler_table
-from thoth.investigator.metrics import registry
+from thoth.investigator.metrics import registry, failures, subscribed_topics
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -41,6 +45,7 @@ from thoth.storages.graph import GraphDatabase
 from prometheus_client import generate_latest
 from confluent_kafka import KafkaError
 from confluent_kafka import KafkaException
+from confluent_kafka import Consumer
 
 # We run all the modules so that their metrics and handlers get registered
 run_module("thoth.investigator.advise_justification.investigate_advise_justification")
@@ -91,9 +96,23 @@ num_workers = int(os.getenv("THOTH_CONSUMER_WORKERS", 5))
 
 routes = web.RouteTableDef()
 
+c = None  # type: Optional[Consumer]
+
 
 def _handler_lookup(topic_name, version):
     return handler_table[topic_name][version]
+
+
+def _get_class_from_topic_name(topic_name):
+    for i in ALL_MESSAGES:
+        if i().topic_name == topic_name:
+            return i
+
+
+def _get_class_from_base_name(base_name):
+    for i in ALL_MESSAGES:
+        if i.base_name == base_name:
+            return i
 
 
 @routes.get("/metrics")
@@ -109,28 +128,71 @@ async def get_health(request):
     return web.json_response(data)
 
 
-async def _worker(c: consumer.Consumer, q: asyncio.Queue):
+@routes.get("/subscribe/{base_topic_name}")
+async def sub_to_topic(request, base_topic_name):
+    """Subscribe to a topic, this function prepends thoth-deployment-name to any topic passed."""
+    global c
+    message_class = _get_class_from_base_name(base_topic_name)
+    if c is None:
+        _LOGGER.debug("Consumer has not been created yet, cannot subscribe to topic.")
+    if message_class:
+        consumer.subscribe_to_message(c, message_class)
+        subscribed_topics.labels(base_topic_name).set(1)
+        data = {"message": f"Successfully subscribed to {message_class().topic_name}."}
+    else:
+        # THIS COULD BE REPLACED WITH SOME ERROR CODE INSTEAD
+        prefix = os.getenv("THOTH_DEPLOYMENT_NAME", None)
+        topic = base_topic_name
+        if prefix:
+            topic = f"{prefix}.{topic}"
+        c.subscribe([topic])
+        subscribed_topics.labels(base_topic_name).set(1)
+        data = {"message": f"No corresponding message type found in `thoth-messaging`. Subscribed to {topic} instead."}
+
+    return web.json_response(data)
+
+
+async def _worker(q: asyncio.Queue):
+    global c
+    if c is None:
+        raise Exception
     while True:
         val = await q.get()
         if val is None:
             break
         func, msg = val
         contents = json.loads(msg.value().decode("utf-8"))
-        try:
-            await func(contents, openshift=openshift, graph=graph)
-        except Exception as e:
-            _LOGGER.warn(e)
-        finally:
-            c.commit(message=msg)
-            await asyncio.sleep(0)  # allow another coroutine to take control
+        for i in range(0, Configuration.MAX_RETRIES):
+            try:
+                await func(contents, openshift=openshift, graph=graph)
+                c.commit(message=msg)
+            except Exception as e:
+                _LOGGER.warn(e)
+                await asyncio.sleep(Configuration.BACKOFF * i)  # linear backoff strategy
+        else:
+            # message has exceeded maximum number of retries
+            # FAILURE logic
+            message_class = _get_class_from_topic_name(msg.topic())
+            if Configuration.ACK_ON_FAIL:
+                message_type = message_class.base_name.rsplit(".", maxsplit=1)[-1]  # type: str
+                message_type = message_type.replace("-", "_")  # this is to match the metrics associate with processing
+                failures.labels(message_type=message_type).inc()
+                c.commit(message=msg)
+            else:
+                # unsubscribe from topic
+                c.unsubscribe(msg.topic())
+                subscribed_topics.labels(base_topic_name=message_class.base_name).set(
+                    0
+                )  # TODO: add alert trigger when message is unsubscribed from
+        await asyncio.sleep(0)  # allow another coroutine to take control
 
 
 # this consumers from Kafka, but produces to async queue
-async def _confluent_consumer_loop(c: consumer.Consumer, q: asyncio.Queue):
-    a = admin.create_admin_client()
-    admin.create_all_topics(a)
+async def _confluent_consumer_loop(q: asyncio.Queue):
+    global c
+    if c is None:
+        raise Exception
     await asyncio.sleep(1.0)  # wait here so that kafka has time to finish creating topics
-    c = consumer.create_consumer()
     try:
         consumer.subscribe_to_all(c)
         while running:
@@ -160,14 +222,17 @@ async def _shutdown(app, bar):
 
 
 if __name__ == "__main__":
+    a = admin.create_admin_client()
+    admin.create_all_topics(a)
+    sleep(1.0)
     loop = asyncio.get_event_loop()
     c = consumer.create_consumer()
     queue = asyncio.Queue(maxsize=10, loop=loop)  # type: asyncio.Queue
 
     tasks = []
-    tasks.append(_confluent_consumer_loop(c=c, q=queue))
+    tasks.append(_confluent_consumer_loop(q=queue))
     for _ in range(num_workers):
-        tasks.append(_worker(c=c, q=queue))
+        tasks.append(_worker(q=queue))
 
     signal.signal(signal.SIGINT, _shutdown)
 

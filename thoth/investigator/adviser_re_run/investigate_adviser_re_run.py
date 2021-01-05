@@ -83,6 +83,6 @@ async def _re_schedule_adviser(openshift: OpenShift, parameters: Dict[str, Any])
         is_scheduled = 1
     except Exception as e:
         _LOGGER.exception(f"Failed to schedule Adviser for `failed` adviser run {re_run_adviser_id}: {e}")
-        is_scheduled = 0
+        raise e
 
     return is_scheduled

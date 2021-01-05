@@ -44,3 +44,8 @@ class Configuration:
     # Quota handling
     SLEEP_TIME = int(os.getenv("ARGO_PENDING_SLEEP_TIME", 2))
     PENDING_WORKFLOW_LIMIT = os.getenv("ARGO_PENDING_WORKFLOW_LIMIT", None)
+
+    # Consumer configuration
+    MAX_RETRIES = float(os.getenv("THOTH_INVESTIGATOR_MAX_RETRIES", 5))
+    BACKOFF = float(os.getenv("THOTH_INVESTIGATOR_BACKOFF", 0.5))  # Linear backoff strategy
+    ACK_ON_FAIL = bool(int(os.getenv("THOTH_INVESTIGATOR_ACK_ON_FAIL", 0)))

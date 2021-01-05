@@ -51,10 +51,24 @@ success = Counter(
     registry=registry,
 )
 
+failures = Counter(
+    "investigator_failures",
+    "Incremented when retry limit for message processing is exceeded.",
+    labelnames=["message_type"],
+    registry=registry,
+)
+
 # Scheduled workflows
 scheduled_workflows = Counter(
     "thoth_investigator_scheduled_workflows",
     "Scheduled workflows by investigator per type.",
     ["message_type", "workflow_type"],
+    registry=registry,
+)
+
+subscribed_topics = Gauge(
+    "investigator_subscribed_topics",
+    "Boolean gauge indicating the subscription status of topics.",
+    labelnames=["base_topic_name"],
     registry=registry,
 )
