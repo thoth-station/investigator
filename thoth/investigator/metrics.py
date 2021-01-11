@@ -27,32 +27,32 @@ registry = CollectorRegistry()
 
 # add the application version info metric
 investigator_info = Gauge(
-    "investigator_consumer_info", "Investigator Version Info", labelnames=["version"], registry=registry,
+    "thoth_investigator_consumer_info", "Investigator Version Info", labelnames=["version"], registry=registry,
 )
 investigator_info.labels(version=__service_version__).inc()
 
 # Metrics for Kafka
 in_progress = Gauge(
-    "investigators_in_progress",
+    "thoth_investigator_in_progress",
     "Total number of investigation messages currently being processed.",
     labelnames=["message_type"],
     registry=registry,
 )
 exceptions = Counter(
-    "investigator_exceptions",
+    "thoth_investigator_exceptions",
     "Number of investigation messages which failed to be processed.",
     labelnames=["message_type"],
     registry=registry,
 )
 success = Counter(
-    "investigators_processed",
+    "thoth_investigator_processed",
     "Number of investigation messages which were successfully processed.",
     labelnames=["message_type"],
     registry=registry,
 )
 
 failures = Counter(
-    "investigator_failures",
+    "thoth_investigator_failures",
     "Incremented when retry limit for message processing is exceeded.",
     labelnames=["message_type"],
     registry=registry,
@@ -67,7 +67,7 @@ scheduled_workflows = Counter(
 )
 
 subscribed_topics = Gauge(
-    "investigator_subscribed_topics",
+    "thoth_investigator_subscribed_topics",
     "Boolean gauge indicating the subscription status of topics.",
     labelnames=["base_topic_name"],
     registry=registry,
