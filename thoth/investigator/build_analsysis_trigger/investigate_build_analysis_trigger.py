@@ -43,15 +43,22 @@ async def parse_build_analysis_trigger_message(
     """Parse build_analysis trigger message."""
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
     workflow_id = openshift.schedule_build_analysis(
-        output_image=build_analysis_trigger["output_image"],
         base_image=build_analysis_trigger["base_image"],
-        registry_user=build_analysis_trigger["registry_user"],
-        registry_password=build_analysis_trigger["registry_password"],
-        registry_verify_tls=build_analysis_trigger["registry_verify_tls"],
-        environment_type=build_analysis_trigger["environment_type"],
+        base_image_analysis_id=build_analysis_trigger["base_image_analysis_id"],
+        base_registry_password=build_analysis_trigger["base_registry_password"],
+        base_registry_user=build_analysis_trigger["base_registry_user"],
+        base_registry_verify_tls=build_analysis_trigger["base_registry_verify_tls"],
+        output_image=build_analysis_trigger["output_image"],
+        output_image_analysis_id=build_analysis_trigger["output_image_analysis_id"],
+        output_registry_password=build_analysis_trigger["output_registry_password"],
+        output_registry_user=build_analysis_trigger["output_registry_user"],
+        output_registry_verify_tls=build_analysis_trigger["output_registry_verify_tls"],
         buildlog_document_id=build_analysis_trigger["buildlog_document_id"],
+        buildlog_parser_id=build_analysis_trigger["buildlog_parser_id"],
+        environment_type=build_analysis_trigger["environment_type"],
         origin=build_analysis_trigger["origin"],
-        job_id=build_analysis_trigger["job_id"],
+        force=build_analysis_trigger["force"],
+        debug=build_analysis_trigger["debug"],
     )
     _LOGGER.debug(f"Scheduled build analysis workflow {workflow_id}")
     build_analysis_trigger_success.inc()
