@@ -235,9 +235,9 @@ def _schedule_solver(
     openshift: OpenShift, package_name: str, package_version: str, indexes: List[str], solver_name: str
 ) -> int:
     """Schedule solver."""
-    try:
-        packages = f"{package_name}==={package_version}"
+    packages = f"{package_name}==={package_version}"
 
+    try:
         analysis_id = openshift.schedule_solver(
             solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=Configuration.LOG_SOLVER
         )
@@ -260,9 +260,9 @@ async def _schedule_all_solvers(
     openshift: OpenShift, package_name: str, package_version: str, indexes: List[str]
 ) -> int:
     """Schedule all solvers."""
-    try:
-        packages = f"{package_name}==={package_version}"
+    packages = f"{package_name}==={package_version}"
 
+    try:
         await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
         analysis_ids = openshift.schedule_all_solvers(packages=packages, indexes=indexes)
         _LOGGER.info(
