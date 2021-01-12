@@ -58,6 +58,7 @@ async def parse_build_analysis_trigger_message(
         environment_type=build_analysis_trigger["environment_type"],
         origin=build_analysis_trigger["origin"],
         debug=build_analysis_trigger["debug"],
+        job_id=build_analysis_trigger["job_id"],
     )
     _LOGGER.debug(f"Scheduled build analysis workflow {workflow_id}")
     build_analysis_trigger_success.inc()
