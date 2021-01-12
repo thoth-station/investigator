@@ -92,8 +92,6 @@ graph.connect()
 
 running = True
 
-num_workers = int(os.getenv("THOTH_CONSUMER_WORKERS", 5))
-
 routes = web.RouteTableDef()
 
 c = None  # type: Optional[Consumer]
@@ -212,7 +210,7 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
             await asyncio.sleep(0)
     finally:
         c.close()
-        for _ in range(num_workers):
+        for _ in range(Configuration.NUM_WORKERS):
             await q.put(None)  # each worker can receive this value exactly once
 
 
@@ -231,7 +229,7 @@ if __name__ == "__main__":
 
     tasks = []
     tasks.append(_confluent_consumer_loop(q=queue))
-    for _ in range(num_workers):
+    for _ in range(Configuration.NUM_WORKERS):
         tasks.append(_worker(q=queue))
 
     signal.signal(signal.SIGINT, _shutdown)
