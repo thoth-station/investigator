@@ -309,3 +309,11 @@ all the things that you see...
 * :pushpin: Automatic update of dependency hypothesis from 5.38.1 to 5.40.0 (#366)
 * :pushpin: Automatic update of dependency pytest from 6.1.1 to 6.1.2 (#365)
 * :pushpin: Automatic update of dependency thoth-common from 0.20.2 to 0.20.4 (#364)
+
+## Release 0.7.0 (2021-01-12T13:20:04)
+### Features
+* :arrow_up: Automatic update of dependencies by kebechet. (#395)
+* :arrow_up: Automatic update of dependencies by kebechet. (#392)
+* Remove use-before-declared linter warning (#390)
+### Improvements
+* Do not use mutable arguments in functions (#391)
