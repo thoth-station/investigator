@@ -46,6 +46,7 @@ from confluent_kafka import KafkaException
 run_module("thoth.investigator.advise_justification.investigate_advise_justification")
 run_module("thoth.investigator.adviser_re_run.investigate_adviser_re_run")
 run_module("thoth.investigator.adviser_trigger.investigate_adviser_trigger")
+run_module("thoth.investigator.build_analysis_trigger.investigate_build_analysis_trigger")
 run_module("thoth.investigator.cve_provided.investigate_cve_provided")
 run_module("thoth.investigator.hash_mismatch.investigate_hash_mismatch")
 run_module("thoth.investigator.kebechet_run_url_trigger.investigate_kebechet_run_url_trigger")
