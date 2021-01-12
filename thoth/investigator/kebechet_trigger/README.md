@@ -2,14 +2,9 @@
 
 [KebechetTriggerMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/kebechet_trigger.py)
 
-This message received contains:
+Available versions (see for message contents):
 
-```python
-webhook_payload: Dict[str, Any]
-job_id: Optional[str] = None
-component_name: str
-service_version: str
-```
+- [Current](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/kebechet_trigger.py)
 
 Thoth investigator schedules the following workflow to run Kebechet bot:
 

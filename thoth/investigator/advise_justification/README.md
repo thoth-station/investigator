@@ -1,15 +1,9 @@
 # AdviseJustificationMessage
 
-- [AdviseJustificationMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/advise_justification.py)
+[AdviseJustificationMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/advise_justification.py)
 
-This message received contains:
+Available versions (see for message contents):
 
-```python
-message: str
-justification_type: str
-count: int
-component_name: str
-service_version: str
-```
+- [Current](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/advise_justification.py)
 
 These messages get processed to update advise justification metrics (`advise_justification_type_number`)

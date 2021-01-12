@@ -2,16 +2,9 @@
 
 [KebechetRunUrlTriggerMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/kebechet_run_url.py)
 
-This message received contains:
+Available versions (see for message contents):
 
-```python
-url = str
-service_name = str
-installation_id = str
-job_id: Optional[str] = None
-component_name: str
-service_version: str
-```
+- [Current](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/kebechet_run_url.py)
 
 Thoth investigator schedules the following workflow to run Kebechet bot:
 
