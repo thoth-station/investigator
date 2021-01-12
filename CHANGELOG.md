@@ -317,3 +317,12 @@ all the things that you see...
 * Remove use-before-declared linter warning (#390)
 ### Improvements
 * Do not use mutable arguments in functions (#391)
+
+## Release 0.8.0 (2021-01-12T18:52:56)
+### Features
+* Buildlog analysis trigger (#393)
+* :arrow_up: Automatic update of dependencies by kebechet. (#403)
+* Manual update of dependencies (#405)
+* :arrow_up: Automatic update of dependencies by kebechet. (#399)
+### Improvements
+* removed bissenbay, thanks for your contributions!
