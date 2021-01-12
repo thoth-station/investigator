@@ -901,11 +901,11 @@
         },
         "thoth-messaging": {
             "hashes": [
-                "sha256:0aea8087010d65a8573e714eaac51d76dd9e46ca3db3f7d4501e5dde6d218c39",
-                "sha256:d74ab06ad5349b47a342f1d10ecd4bdbebe26e2cc9cbeb873ab4b9863ae9080d"
+                "sha256:568063f4a51c5abe1052d601b14fe717c14f8690e759b24e7a49ae1c5985f665",
+                "sha256:a3ba47214907c55d78ba773e49e747c9746b7e1110507a05115e47de678cea90"
             ],
             "index": "pypi",
-            "version": "==0.10.0"
+            "version": "==0.10.1"
         },
         "thoth-python": {
             "hashes": [
