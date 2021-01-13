@@ -113,6 +113,11 @@ def _get_class_from_base_name(base_name):
             return i
 
 
+def _inc_all_message_subscriptions():
+    for i in ALL_MESSAGES:
+        subscribed_topics.labels(i.base_name).set(1)
+
+
 @routes.get("/metrics")
 async def get_metrics(request):
     """Display prometheus metrics."""
@@ -127,27 +132,21 @@ async def get_health(request):
 
 
 @routes.get("/subscribe/{base_topic_name}")
-async def sub_to_topic(request, base_topic_name):
+async def sub_to_topic(request):
     """Subscribe to a topic, this function prepends thoth-deployment-name to any topic passed."""
     global c
+    base_topic_name = request.match_info["base_topic_name"]
     message_class = _get_class_from_base_name(base_topic_name)
     if c is None:
         _LOGGER.debug("Consumer has not been created yet, cannot subscribe to topic.")
     if message_class:
-        consumer.subscribe_to_message(c, message_class)
+        consumer.subscribe_to_message(c, message_class())
         subscribed_topics.labels(base_topic_name).set(1)
         data = {"message": f"Successfully subscribed to {message_class().topic_name}."}
+        return web.json_response(data)
     else:
-        # THIS COULD BE REPLACED WITH SOME ERROR CODE INSTEAD
-        prefix = os.getenv("THOTH_DEPLOYMENT_NAME", None)
-        topic = base_topic_name
-        if prefix:
-            topic = f"{prefix}.{topic}"
-        c.subscribe([topic])
-        subscribed_topics.labels(base_topic_name).set(1)
-        data = {"message": f"No corresponding message type found in `thoth-messaging`. Subscribed to {topic} instead."}
-
-    return web.json_response(data)
+        data = {"message": "No corresponding message type found in `thoth-messaging`. No action taken."}
+        return web.json_response(data=data, status=422)
 
 
 async def _worker(q: asyncio.Queue):
@@ -193,6 +192,7 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
     await asyncio.sleep(1.0)  # wait here so that kafka has time to finish creating topics
     try:
         consumer.subscribe_to_all(c)
+        _inc_all_message_subscriptions()
         while running:
             msg = c.poll(0)
             if msg is None:
