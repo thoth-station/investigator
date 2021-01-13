@@ -4,15 +4,9 @@
 
 - [package release producer](https://github.com/thoth-station/package-releases-job) to acquire knowledge on newly released package version from a certain index.
 
-This message received contains:
+Available versions (see for message contents):
 
-```python
-package_name: str
-package_version: str
-index_url: str
-component_name: str
-service_version: str
-```
+- [Current](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/package_releases.py)
 
 Thoth investigator schedules the following workflows to increase Thoth knowledge:
 

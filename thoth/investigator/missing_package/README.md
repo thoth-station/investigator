@@ -2,13 +2,8 @@
 
 [MissingPackageMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/missing_package.py)
 
-This message received contains:
+Available versions (see for message contents):
 
-```python
-index_url: str
-package_name: str
-component_name: str
-service_version: str
-```
+- [Current](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/missing_package.py)
 
 If package goes missing from a package index we mark all it as missing.

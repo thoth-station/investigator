@@ -4,16 +4,9 @@
 
 - [solver](https://github.com/thoth-station/solver) when Thoth learn about new package version index solved.
 
-This message received contains:
+Available versions (see for message contents):
 
-```python
-package_name: str
-package_version: str
-index_url: str
-solver: str
-component_name: str
-service_version: str
-```
+- [Current](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/solved_package.py)
 
 Thoth investigator schedules the following workflow to increase Thoth knowledge:
 

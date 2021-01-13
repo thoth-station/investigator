@@ -2,12 +2,8 @@
 
 [CVEProvidedMessage](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/cve_provided.py)
 
-This message received contains:
+Available versions (see for message contents):
 
-```python
-index_url: str
-package_name: str
-package_version: str
-```
+- [Current](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/cve_provided.py)
 
 If we receive an CVEProvidedMessage we schedule KebechetAdministrator on all the affected repositories.

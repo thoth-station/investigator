@@ -6,16 +6,9 @@
 
 - [adviser](https://github.com/thoth-station/adviser) when Thoth is missing knowledge in providing an advice.
 
-This message received contains:
+Available versions (see for message contents):
 
-```python
-package_name: str
-package_version: Optional[str]
-index_url: Optional[List[str]]
-solver: Optional[str]
-component_name: str
-service_version: str
-```
+- [Current](https://github.com/thoth-station/messaging/blob/master/thoth/messaging/unresolved_package.py)
 
 Thoth investigator schedules the following workflow to increase Thoth knowledge:
 
