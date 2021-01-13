@@ -326,3 +326,7 @@ all the things that you see...
 * :arrow_up: Automatic update of dependencies by kebechet. (#399)
 ### Improvements
 * removed bissenbay, thanks for your contributions!
+
+## Release 0.8.1 (2021-01-13T18:21:03)
+### Features
+* analsysis->analysis (#410)
