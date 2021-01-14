@@ -28,7 +28,7 @@ from runpy import run_module
 from aiohttp import web
 from time import sleep
 
-from typing import Optional
+from typing import Optional, List
 
 import thoth.messaging.consumer as consumer
 import thoth.messaging.admin_client as admin
@@ -36,8 +36,9 @@ from thoth.messaging import ALL_MESSAGES
 
 from thoth.investigator import __service_version__
 from thoth.investigator.configuration import Configuration
+
 from thoth.investigator.common import handler_table
-from thoth.investigator.metrics import registry, failures, subscribed_topics
+from thoth.investigator.metrics import registry, failures, paused_topics
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -46,6 +47,7 @@ from prometheus_client import generate_latest
 from confluent_kafka import KafkaError
 from confluent_kafka import KafkaException
 from confluent_kafka import Consumer
+from confluent_kafka import TopicPartition
 
 # We run all the modules so that their metrics and handlers get registered
 run_module("thoth.investigator.advise_justification.investigate_advise_justification")
@@ -94,6 +96,8 @@ running = True
 
 routes = web.RouteTableDef()
 
+paused_partitions = []  # type: List[TopicPartition]
+
 c = None  # type: Optional[Consumer]
 
 
@@ -113,9 +117,9 @@ def _get_class_from_base_name(base_name):
             return i
 
 
-def _inc_all_message_subscriptions():
+def _set_paused_to_zero():
     for i in ALL_MESSAGES:
-        subscribed_topics.labels(i.base_name).set(1)
+        paused_topics.labels(i.base_name).set(0)
 
 
 @routes.get("/metrics")
@@ -131,7 +135,7 @@ async def get_health(request):
     return web.json_response(data)
 
 
-@routes.get("/subscribe/{base_topic_name}")
+@routes.get("/resume/{base_topic_name}")
 async def sub_to_topic(request):
     """Subscribe to a topic, this function prepends thoth-deployment-name to any topic passed."""
     global c
@@ -140,9 +144,12 @@ async def sub_to_topic(request):
     if c is None:
         _LOGGER.debug("Consumer has not been created yet, cannot subscribe to topic.")
     if message_class:
-        consumer.subscribe_to_message(c, message_class())
-        subscribed_topics.labels(base_topic_name).set(1)
-        data = {"message": f"Successfully subscribed to {message_class().topic_name}."}
+        for partition in paused_partitions:
+            if partition.topic == message_class().topic_name:
+                c.resume([partition])
+                paused_partitions.remove(partition)
+        paused_topics.labels(base_topic_name).set(0)
+        data = {"message": f"Successfully resumed consumption of {message_class().topic_name}."}
         return web.json_response(data)
     else:
         data = {"message": "No corresponding message type found in `thoth-messaging`. No action taken."}
@@ -176,9 +183,14 @@ async def _worker(q: asyncio.Queue):
                 failures.labels(message_type=message_type).inc()
                 c.commit(message=msg)
             else:
-                # unsubscribe from topic
-                c.unsubscribe(msg.topic())
-                subscribed_topics.labels(base_topic_name=message_class.base_name).set(
+                # pause consumption of a topic
+                for partition in c.assignment():
+                    if partition.topic == message_class().topic_name:
+                        c.pause([partition])
+                        paused_partitions.append(partition)
+
+                # c.unsubscribe(msg.topic())
+                paused_topics.labels(base_topic_name=message_class.base_name).set(
                     0
                 )  # TODO: add alert trigger when message is unsubscribed from
         await asyncio.sleep(0)  # allow another coroutine to take control
@@ -192,7 +204,7 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
     await asyncio.sleep(1.0)  # wait here so that kafka has time to finish creating topics
     try:
         consumer.subscribe_to_all(c)
-        _inc_all_message_subscriptions()
+        _set_paused_to_zero()
         while running:
             msg = c.poll(0)
             if msg is None:
