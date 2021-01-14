@@ -37,9 +37,9 @@ from prometheus_async.aio import count_exceptions, track_inprogress
 _LOGGER = logging.getLogger(__name__)
 
 
+@register_handler(SolvedPackageMessage().topic_name, ["v1"])
 @count_exceptions(solved_package_exceptions)
 @track_inprogress(solved_package_in_progress)
-@register_handler(SolvedPackageMessage().topic_name, ["v1"])
 async def parse_solved_package_message(
     solved_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs
 ) -> None:

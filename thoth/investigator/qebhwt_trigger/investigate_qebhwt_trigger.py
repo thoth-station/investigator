@@ -34,9 +34,9 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
+@register_handler(QebHwtTriggerMessage().topic_name, ["v1"])
 @count_exceptions(qebhwt_trigger_exceptions)
 @track_inprogress(qebhwt_trigger_in_progress)
-@register_handler(QebHwtTriggerMessage().topic_name, ["v1"])
 async def parse_qebhwt_trigger_message(qebhwt_trigger: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:
     """Parse qebhwt_trigger message."""
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)

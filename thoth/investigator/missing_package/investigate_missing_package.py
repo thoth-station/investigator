@@ -30,9 +30,9 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 from thoth.messaging import MissingPackageMessage
 
 
+@register_handler(MissingPackageMessage().topic_name, ["v1"])
 @count_exceptions(missing_package_exceptions)
 @track_inprogress(missing_package_in_progress)
-@register_handler(MissingPackageMessage().topic_name, ["v1"])
 async def parse_missing_package(package: Dict[str, Any], **kwargs):
     """Process a missing package message from package-update producer."""
     # TODO call kebechet with the missing package name, which would call kebechet on the individual

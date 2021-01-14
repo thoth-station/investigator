@@ -33,9 +33,9 @@ from .metrics_package_released import package_released_success
 from prometheus_async.aio import track_inprogress, count_exceptions
 
 
+@register_handler(PackageReleasedMessage().topic_name, ["v1"])
 @count_exceptions(package_released_exceptions)
 @track_inprogress(package_released_in_progress)
-@register_handler(PackageReleasedMessage().topic_name, ["v1"])
 async def parse_package_released_message(
     package_released: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs
 ) -> None:

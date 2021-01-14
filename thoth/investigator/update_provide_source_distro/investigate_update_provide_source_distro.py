@@ -33,9 +33,9 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
+@register_handler(UpdateProvidesSourceDistroMessage().topic_name, ["v1"])
 @count_exceptions(update_provide_source_distro_exceptions)
 @track_inprogress(update_provide_source_distro_in_progress)
-@register_handler(UpdateProvidesSourceDistroMessage().topic_name, ["v1"])
 async def parse_update_provide_source_distro_message(
     update_provide_source_distro: Dict[str, Any], graph: GraphDatabase, **kwargs
 ):
