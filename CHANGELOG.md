@@ -330,3 +330,11 @@ all the things that you see...
 ## Release 0.8.1 (2021-01-13T18:21:03)
 ### Features
 * analsysis->analysis (#410)
+
+## Release 0.8.2 (2021-01-14T11:26:47)
+### Features
+* :arrow_up: Automatic update of dependencies by kebechet. (#415)
+* remove message contents (link instead) (#409)
+* :arrow_up: Automatic update of dependencies by kebechet. (#413)
+### Improvements
+* Update dependencies to have more recent thoth-common (#418)
