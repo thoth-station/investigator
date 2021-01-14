@@ -34,9 +34,9 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
+@register_handler(KebechetTriggerMessage().topic_name, ["v1"])
 @count_exceptions(kebechet_trigger_exceptions)
 @track_inprogress(kebechet_trigger_in_progress)
-@register_handler(KebechetTriggerMessage().topic_name, ["v1"])
 async def parse_kebechet_trigger_message(kebechet_trigger: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:
     """Parse kebechet_trigger message."""
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)

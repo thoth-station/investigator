@@ -38,9 +38,9 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
+@register_handler(SIUnanalyzedPackageMessage().topic_name, ["v1"])
 @count_exceptions(si_unanalyzed_package_exceptions)
 @track_inprogress(si_unanalyzed_package_in_progress)
-@register_handler(SIUnanalyzedPackageMessage().topic_name, ["v1"])
 async def parse_si_unanalyzed_package_message(
     si_unanalyzed_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs
 ) -> None:

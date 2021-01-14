@@ -35,9 +35,9 @@ from thoth.storages import GraphDatabase
 _LOGGER = logging.getLogger(__name__)
 
 
+@register_handler(HashMismatchMessage().topic_name, ["v1"])
 @count_exceptions(hash_mismatch_exceptions)
 @track_inprogress(hash_mismatch_in_progress)
-@register_handler(HashMismatchMessage().topic_name, ["v1"])
 async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs):
     """Process a hash mismatch message from package-update producer."""
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER:

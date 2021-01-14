@@ -34,9 +34,9 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
+@register_handler(ProvenanceCheckerTriggerMessage().topic_name, ["v1"])
 @count_exceptions(provenance_checker_trigger_exceptions)
 @track_inprogress(provenance_checker_trigger_in_progress)
-@register_handler(ProvenanceCheckerTriggerMessage().topic_name, ["v1"])
 async def parse_provenance_checker_trigger_message(
     provenance_checker_trigger: Dict[str, Any], openshift: OpenShift, **kwargs
 ) -> None:

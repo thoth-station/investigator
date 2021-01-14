@@ -35,9 +35,9 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
+@register_handler(UnrevsolvedPackageMessage().topic_name, ["v1"])
 @count_exceptions(unrevsolved_package_exceptions)
 @track_inprogress(unrevsolved_package_in_progress)
-@register_handler(UnrevsolvedPackageMessage().topic_name, ["v1"])
 async def parse_revsolved_package_message(unrevsolved_package: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:
     """Parse soolved package message."""
     package_name = unrevsolved_package["package_name"]

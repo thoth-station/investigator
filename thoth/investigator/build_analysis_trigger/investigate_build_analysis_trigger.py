@@ -34,9 +34,9 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
+@register_handler(BuildAnalysisTriggerMessage().topic_name, ["v1"])
 @count_exceptions(build_analysis_trigger_exceptions)
 @track_inprogress(build_analysis_trigger_in_progress)
-@register_handler(BuildAnalysisTriggerMessage().topic_name, ["v1"])
 async def parse_build_analysis_trigger_message(
     build_analysis_trigger: Dict[str, Any], openshift: OpenShift, **kwargs
 ) -> None:
