@@ -170,8 +170,8 @@ async def _worker(q: asyncio.Queue):
             try:
                 await func(contents, openshift=openshift, graph=graph)
                 c.commit(message=msg)
-            except Exception as e:
-                _LOGGER.warn(e)
+                break
+            except Exception:
                 await asyncio.sleep(Configuration.BACKOFF * i)  # linear backoff strategy
         else:
             # message has exceeded maximum number of retries
@@ -189,9 +189,8 @@ async def _worker(q: asyncio.Queue):
                         c.pause([partition])
                         paused_partitions.append(partition)
 
-                # c.unsubscribe(msg.topic())
                 paused_topics.labels(base_topic_name=message_class.base_name).set(
-                    0
+                    1
                 )  # TODO: add alert trigger when message is unsubscribed from
         await asyncio.sleep(0)  # allow another coroutine to take control
 
@@ -237,7 +236,7 @@ if __name__ == "__main__":
     sleep(1.0)
     loop = asyncio.get_event_loop()
     c = consumer.create_consumer()
-    queue = asyncio.Queue(maxsize=10, loop=loop)  # type: asyncio.Queue
+    queue = asyncio.Queue(maxsize=Configuration.NUM_WORKERS, loop=loop)  # type: asyncio.Queue
 
     tasks = []
     tasks.append(_confluent_consumer_loop(q=queue))
