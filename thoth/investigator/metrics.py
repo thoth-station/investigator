@@ -72,3 +72,10 @@ paused_topics = Gauge(
     labelnames=["base_topic_name"],
     registry=registry,
 )
+
+schema_revision_metric = Gauge(
+    "thoth_database_schema_revision_script",
+    "Thoth database schema revision from script",
+    ["component", "revision"],
+    registry=registry,
+)

@@ -38,7 +38,8 @@ from thoth.investigator import __service_version__
 from thoth.investigator.configuration import Configuration
 
 from thoth.investigator.common import handler_table
-from thoth.investigator.metrics import registry, failures, paused_topics
+from thoth.investigator.metrics import registry
+from thoth.investigator.metrics import failures, paused_topics, schema_revision_metric
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -90,6 +91,8 @@ _LOGGER.info("Schedule Unanalyzed SI Messages set to - %r", Configuration.THOTH_
 
 openshift = OpenShift()
 graph = GraphDatabase()
+
+schema_revision_metric.labels("investigator", graph.get_script_alembic_version_head()).set(1)
 
 graph.connect()
 
