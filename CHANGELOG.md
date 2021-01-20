@@ -338,3 +338,12 @@ all the things that you see...
 * :arrow_up: Automatic update of dependencies by kebechet. (#413)
 ### Improvements
 * Update dependencies to have more recent thoth-common (#418)
+
+## Release 0.9.0 (2021-01-20T20:18:11)
+### Features
+* Add metric schema (#428)
+* :arrow_up: Automatic update of dependencies by kebechet. (#427)
+* :arrow_up: Automatic update of dependencies by kebechet. (#423)
+* decs are applied inside-out (#424)
+### Bug Fixes
+* retry on exceptions and other error handling (#389)
