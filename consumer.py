@@ -92,7 +92,9 @@ _LOGGER.info("Schedule Unanalyzed SI Messages set to - %r", Configuration.THOTH_
 openshift = OpenShift()
 graph = GraphDatabase()
 
-schema_revision_metric.labels("investigator", graph.get_script_alembic_version_head()).set(1)
+schema_revision_metric.labels(
+    "investigator", graph.get_script_alembic_version_head(), Configuration.DEPLOYMENT_NAME
+).set(1)
 
 graph.connect()
 

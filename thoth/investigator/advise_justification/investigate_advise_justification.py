@@ -18,8 +18,9 @@
 """Expose metrics about advise justification."""
 
 import logging
-import os
 from typing import Dict, Any
+
+from thoth.investigator.configuration import Configuration
 
 from .metrics_advise_justification import advise_justification_exceptions
 from .metrics_advise_justification import advise_justification_success
@@ -33,8 +34,6 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
-DEPLOYMENT_NAME = os.environ["THOTH_DEPLOYMENT_NAME"]
-
 
 @register_handler(AdviseJustificationMessage().topic_name, ["v1"])
 @count_exceptions(advise_justification_exceptions)
@@ -44,7 +43,7 @@ async def expose_advise_justification_metrics(advise_justification: Dict[str, An
     advise_justification_type_number.labels(
         advise_message=advise_justification["message"],
         justification_type=advise_justification["justification_type"],
-        thoth_environment=DEPLOYMENT_NAME,
+        thoth_environment=Configuration.DEPLOYMENT_NAME,
     ).inc(advise_justification["count"])
     _LOGGER.info(
         "advise_justification_type_number(%r, %r)=%r",
