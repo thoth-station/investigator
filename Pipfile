@@ -11,7 +11,7 @@ thoth-sourcemanagement = "*"
 prometheus-async = "*"
 confluent-kafka = "*"
 thoth-common = "*"
-thoth-messaging = ">=0.8"
+thoth-messaging = ">=0.10.3"
 
 [dev-packages]
 pytest = "*"
