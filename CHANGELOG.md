@@ -347,3 +347,8 @@ all the things that you see...
 * decs are applied inside-out (#424)
 ### Bug Fixes
 * retry on exceptions and other error handling (#389)
+
+## Release 0.9.1 (2021-01-26T09:49:05)
+### Features
+* Standardize metrics for revision check (#434)
+* :arrow_up: Automatic update of dependencies by kebechet. (#436)
