@@ -352,3 +352,12 @@ all the things that you see...
 ### Features
 * Standardize metrics for revision check (#434)
 * :arrow_up: Automatic update of dependencies by kebechet. (#436)
+
+## Release 0.9.2 (2021-02-20T07:09:39)
+### Features
+* :arrow_up: Automatic update of dependencies by Kebechet (#446)
+* add handler for inspection complete messages (#433)
+* :arrow_up: Automatic update of dependencies by Kebechet (#444)
+* :arrow_up: Automatic update of dependencies by Kebechet (#443)
+* Add missing title to Kebechet template
+* :arrow_up: Automatic update of dependencies by Kebechet (#440)
