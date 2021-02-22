@@ -61,10 +61,10 @@
         },
         "alembic": {
             "hashes": [
-                "sha256:e871118b6174681f7e9a9ea67cfcae954c6d18e05b49c6b17f662d2530c76bf5"
+                "sha256:df0028c19275a2cff137e39617a39cdcdbd1173733b87b6bfa257b7c0860213b"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'",
-            "version": "==1.5.4"
+            "version": "==1.5.5"
         },
         "amun": {
             "hashes": [
@@ -225,11 +225,16 @@
         },
         "cryptography": {
             "hashes": [
+                "sha256:066bc53f052dfeda2f2d7c195cf16fb3e5ff13e1b6b7415b468514b40b381a5b",
+                "sha256:0923ba600d00718d63a3976f23cab19aef10c1765038945628cd9be047ad0336",
                 "sha256:2d32223e5b0ee02943f32b19245b61a62db83a882f0e76cc564e1cec60d48f87",
+                "sha256:4169a27b818de4a1860720108b55a2801f32b6ae79e7f99c00d79f2a2822eeb7",
                 "sha256:57ad77d32917bc55299b16d3b996ffa42a1c73c6cfa829b14043c561288d2799",
                 "sha256:5ecf2bcb34d17415e89b546dbb44e73080f747e504273e4d4987630493cded1b",
+                "sha256:600cf9bfe75e96d965509a4c0b2b183f74a4fa6f5331dcb40fb7b77b7c2484df",
                 "sha256:66b57a9ca4b3221d51b237094b0303843b914b7d5afd4349970bb26518e350b0",
                 "sha256:93cfe5b7ff006de13e1e89830810ecbd014791b042cbe5eec253be11ac2b28f3",
+                "sha256:9e98b452132963678e3ac6c73f7010fe53adf72209a32854d55690acac3f6724",
                 "sha256:df186fcbf86dc1ce56305becb8434e4b6b7504bc724b71ad7a3239e0c9d14ef2",
                 "sha256:fec7fb46b10da10d9e1d078d1ff8ed9e05ae14f431fdbd11145edd0550b9a964"
             ],
@@ -914,11 +919,10 @@
         },
         "thoth-common": {
             "hashes": [
-                "sha256:433d72fc435759816c0015457d4ac8d629982ffbc62612bea47645ff2f41ef01",
-                "sha256:5fd72f2b570c9638d12f8243e0e5b81e145bc3a6ec1113227a816fa27512dc34"
+                "sha256:74d4fd18fd7b421e9384b548c5f024e8166f84230dfe5ef86ee869241d23bd94"
             ],
             "index": "pypi",
-            "version": "==0.23.0"
+            "version": "==0.24.0"
         },
         "thoth-messaging": {
             "hashes": [
@@ -930,11 +934,10 @@
         },
         "thoth-python": {
             "hashes": [
-                "sha256:51608c7507a96c889bfac765e7b03fb8d57ffcafefb32760186116de410f90ad",
-                "sha256:e1e5aa9eea50a61bcabdf8af44709bea0ae045b702537d9fee2f7cb2cc9d5d06"
+                "sha256:ed19a4d6ee43f0f7b2ec4cb7595bc3e617554f2a95c0e7c1b9b497b14e98581b"
             ],
             "index": "pypi",
-            "version": "==0.14.0"
+            "version": "==0.15.0"
         },
         "thoth-sourcemanagement": {
             "hashes": [
@@ -1160,11 +1163,11 @@
         },
         "hypothesis": {
             "hashes": [
-                "sha256:32c1706ee12a493befb5192e91a74b355fc2d6b70ce89e21c5b54e24713fc821",
-                "sha256:c16fbde26b65c98a2464c48209b066c2f6dab5e8e38acd9d959021eb8d58b6c0"
+                "sha256:3458e095724535179a1f8362f3498fd59e16bd1d22ea6d1ab190ca3103567f70",
+                "sha256:9340fd2d183b3f092b47f5a593d88ca6ed7bf3b635ff08c0dd404645d52ff5a8"
             ],
             "index": "pypi",
-            "version": "==6.2.0"
+            "version": "==6.3.0"
         },
         "hypothesis-auto": {
             "hashes": [
@@ -1176,11 +1179,11 @@
         },
         "identify": {
             "hashes": [
-                "sha256:70b638cf4743f33042bebb3b51e25261a0a10e80f978739f17e7fd4837664a66",
-                "sha256:9dfb63a2e871b807e3ba62f029813552a24b5289504f5b071dea9b041aee9fe4"
+                "sha256:de7129142a5c86d75a52b96f394d94d96d497881d2aaf8eafe320cdbe8ac4bcc",
+                "sha256:e0dae57c0397629ce13c289f6ddde0204edf518f557bfdb1e56474aa143e77c3"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==1.5.13"
+            "version": "==1.5.14"
         },
         "iniconfig": {
             "hashes": [
