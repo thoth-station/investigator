@@ -361,3 +361,10 @@ all the things that you see...
 * :arrow_up: Automatic update of dependencies by Kebechet (#443)
 * Add missing title to Kebechet template
 * :arrow_up: Automatic update of dependencies by Kebechet (#440)
+
+## Release 0.10.0 (2021-02-25T20:20:34)
+### Features
+* Manual dependency update (#457)
+* Bump adviser re-run and provenance-checker message versions
+### Bug Fixes
+* Do not pass arguments that are prepared in adviser container
