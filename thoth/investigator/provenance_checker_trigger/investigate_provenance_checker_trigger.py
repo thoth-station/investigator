@@ -34,7 +34,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(ProvenanceCheckerTriggerMessage().topic_name, ["v1"])
+@register_handler(ProvenanceCheckerTriggerMessage().topic_name, ["v2"])
 @count_exceptions(provenance_checker_trigger_exceptions)
 @track_inprogress(provenance_checker_trigger_in_progress)
 async def parse_provenance_checker_trigger_message(
@@ -43,7 +43,6 @@ async def parse_provenance_checker_trigger_message(
     """Parse provenance_checker_trigger message."""
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
     workflow_name = openshift.schedule_provenance_checker(
-        application_stack=provenance_checker_trigger["application_stack"],
         origin=provenance_checker_trigger["origin"],
         whitelisted_sources=provenance_checker_trigger["whitelisted_sources"],
         debug=provenance_checker_trigger["debug"],

@@ -35,7 +35,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(AdviserReRunMessage().topic_name, ["v1"])
+@register_handler(AdviserReRunMessage().topic_name, ["v2"])
 @count_exceptions(adviser_re_run_exceptions)
 @track_inprogress(adviser_re_run_in_progress)
 async def parse_adviser_re_run_message(adviser_re_run: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:
@@ -52,9 +52,7 @@ async def parse_adviser_re_run_message(adviser_re_run: Dict[str, Any], openshift
 async def _re_schedule_adviser(openshift: OpenShift, parameters: Dict[str, Any]) -> int:
     """Re-Schedule Adviser."""
     re_run_adviser_id = parameters["adviser_id"]
-    application_stack = parameters["application_stack"]
     recommendation_type = parameters["recommendation_type"]
-    runtime_environment = parameters["runtime_environment"]
     origin = parameters["origin"]
     github_event_type = parameters["github_event_type"]
     github_check_run_id = parameters["github_check_run_id"]
@@ -65,9 +63,7 @@ async def _re_schedule_adviser(openshift: OpenShift, parameters: Dict[str, Any])
     try:
         await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
         analysis_id = openshift.schedule_adviser(
-            application_stack=application_stack,
             recommendation_type=recommendation_type,
-            runtime_environment=runtime_environment,
             origin=origin,
             github_event_type=github_event_type,
             github_check_run_id=github_check_run_id,
