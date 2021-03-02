@@ -79,3 +79,13 @@ schema_revision_metric = Gauge(
     ["component", "revision", "env"],
     registry=registry,
 )
+
+
+# Message Metrics
+
+message_version_metric = Counter(
+    "message_count_by_version",
+    "Number of messages encountered by message version.",
+    ["message_type", "message_version"],
+    registry=registry,
+)

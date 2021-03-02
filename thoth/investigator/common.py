@@ -21,6 +21,7 @@
 import logging
 from math import inf
 from asyncio import sleep
+import json
 
 from typing import List, Tuple, Optional, Callable
 
@@ -29,6 +30,7 @@ from thoth.storages import GraphDatabase
 from thoth.messaging import ALL_MESSAGES
 
 from .configuration import Configuration
+from .metrics import message_version_metric
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,10 +42,29 @@ def _create_base_handler_table():
     return table
 
 
-handler_table = _create_base_handler_table()
+def _get_class_from_topic_name(topic_name):
+    for i in ALL_MESSAGES:
+        if i().topic_name == topic_name:
+            return i
 
 
-def register_handler(topic_name: str, version_strings: List[str]):
+def _get_class_from_base_name(base_name):
+    for i in ALL_MESSAGES:
+        if i.base_name == base_name:
+            return i
+
+
+def _message_type_from_message_class(message_class):
+    message_type = message_class.base_name.rsplit(".", maxsplit=1)[-1]  # type: str
+    message_type = message_type.replace("-", "_")  # this is to match the metrics associate with processing
+    return message_type
+
+
+investigator_handler_table = _create_base_handler_table()
+metrics_handler_table = _create_base_handler_table()
+
+
+def register_handler(topic_name: str, version_strings: List[str], handler_table: dict = investigator_handler_table):
     """Register function to specific message versions."""
 
     def wrapper_func(func: Callable):
@@ -57,6 +78,15 @@ def register_handler(topic_name: str, version_strings: List[str]):
         return innner_func
 
     return wrapper_func
+
+
+def default_metric_handler(msg, **kwargs):
+    """Increments counter specific to message type and version that was encountered."""
+    metric = message_version_metric.labels(
+        message_type=_message_type_from_message_class(_get_class_from_topic_name(msg.topic_name)),
+        message_version=json.loads(msg.value().decode("utf-8")).get("version", "None"),
+    )
+    metric.inc()
 
 
 async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
