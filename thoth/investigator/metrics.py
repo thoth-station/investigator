@@ -73,6 +73,13 @@ paused_topics = Gauge(
     registry=registry,
 )
 
+missing_handler = Gauge(
+    "thoth_investigator_missing_handler",
+    "Boolean gauge which gets set when a message version is encountered that doesn't have a registered handler.",
+    labelnames=["base_topic_name", "message_version"],
+    registry=registry,
+)
+
 schema_revision_metric = Gauge(
     "thoth_database_schema_revision_script",
     "Thoth database schema revision from script",

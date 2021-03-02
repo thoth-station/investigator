@@ -39,7 +39,7 @@ from thoth.investigator.configuration import Configuration
 
 from thoth.investigator.common import handler_table
 from thoth.investigator.metrics import registry
-from thoth.investigator.metrics import failures, paused_topics, schema_revision_metric
+from thoth.investigator.metrics import failures, paused_topics, schema_revision_metric, missing_handler
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -231,6 +231,8 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
                     func = _handler_lookup(msg.topic(), v)
                 except KeyError:
                     _LOGGER.warn("No handler for version %s of %s", v, _get_class_from_topic_name(msg.topic_name()))
+                    message_class = _get_class_from_topic_name(msg.topic())
+                    missing_handler.labels(base_topic_name=message_class.base_name, message_version=v).set(1)
                     _message_failed(msg)
                 await q.put((func, msg))
             await asyncio.sleep(0)
