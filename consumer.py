@@ -130,6 +130,24 @@ def _set_paused_to_zero():
         paused_topics.labels(i.base_name).set(0)
 
 
+def _message_failed(msg):
+    global c
+    message_class = _get_class_from_topic_name(msg.topic())
+    if Configuration.ACK_ON_FAIL:
+        message_type = message_class.base_name.rsplit(".", maxsplit=1)[-1]  # type: str
+        message_type = message_type.replace("-", "_")  # this is to match the metrics associate with processing
+        failures.labels(message_type=message_type).inc()
+        c.commit(message=msg)
+    else:
+        # pause consumption of a topic
+        for partition in c.assignment():
+            if partition.topic == message_class().topic_name:
+                c.pause([partition])
+                paused_partitions.append(partition)
+
+        paused_topics.labels(base_topic_name=message_class.base_name).set(1)
+
+
 @routes.get("/metrics")
 async def get_metrics(request):
     """Display prometheus metrics."""
@@ -184,22 +202,7 @@ async def _worker(q: asyncio.Queue):
         else:
             # message has exceeded maximum number of retries
             # FAILURE logic
-            message_class = _get_class_from_topic_name(msg.topic())
-            if Configuration.ACK_ON_FAIL:
-                message_type = message_class.base_name.rsplit(".", maxsplit=1)[-1]  # type: str
-                message_type = message_type.replace("-", "_")  # this is to match the metrics associate with processing
-                failures.labels(message_type=message_type).inc()
-                c.commit(message=msg)
-            else:
-                # pause consumption of a topic
-                for partition in c.assignment():
-                    if partition.topic == message_class().topic_name:
-                        c.pause([partition])
-                        paused_partitions.append(partition)
-
-                paused_topics.labels(base_topic_name=message_class.base_name).set(
-                    1
-                )  # TODO: add alert trigger when message is unsubscribed from
+            _message_failed(msg)
         await asyncio.sleep(0)  # allow another coroutine to take control
 
 
@@ -224,7 +227,11 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
             else:
                 contents = json.loads(msg.value().decode("utf-8"))  # type: dict
                 v = contents.get("version", "v1")
-                func = _handler_lookup(msg.topic(), v)
+                try:
+                    func = _handler_lookup(msg.topic(), v)
+                except KeyError:
+                    _LOGGER.warn("No handler for version %s of %s", v, _get_class_from_topic_name(msg.topic_name()))
+                    _message_failed(msg)
                 await q.put((func, msg))
             await asyncio.sleep(0)
     finally:
