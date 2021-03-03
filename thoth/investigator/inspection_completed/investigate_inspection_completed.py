@@ -23,7 +23,7 @@ from typing import Dict, Any
 from .metrics_inspection_completed import inspection_completed_exceptions
 from .metrics_inspection_completed import inspection_completed_in_progress
 from .metrics_inspection_completed import inspection_completed_success
-from ..common import register_handler, wait_for_limit, investigator_handler_table
+from ..common import register_handler, wait_for_limit
 
 from thoth.common import OpenShift
 

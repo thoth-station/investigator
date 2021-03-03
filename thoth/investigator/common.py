@@ -80,10 +80,10 @@ def register_handler(topic_name: str, version_strings: List[str], handler_table:
     return wrapper_func
 
 
-def default_metric_handler(msg, **kwargs):
+async def default_metric_handler(contents, msg, **kwargs):
     """Increments counter specific to message type and version that was encountered."""
     metric = message_version_metric.labels(
-        message_type=_message_type_from_message_class(_get_class_from_topic_name(msg.topic_name)),
+        message_type=_message_type_from_message_class(_get_class_from_topic_name(msg.topic())),
         message_version=json.loads(msg.value().decode("utf-8")).get("version", "None"),
     )
     metric.inc()

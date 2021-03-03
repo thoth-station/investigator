@@ -43,10 +43,9 @@ from thoth.investigator.common import (
     default_metric_handler,
     _get_class_from_topic_name,
     _get_class_from_base_name,
-    _message_type_from_message_class,
 )
 from thoth.investigator.metrics import registry
-from thoth.investigator.metrics import failures, paused_topics, schema_revision_metric
+from thoth.investigator.metrics import failures, paused_topics, schema_revision_metric, missing_handler
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -129,6 +128,24 @@ def _set_paused_to_zero():
         paused_topics.labels(i.base_name).set(0)
 
 
+def _message_failed(msg):
+    global c
+    message_class = _get_class_from_topic_name(msg.topic())
+    if Configuration.ACK_ON_FAIL:
+        message_type = message_class.base_name.rsplit(".", maxsplit=1)[-1]  # type: str
+        message_type = message_type.replace("-", "_")  # this is to match the metrics associate with processing
+        failures.labels(message_type=message_type).inc()
+        c.commit(message=msg)
+    else:
+        # pause consumption of a topic
+        for partition in c.assignment():
+            if partition.topic == message_class().topic_name:
+                c.pause([partition])
+                paused_partitions.append(partition)
+
+        paused_topics.labels(base_topic_name=message_class.base_name).set(1)
+
+
 @routes.get("/metrics")
 async def get_metrics(request):
     """Display prometheus metrics."""
@@ -175,29 +192,16 @@ async def _worker(q: asyncio.Queue):
         contents = json.loads(msg.value().decode("utf-8"))
         for i in range(0, Configuration.MAX_RETRIES):
             try:
-                await func(contents, openshift=openshift, graph=graph)
+                await func(contents, openshift=openshift, graph=graph, msg=msg)
                 c.commit(message=msg)
                 break
-            except Exception:
+            except Exception as e:
+                _LOGGER.warning(e)
                 await asyncio.sleep(Configuration.BACKOFF * i)  # linear backoff strategy
         else:
             # message has exceeded maximum number of retries
             # FAILURE logic
-            message_class = _get_class_from_topic_name(msg.topic())
-            if Configuration.ACK_ON_FAIL:
-                message_type = _message_type_from_message_class(message_class)
-                failures.labels(message_type=message_type).inc()
-                c.commit(message=msg)
-            else:
-                # pause consumption of a topic
-                for partition in c.assignment():
-                    if partition.topic == message_class().topic_name:
-                        c.pause([partition])
-                        paused_partitions.append(partition)
-
-                paused_topics.labels(base_topic_name=message_class.base_name).set(
-                    1
-                )  # TODO: add alert trigger when message is unsubscribed from
+            _message_failed(msg)
         await asyncio.sleep(0)  # allow another coroutine to take control
 
 
@@ -227,9 +231,22 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
                 # Choose which handler table to use based on env variables #
                 ############################################################
                 if ConsumerModeEnum[Configuration.CONSUMER_MODE] == ConsumerModeEnum.investigator:
-                    func = _handler_lookup(msg.topic(), v)
+                    try:
+                        func = _handler_lookup(msg.topic(), v)
+                    except KeyError:
+                        _LOGGER.warning(
+                            "No handler for version %s of %s", v, _get_class_from_topic_name(msg.topic_name())
+                        )
+                        message_class = _get_class_from_topic_name(msg.topic())
+                        missing_handler.labels(base_topic_name=message_class.base_name, message_version=v).set(1)
+                        _message_failed(msg)
                 elif ConsumerModeEnum[Configuration.CONSUMER_MODE] == ConsumerModeEnum.metrics:
-                    func = _handler_lookup(msg.topic(), v, table=metrics_handler_table, default=default_metric_handler)
+                    try:
+                        func = _handler_lookup(
+                            msg.topic(), v, table=metrics_handler_table, default=default_metric_handler
+                        )
+                    except KeyError:
+                        _LOGGER.warning("Could not find entry in metrics handler table for %s.", msg.topic_name())
                 #############################################################
 
                 await q.put((func, msg))
