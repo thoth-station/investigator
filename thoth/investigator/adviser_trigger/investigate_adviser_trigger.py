@@ -34,7 +34,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(AdviserTriggerMessage().topic_name, ["v2"])
+@register_handler(AdviserTriggerMessage().topic_name, ["v2", "v3"])
 @count_exceptions(adviser_trigger_exceptions)
 @track_inprogress(adviser_trigger_in_progress)
 async def parse_adviser_trigger_message(adviser_trigger: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:
@@ -54,6 +54,9 @@ async def parse_adviser_trigger_message(adviser_trigger: Dict[str, Any], openshi
         github_base_repo_url=adviser_trigger["github_base_repo_url"],
         re_run_adviser_id=adviser_trigger["re_run_adviser_id"],
         source_type=adviser_trigger["source_type"],
+        kebechet_metadata=adviser_trigger.get("kebechet_metadata", None),
+        justification=adviser_trigger.get("justification", None),
+        stack_info=adviser_trigger.get("stack_info", None),
     )
     _LOGGER.debug(f"Scheduled adviser workflow {workflow_id}")
     adviser_trigger_success.inc()

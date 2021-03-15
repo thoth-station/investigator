@@ -34,7 +34,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(ProvenanceCheckerTriggerMessage().topic_name, ["v2"])
+@register_handler(ProvenanceCheckerTriggerMessage().topic_name, ["v2", "v3"])
 @count_exceptions(provenance_checker_trigger_exceptions)
 @track_inprogress(provenance_checker_trigger_in_progress)
 async def parse_provenance_checker_trigger_message(
@@ -47,6 +47,9 @@ async def parse_provenance_checker_trigger_message(
         whitelisted_sources=provenance_checker_trigger["whitelisted_sources"],
         debug=provenance_checker_trigger["debug"],
         job_id=provenance_checker_trigger["job_id"],
+        kebechet_metadata=provenance_checker_trigger.get("kebechet_metadata", None),
+        justification=provenance_checker_trigger.get("justification", None),
+        stack_info=provenance_checker_trigger.get("stack_info", None),
     )
     _LOGGER.debug(f"Scheduled provenance checker workflow {workflow_name}")
     provenance_checker_trigger_success.inc()
