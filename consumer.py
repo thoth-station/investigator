@@ -35,9 +35,15 @@ import thoth.messaging.admin_client as admin
 from thoth.messaging import ALL_MESSAGES
 
 from thoth.investigator import __service_version__
-from thoth.investigator.configuration import Configuration
+from thoth.investigator.configuration import Configuration, ConsumerModeEnum
 
-from thoth.investigator.common import handler_table
+from thoth.investigator.common import (
+    investigator_handler_table,
+    metrics_handler_table,
+    default_metric_handler,
+    _get_class_from_topic_name,
+    _get_class_from_base_name,
+)
 from thoth.investigator.metrics import registry
 from thoth.investigator.metrics import failures, paused_topics, schema_revision_metric, missing_handler
 
@@ -109,20 +115,12 @@ paused_partitions = []  # type: List[TopicPartition]
 c = None  # type: Optional[Consumer]
 
 
-def _handler_lookup(topic_name, version):
-    return handler_table[topic_name][version]
-
-
-def _get_class_from_topic_name(topic_name):
-    for i in ALL_MESSAGES:
-        if i().topic_name == topic_name:
-            return i
-
-
-def _get_class_from_base_name(base_name):
-    for i in ALL_MESSAGES:
-        if i.base_name == base_name:
-            return i
+def _handler_lookup(topic_name, version, table=investigator_handler_table, default=None):
+    if default is None:
+        return table[topic_name][version]
+    else:
+        # throws KeyError if topic name is not in handler table even when `default` is set
+        return table[topic_name].get(version, default)
 
 
 def _set_paused_to_zero():
@@ -194,10 +192,11 @@ async def _worker(q: asyncio.Queue):
         contents = json.loads(msg.value().decode("utf-8"))
         for i in range(0, Configuration.MAX_RETRIES):
             try:
-                await func(contents, openshift=openshift, graph=graph)
+                await func(contents, openshift=openshift, graph=graph, msg=msg)
                 c.commit(message=msg)
                 break
-            except Exception:
+            except Exception as e:
+                _LOGGER.warning(e)
                 await asyncio.sleep(Configuration.BACKOFF * i)  # linear backoff strategy
         else:
             # message has exceeded maximum number of retries
@@ -227,13 +226,29 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
             else:
                 contents = json.loads(msg.value().decode("utf-8"))  # type: dict
                 v = contents.get("version", "v1")
-                try:
-                    func = _handler_lookup(msg.topic(), v)
-                except KeyError:
-                    _LOGGER.warn("No handler for version %s of %s", v, _get_class_from_topic_name(msg.topic_name()))
-                    message_class = _get_class_from_topic_name(msg.topic())
-                    missing_handler.labels(base_topic_name=message_class.base_name, message_version=v).set(1)
-                    _message_failed(msg)
+
+                ############################################################
+                # Choose which handler table to use based on env variables #
+                ############################################################
+                if ConsumerModeEnum[Configuration.CONSUMER_MODE] == ConsumerModeEnum.investigator:
+                    try:
+                        func = _handler_lookup(msg.topic(), v)
+                    except KeyError:
+                        _LOGGER.warning(
+                            "No handler for version %s of %s", v, _get_class_from_topic_name(msg.topic_name())
+                        )
+                        message_class = _get_class_from_topic_name(msg.topic())
+                        missing_handler.labels(base_topic_name=message_class.base_name, message_version=v).set(1)
+                        _message_failed(msg)
+                elif ConsumerModeEnum[Configuration.CONSUMER_MODE] == ConsumerModeEnum.metrics:
+                    try:
+                        func = _handler_lookup(
+                            msg.topic(), v, table=metrics_handler_table, default=default_metric_handler
+                        )
+                    except KeyError:
+                        _LOGGER.warning("Could not find entry in metrics handler table for %s.", msg.topic_name())
+                #############################################################
+
                 await q.put((func, msg))
             await asyncio.sleep(0)
     finally:

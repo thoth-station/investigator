@@ -21,8 +21,16 @@
 
 import logging
 import os
+from enum import Enum, auto
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class ConsumerModeEnum(Enum):
+    """Class representing the different modes the consumer can use which correspond to different handler tables."""
+
+    investigator = auto()
+    metrics = auto()
 
 
 class Configuration:
@@ -52,3 +60,4 @@ class Configuration:
     BACKOFF = float(os.getenv("THOTH_INVESTIGATOR_BACKOFF", 0.5))  # Linear backoff strategy
     ACK_ON_FAIL = bool(int(os.getenv("THOTH_INVESTIGATOR_ACK_ON_FAIL", 0)))
     NUM_WORKERS = int(os.getenv("THOTH_CONSUMER_WORKERS", 5))
+    CONSUMER_MODE = os.getenv("THOTH_CONSUMER_MODE", "investigator")
