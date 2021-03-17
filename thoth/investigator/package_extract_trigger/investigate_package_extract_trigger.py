@@ -34,7 +34,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(PackageExtractTriggerMessage().topic_name, ["v1"])
+@register_handler(PackageExtractTriggerMessage().topic_name, ["v1", "v2"])
 @count_exceptions(package_extract_trigger_exceptions)
 @track_inprogress(package_extract_trigger_in_progress)
 async def parse_package_extract_trigger_message(
@@ -52,6 +52,7 @@ async def parse_package_extract_trigger_message(
         verify_tls=package_extract_trigger["verify_tls"],
         debug=package_extract_trigger["debug"],
         job_id=package_extract_trigger["job_id"],
+        graph_sync=package_extract_trigger.get("graph_sync", False),
     )
     _LOGGER.debug(f"Scheduled package extract workflow {workflow_name}")
     package_extract_trigger_success.inc()

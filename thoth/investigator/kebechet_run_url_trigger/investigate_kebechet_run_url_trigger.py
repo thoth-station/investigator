@@ -34,7 +34,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(KebechetRunUrlTriggerMessage().topic_name, ["v1"])
+@register_handler(KebechetRunUrlTriggerMessage().topic_name, ["v1", "v2"])
 @count_exceptions(kebechet_run_url_trigger_exceptions)
 @track_inprogress(kebechet_run_url_trigger_in_progress)
 async def parse_kebechet_run_url_trigger_message(
@@ -46,6 +46,7 @@ async def parse_kebechet_run_url_trigger_message(
         repo_url=kebechet_run_url_trigger["url"],
         service_name=kebechet_run_url_trigger["service_name"],
         job_id=kebechet_run_url_trigger["job_id"],
+        kebechet_metadata=kebechet_run_url_trigger.get("kebechet_metadata", None),
     )
     _LOGGER.debug(f"Scheduled kebechet run url workflow {workflow_name}")
     kebechet_run_url_trigger_success.inc()
