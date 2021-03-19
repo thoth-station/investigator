@@ -12,7 +12,6 @@ prometheus-async = "*"
 confluent-kafka = "*"
 thoth-common = "*"
 thoth-messaging = ">=0.11.2"
-openshift = "==0.11.2"
 
 [dev-packages]
 pytest = "*"
