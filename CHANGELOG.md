@@ -368,3 +368,14 @@ all the things that you see...
 * Bump adviser re-run and provenance-checker message versions
 ### Bug Fixes
 * Do not pass arguments that are prepared in adviser container
+
+## Release 0.10.1 (2021-03-21T18:55:29)
+### Features
+* :arrow_up: Automatic update of dependencies by Kebechet (#473)
+* relock the dependencies (#471)
+* add new args to function call (#469)
+* :arrow_up: Automatic update of dependencies by Kebechet (#461)
+* :arrow_up: update pre-commit plugins, CI related configs (#466)
+* if handler hasn't been registered treat it the same as messagea excep… (#465)
+### Other
+* Add code for switching modes (handler functions) in investigator (#467)
