@@ -47,6 +47,9 @@ async def parse_provenance_checker_trigger_message(
         whitelisted_sources=provenance_checker_trigger["whitelisted_sources"],
         debug=provenance_checker_trigger["debug"],
         job_id=provenance_checker_trigger["job_id"],
+        kebechet_metadata=provenance_checker_trigger.get("kebechet_metadata"),
+        stack_info=provenance_checker_trigger.get("stack_info"),
+        justification=provenance_checker_trigger.get("justification"),
     )
     _LOGGER.debug(f"Scheduled provenance checker workflow {workflow_name}")
     provenance_checker_trigger_success.inc()
