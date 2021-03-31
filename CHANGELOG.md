@@ -379,3 +379,9 @@ all the things that you see...
 * if handler hasn't been registered treat it the same as messagea excep… (#465)
 ### Other
 * Add code for switching modes (handler functions) in investigator (#467)
+
+## Release 0.11.0 (2021-03-31T21:09:00)
+### Features
+* :arrow_up: Automatic update of dependencies by Kebechet (#482)
+* :arrow_up: Automatic update of dependencies by Kebechet (#477)
+* add new function args to call (#476)
