@@ -21,7 +21,7 @@ VERSION = get_version()
 setup(
     name="thoth-investigator",
     version=VERSION,
-    description="Thoth component used for manipulating with messages and workloads.",
+    description="Thoth's investigator is a Kafka based component that consumes all messages produced by Thoth components",
     long_description=Path("README.rst").read_text(),
     license="GPLv3+",
     url="https://github.com/thoth-station/investigator",
