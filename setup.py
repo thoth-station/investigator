@@ -21,16 +21,12 @@ VERSION = get_version()
 setup(
     name="thoth-investigator",
     version=VERSION,
-    description="Thoth's investigator is a Kafka based component that consumes all messages produced by Thoth components",
+    description="Thoth's investigator is a Kafka based component that consumes "
+    "all messages produced by Thoth components",
     long_description=Path("README.rst").read_text(),
     license="GPLv3+",
     url="https://github.com/thoth-station/investigator",
     zip_safe=False,
     long_description_content_type="text/x-rst",
-    command_options={
-        "build_sphinx": {
-            "version": ("setup.py", VERSION),
-            "release": ("setup.py", VERSION),
-        }
-    },
+    command_options={"build_sphinx": {"version": ("setup.py", VERSION), "release": ("setup.py", VERSION),}},
 )
