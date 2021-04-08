@@ -131,7 +131,7 @@ Investigator scenarios description
 ==================================
 
 Thoth knowledge increase using investigator
-===========================================
+###########################################
 
 .. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/thoth/investigator/images/IncreaseThothKnowledge.jpg
    :align: center
@@ -144,7 +144,7 @@ The image above shows how Thoth keeps learning automatically using two fundament
 * `graph-refresh producer <https://github.com/thoth-station/graph-refresh-job>`__ to allow Thoth continuosly learn and keep the internal knowledge up to date.
 
 Thoth self-learn on errors during knowledge acquisition
-========================================================
+########################################################
 
 .. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/thoth/investigator/images/UpdateProvidesSourceDistro.jpg
    :align: center
@@ -164,7 +164,7 @@ for that package. (In the image below what Grafana dashboard shows)
    :alt: Thoth SI Analysis monitoring.
 
 Thoth self-heal when knowledge is missing in providing an advise
-=================================================================
+#################################################################
 
 .. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/thoth/investigator/images/FailedAdviceAdviserReRun.jpg
    :align: center
@@ -188,7 +188,7 @@ This self-learning data-driven pipeline with Argo and Kafka is fundamental for a
 and keep its knowledge up to date to what users use in their software stacks.
 
 Users interaction with Thoth services
-=====================================
+#####################################
 
 .. image:: https://raw.githubusercontent.com/thoth-station/investigator/master/thoth/investigator/images/UserAPIKafkaProducer.jpg
    :align: center
