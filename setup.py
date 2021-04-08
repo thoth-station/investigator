@@ -6,7 +6,7 @@ from setuptools import setup
 
 
 def get_version():
-    """Get current version of adviser module."""
+    """Get current version of investigator module."""
     with open(os.path.join("thoth", "investigator", "__init__.py")) as f:
         content = f.readlines()
 
