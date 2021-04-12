@@ -385,3 +385,14 @@ all the things that you see...
 * :arrow_up: Automatic update of dependencies by Kebechet (#482)
 * :arrow_up: Automatic update of dependencies by Kebechet (#477)
 * add new function args to call (#476)
+
+## Release 0.11.1 (2021-04-12T19:20:33)
+### Features
+* Constrain thoth-messaging to <=0.13
+* Changes for publishing on thoth-station.ninja (#488)
+* :arrow_up: Automatic update of dependencies by Kebechet (#487)
+* constrain thoth-messaging (#478)
+* :arrow_up: Automatic update of dependencies by Kebechet (#486)
+* :arrow_up: Automatic update of dependencies by Kebechet (#485)
+### Improvements
+* use function as handler for all versions of message (#480)
