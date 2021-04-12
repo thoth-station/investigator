@@ -396,3 +396,7 @@ all the things that you see...
 * :arrow_up: Automatic update of dependencies by Kebechet (#485)
 ### Improvements
 * use function as handler for all versions of message (#480)
+
+## Release 0.11.2 (2021-04-12T20:13:46)
+### Features
+* Adviser trigger message v4 (#492)
