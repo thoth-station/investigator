@@ -45,7 +45,7 @@ async def parse_adviser_trigger_message(adviser_trigger: Dict[str, Any], openshi
         count=adviser_trigger["count"],
         limit=adviser_trigger["limit"],
         origin=adviser_trigger["origin"],
-        authenticated=adviser_trigger.get("authenticated"),
+        authenticated=adviser_trigger.get("authenticated", False),
         dev=adviser_trigger["dev"],
         debug=adviser_trigger["debug"],
         job_id=adviser_trigger["job_id"],

@@ -44,7 +44,7 @@ async def parse_provenance_checker_trigger_message(
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
     workflow_name = openshift.schedule_provenance_checker(
         origin=provenance_checker_trigger["origin"],
-        authenticated=provenance_checker_trigger.get("authenticated"),
+        authenticated=provenance_checker_trigger.get("authenticated", False),
         whitelisted_sources=provenance_checker_trigger["whitelisted_sources"],
         debug=provenance_checker_trigger["debug"],
         job_id=provenance_checker_trigger["job_id"],
