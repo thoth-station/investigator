@@ -34,7 +34,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(AdviserTriggerMessage().topic_name, ["v1", "v2", "v3"])
+@register_handler(AdviserTriggerMessage().topic_name, ["v1", "v2", "v3", "v4"])
 @count_exceptions(adviser_trigger_exceptions)
 @track_inprogress(adviser_trigger_in_progress)
 async def parse_adviser_trigger_message(adviser_trigger: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:
@@ -45,6 +45,7 @@ async def parse_adviser_trigger_message(adviser_trigger: Dict[str, Any], openshi
         count=adviser_trigger["count"],
         limit=adviser_trigger["limit"],
         origin=adviser_trigger["origin"],
+        authenticated=adviser_trigger.get("authenticated"),
         dev=adviser_trigger["dev"],
         debug=adviser_trigger["debug"],
         job_id=adviser_trigger["job_id"],
