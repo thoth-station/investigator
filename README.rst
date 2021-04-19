@@ -180,7 +180,7 @@ through one of its tasks which depends on `thoth-messaging <https://github.com/t
 
 * During solver workflow two Kafka messages are sent out:
   * `SolvedPackageMessage <https://github.com/thoth-station/messaging/blob/master/thoth/messaging/solved_package.py>`__, used by investigator to schedule the next information that needs to be learned by Thoth e.g security information.
-  * `AdviserReRunMessage <https://github.com/thoth-station/messaging/blob/master/thoth/messaging/adviser_re_run.py>`__, that contains all information required by investigator to reschedule an adviser that previously failed.
+  * `AdviserTriggerMessage <https://github.com/thoth-station/messaging/blob/master/thoth/messaging/adviser_trigger.py>`__, that contains all information required by investigator to reschedule an adviser that previously failed.
 
 * The loop is closed once the adviser workflow re-run is successful in providing advice.
 
