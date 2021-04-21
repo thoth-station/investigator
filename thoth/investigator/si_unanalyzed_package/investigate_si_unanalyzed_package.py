@@ -21,7 +21,7 @@ import logging
 from typing import Dict, Any
 
 from thoth.storages.graph import GraphDatabase
-from thoth.messaging import SIUnanalyzedPackageMessage
+from thoth.messaging import si_unanalyzed_package_message
 from thoth.common import OpenShift
 
 
@@ -38,7 +38,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(SIUnanalyzedPackageMessage().topic_name, ["v1"])
+@register_handler(si_unanalyzed_package_message.topic_name, ["v1"])
 @count_exceptions(si_unanalyzed_package_exceptions)
 @track_inprogress(si_unanalyzed_package_in_progress)
 async def parse_si_unanalyzed_package_message(
@@ -61,7 +61,7 @@ async def parse_si_unanalyzed_package_message(
         )
 
         scheduled_workflows.labels(
-            message_type=SIUnanalyzedPackageMessage.base_name, workflow_type="security-indicator"
+            message_type=si_unanalyzed_package_message.base_name, workflow_type="security-indicator"
         ).inc(si_wfs_scheduled)
 
     si_unanalyzed_package_success.inc()

@@ -28,14 +28,14 @@ from .metrics_advise_justification import advise_justification_in_progress
 from .metrics_advise_justification import advise_justification_type_number
 from ..common import register_handler
 
-from thoth.messaging import AdviseJustificationMessage
+from thoth.messaging import advise_justification_message
 
 from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(AdviseJustificationMessage().topic_name, ["v1"])
+@register_handler(advise_justification_message.topic_name, ["v1"])
 @count_exceptions(advise_justification_exceptions)
 @track_inprogress(advise_justification_in_progress)
 async def expose_advise_justification_metrics(advise_justification: Dict[str, Any], **kwargs):

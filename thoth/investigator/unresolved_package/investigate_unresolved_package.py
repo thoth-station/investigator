@@ -22,7 +22,7 @@ import logging
 from typing import Optional, List, Dict, Any
 
 from thoth.storages.graph import GraphDatabase
-from thoth.messaging import UnresolvedPackageMessage
+from thoth.messaging import unresolved_package_message
 from thoth.common import OpenShift
 from thoth.python import Source
 
@@ -39,7 +39,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(UnresolvedPackageMessage().topic_name, ["v1"])
+@register_handler(unresolved_package_message.topic_name, ["v1"])
 @count_exceptions(unresolved_package_exceptions)
 @track_inprogress(unresolved_package_in_progress)
 async def parse_unresolved_package_message(
@@ -96,7 +96,7 @@ async def parse_unresolved_package_message(
 
                 total_solver_wfs_scheduled += solver_wfs_scheduled
 
-        scheduled_workflows.labels(message_type=UnresolvedPackageMessage.base_name, workflow_type="solver").inc(
+        scheduled_workflows.labels(message_type=unresolved_package_message.base_name, workflow_type="solver").inc(
             total_solver_wfs_scheduled
         )
 

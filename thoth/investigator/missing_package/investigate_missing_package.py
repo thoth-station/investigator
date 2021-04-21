@@ -27,10 +27,10 @@ from ..common import register_handler
 # from ..metrics import scheduled_workflows
 
 from prometheus_async.aio import track_inprogress, count_exceptions
-from thoth.messaging import MissingPackageMessage
+from thoth.messaging import missing_package_message
 
 
-@register_handler(MissingPackageMessage().topic_name, ["v1"])
+@register_handler(missing_package_message.topic_name, ["v1"])
 @count_exceptions(missing_package_exceptions)
 @track_inprogress(missing_package_in_progress)
 async def parse_missing_package(package: Dict[str, Any], **kwargs):

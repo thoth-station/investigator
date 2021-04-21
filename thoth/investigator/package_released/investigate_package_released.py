@@ -20,7 +20,7 @@
 from typing import Dict, Any
 
 from thoth.storages.graph import GraphDatabase
-from thoth.messaging import PackageReleasedMessage
+from thoth.messaging import package_released_message
 from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
@@ -33,7 +33,7 @@ from .metrics_package_released import package_released_success
 from prometheus_async.aio import track_inprogress, count_exceptions
 
 
-@register_handler(PackageReleasedMessage().topic_name, ["v1"])
+@register_handler(package_released_message.topic_name, ["v1"])
 @count_exceptions(package_released_exceptions)
 @track_inprogress(package_released_in_progress)
 async def parse_package_released_message(
@@ -55,7 +55,7 @@ async def parse_package_released_message(
             package_version=package_version,
         )
 
-        scheduled_workflows.labels(message_type=PackageReleasedMessage.base_name, workflow_type="solver").inc(
+        scheduled_workflows.labels(message_type=package_released_message.base_name, workflow_type="solver").inc(
             solver_wf_scheduled
         )
 
@@ -65,7 +65,7 @@ async def parse_package_released_message(
             openshift=openshift, is_present=False, package_name=package_name, package_version=package_version,
         )
 
-        scheduled_workflows.labels(message_type=PackageReleasedMessage.base_name, workflow_type="revsolver").inc(
+        scheduled_workflows.labels(message_type=package_released_message.base_name, workflow_type="revsolver").inc(
             revsolver_wf_scheduled
         )
 

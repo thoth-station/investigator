@@ -27,14 +27,14 @@ from ..common import register_handler, wait_for_limit
 
 from thoth.common import OpenShift
 
-from thoth.messaging.inspection_complete import InspectionCompletedMessage
+from thoth.messaging.inspection_complete import inspection_completed_message
 
 from prometheus_async.aio import track_inprogress, count_exceptions
 
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(InspectionCompletedMessage().topic_name, ["v1"])
+@register_handler(inspection_completed_message.topic_name, ["v1"])
 @count_exceptions(inspection_completed_exceptions)
 @track_inprogress(inspection_completed_in_progress)
 async def parse_inspection_completed(inspection_completed: Dict[str, Any], openshift: OpenShift, **kwargs):

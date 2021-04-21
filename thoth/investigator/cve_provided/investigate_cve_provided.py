@@ -28,13 +28,13 @@ from .metrics_cve_provided import cve_provided_exceptions
 from .metrics_cve_provided import cve_provided_success
 from .metrics_cve_provided import cve_provided_in_progress
 from prometheus_async.aio import track_inprogress, count_exceptions
-from thoth.messaging import CVEProvidedMessage
+from thoth.messaging import cve_provided_message
 from thoth.common import OpenShift
 
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(CVEProvidedMessage().topic_name, ["v1"])
+@register_handler(cve_provided_message.topic_name, ["v1"])
 @count_exceptions(cve_provided_exceptions)
 @track_inprogress(cve_provided_in_progress)
 async def parse_cve_provided(cve_provided: Dict[str, Any], openshift: OpenShift, **kwargs):
@@ -51,11 +51,11 @@ async def parse_cve_provided(cve_provided: Dict[str, Any], openshift: OpenShift,
 
         # We schedule Kebechet Administrator workflow here -
         workflow_id = await schedule_kebechet_administrator(
-            openshift=openshift, message_info=message_info, message_name=CVEProvidedMessage.__name__,
+            openshift=openshift, message_info=message_info, message_name=cve_provided_message.base_name,
         )
 
         scheduled_workflows.labels(
-            message_type=CVEProvidedMessage.base_name, workflow_type="kebechet-administrator"
+            message_type=cve_provided_message.base_name, workflow_type="kebechet-administrator"
         ).inc()
         _LOGGER.info(f"Scheduled kebechet administrator workflow {workflow_id}")
 

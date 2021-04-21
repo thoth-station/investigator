@@ -20,7 +20,7 @@
 import logging
 from typing import Dict, Any
 
-from thoth.messaging import UnrevsolvedPackageMessage
+from thoth.messaging import unrevsolved_package_message
 from thoth.common import OpenShift
 
 from .. import common
@@ -35,7 +35,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(UnrevsolvedPackageMessage().topic_name, ["v1"])
+@register_handler(unrevsolved_package_message.topic_name, ["v1"])
 @count_exceptions(unrevsolved_package_exceptions)
 @track_inprogress(unrevsolved_package_in_progress)
 async def parse_revsolved_package_message(unrevsolved_package: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:
@@ -53,7 +53,7 @@ async def parse_revsolved_package_message(unrevsolved_package: Dict[str, Any], o
             revsolver_packages_seen=[],
         )
 
-        scheduled_workflows.labels(message_type=UnrevsolvedPackageMessage.base_name, workflow_type="revsolver").inc(
+        scheduled_workflows.labels(message_type=unrevsolved_package_message.base_name, workflow_type="revsolver").inc(
             revsolver_wfs_scheduled
         )
 

@@ -21,7 +21,7 @@ import logging
 from typing import Dict, Any
 
 from thoth.storages.graph import GraphDatabase
-from thoth.messaging import SolvedPackageMessage
+from thoth.messaging import solved_package_message
 from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
@@ -37,7 +37,7 @@ from prometheus_async.aio import count_exceptions, track_inprogress
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(SolvedPackageMessage().topic_name, ["v1"])
+@register_handler(solved_package_message.topic_name, ["v1"])
 @count_exceptions(solved_package_exceptions)
 @track_inprogress(solved_package_in_progress)
 async def parse_solved_package_message(
@@ -59,9 +59,9 @@ async def parse_solved_package_message(
             index_url=index_url,
         )
 
-        scheduled_workflows.labels(message_type=SolvedPackageMessage.base_name, workflow_type="security-indicator").inc(
-            si_wfs_scheduled
-        )
+        scheduled_workflows.labels(
+            message_type=solved_package_message.base_name, workflow_type="security-indicator"
+        ).inc(si_wfs_scheduled)
 
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
         # Schedule Kebechet Administrator
@@ -74,11 +74,11 @@ async def parse_solved_package_message(
 
         # We schedule Kebechet Administrator workflow here -
         workflow_id = await common.schedule_kebechet_administrator(
-            openshift=openshift, message_info=message_info, message_name=SolvedPackageMessage.__name__,
+            openshift=openshift, message_info=message_info, message_name=solved_package_message.base_name,
         )
         _LOGGER.info(f"Schedule Kebechet Administrator with id = {workflow_id}")
         scheduled_workflows.labels(
-            message_type=SolvedPackageMessage.base_name, workflow_type="kebechet-administrator"
+            message_type=solved_package_message.base_name, workflow_type="kebechet-administrator"
         ).inc()
 
     solved_package_success.inc()
