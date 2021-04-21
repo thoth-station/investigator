@@ -58,7 +58,6 @@ from confluent_kafka import TopicPartition
 
 # We run all the modules so that their metrics and handlers get registered
 run_module("thoth.investigator.advise_justification.__init__")
-run_module("thoth.investigator.adviser_re_run.__init__")
 run_module("thoth.investigator.adviser_trigger.__init__")
 run_module("thoth.investigator.build_analysis_trigger.__init__")
 run_module("thoth.investigator.cve_provided.__init__")
