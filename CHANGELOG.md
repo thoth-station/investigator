@@ -400,3 +400,11 @@ all the things that you see...
 ## Release 0.11.2 (2021-04-12T20:13:46)
 ### Features
 * Adviser trigger message v4 (#492)
+
+## Release 0.12.0 (2021-05-02T23:08:07)
+### Features
+* F/pydantic consumer (#500)
+* :arrow_up: Automatic update of dependencies by Kebechet (#499)
+* Remove adviser re run message consumer (#498)
+* :arrow_up: Automatic update of dependencies by Kebechet (#497)
+* Fix type for the authenticated parameter (#495)
