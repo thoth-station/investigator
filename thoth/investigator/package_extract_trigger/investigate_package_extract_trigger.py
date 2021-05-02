@@ -20,7 +20,7 @@
 import logging
 from typing import Dict, Any
 
-from thoth.messaging import PackageExtractTriggerMessage
+from thoth.messaging import package_extract_trigger_message
 from thoth.common import OpenShift
 
 from ..common import wait_for_limit, register_handler
@@ -34,7 +34,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(PackageExtractTriggerMessage().topic_name, ["v1", "v2"])
+@register_handler(package_extract_trigger_message.topic_name, ["v1", "v2"])
 @count_exceptions(package_extract_trigger_exceptions)
 @track_inprogress(package_extract_trigger_in_progress)
 async def parse_package_extract_trigger_message(

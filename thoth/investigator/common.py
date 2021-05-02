@@ -38,13 +38,13 @@ _LOGGER = logging.getLogger(__name__)
 def _create_base_handler_table():
     table = dict()
     for i in ALL_MESSAGES:
-        table[i().topic_name] = dict()
+        table[i.topic_name] = dict()
     return table
 
 
 def _get_class_from_topic_name(topic_name):
     for i in ALL_MESSAGES:
-        if i().topic_name == topic_name:
+        if i.topic_name == topic_name:
             return i
 
 

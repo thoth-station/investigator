@@ -21,7 +21,7 @@ import logging
 from typing import Dict, Any
 
 from thoth.common import OpenShift
-from thoth.messaging import QebHwtTriggerMessage
+from thoth.messaging import qebhwt_trigger_message
 
 from ..common import wait_for_limit, register_handler
 from ..configuration import Configuration
@@ -34,7 +34,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(QebHwtTriggerMessage().topic_name, ["v1"])
+@register_handler(qebhwt_trigger_message.topic_name, ["v1"])
 @count_exceptions(qebhwt_trigger_exceptions)
 @track_inprogress(qebhwt_trigger_in_progress)
 async def parse_qebhwt_trigger_message(qebhwt_trigger: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:

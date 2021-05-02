@@ -28,7 +28,7 @@ from .metrics_missing_version import missing_version_in_progress
 from .metrics_missing_version import missing_version_success
 
 from prometheus_async.aio import track_inprogress, count_exceptions
-from thoth.messaging import MissingVersionMessage
+from thoth.messaging import missing_version_message
 from thoth.common import OpenShift
 from thoth.storages import GraphDatabase
 from ..configuration import Configuration
@@ -36,7 +36,7 @@ from ..configuration import Configuration
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(MissingVersionMessage().topic_name, ["v1"])
+@register_handler(missing_version_message.topic_name, ["v1"])
 @count_exceptions(missing_version_exceptions)
 @track_inprogress(missing_version_in_progress)
 async def parse_missing_version(version: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs):
@@ -57,12 +57,12 @@ async def parse_missing_version(version: Dict[str, Any], openshift: OpenShift, g
 
         # We schedule Kebechet Administrator workflow here -
         workflow_id = await schedule_kebechet_administrator(
-            openshift=openshift, message_info=message_info, message_name=MissingVersionMessage.__name__,
+            openshift=openshift, message_info=message_info, message_name=missing_version_message.base_name,
         )
 
         _LOGGER.info(f"Scheduled kebechet administrator workflow {workflow_id}")
 
         scheduled_workflows.labels(
-            message_type=MissingVersionMessage.base_name, workflow_type="kebechet-administrator"
+            message_type=missing_version_message.base_name, workflow_type="kebechet-administrator"
         ).inc()
     missing_version_success.inc()

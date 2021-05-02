@@ -28,14 +28,14 @@ from .metrics_hash_mismatch import hash_mismatch_exceptions
 from .metrics_hash_mismatch import hash_mismatch_success
 from .metrics_hash_mismatch import hash_mismatch_in_progress
 from prometheus_async.aio import track_inprogress, count_exceptions
-from thoth.messaging import HashMismatchMessage
+from thoth.messaging import hash_mismatch_message
 from thoth.common import OpenShift
 from thoth.storages import GraphDatabase
 
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(HashMismatchMessage().topic_name, ["v1"])
+@register_handler(hash_mismatch_message.topic_name, ["v1"])
 @count_exceptions(hash_mismatch_exceptions)
 @track_inprogress(hash_mismatch_in_progress)
 async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs):
@@ -51,7 +51,7 @@ async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, gr
             package_version=mismatch["package_version"],
         )
 
-        scheduled_workflows.labels(message_type=HashMismatchMessage.base_name, workflow_type="solver").inc(
+        scheduled_workflows.labels(message_type=hash_mismatch_message.base_name, workflow_type="solver").inc(
             solver_wf_scheduled
         )
 
@@ -73,10 +73,10 @@ async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, gr
 
         # We schedule Kebechet Administrator workflow here -
         workflow_id = await schedule_kebechet_administrator(
-            openshift=openshift, message_info=message_info, message_name=HashMismatchMessage.__name__,
+            openshift=openshift, message_info=message_info, message_name=hash_mismatch_message.__name__,
         )
         scheduled_workflows.labels(
-            message_type=HashMismatchMessage.base_name, workflow_type="kebechet-administrator"
+            message_type=hash_mismatch_message.base_name, workflow_type="kebechet-administrator"
         ).inc()
 
         _LOGGER.info(f"Scheduled kebechet administrator workflow {workflow_id}")
