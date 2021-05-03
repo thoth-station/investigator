@@ -400,3 +400,15 @@ all the things that you see...
 ## Release 0.11.2 (2021-04-12T20:13:46)
 ### Features
 * Adviser trigger message v4 (#492)
+
+## Release 0.12.0 (2021-05-03T03:40:49)
+### Features
+* :arrow_up: Automatic update of dependencies by Kebechet (#504)
+* :arrow_up: Automatic update of dependencies by Kebechet (#502)
+* F/pydantic consumer (#500)
+* :arrow_up: Automatic update of dependencies by Kebechet (#499)
+* Remove adviser re run message consumer (#498)
+* :arrow_up: Automatic update of dependencies by Kebechet (#497)
+* Fix type for the authenticated parameter (#495)
+### Bug Fixes
+* Relock the dependencies for fix sqlalchemy-utils (#508)
