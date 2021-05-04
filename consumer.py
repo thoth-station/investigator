@@ -137,7 +137,7 @@ def _message_failed(msg):
     else:
         # pause consumption of a topic
         for partition in c.assignment():
-            if partition.topic == message_class().topic_name:
+            if partition.topic == message_class.topic_name:
                 c.pause([partition])
                 paused_partitions.append(partition)
 
@@ -167,11 +167,11 @@ async def sub_to_topic(request):
         _LOGGER.debug("Consumer has not been created yet, cannot subscribe to topic.")
     if message_class:
         for partition in paused_partitions:
-            if partition.topic == message_class().topic_name:
+            if partition.topic == message_class.topic_name:
                 c.resume([partition])
                 paused_partitions.remove(partition)
         paused_topics.labels(base_topic_name).set(0)
-        data = {"message": f"Successfully resumed consumption of {message_class().topic_name}."}
+        data = {"message": f"Successfully resumed consumption of {message_class.topic_name}."}
         return web.json_response(data)
     else:
         data = {"message": "No corresponding message type found in `thoth-messaging`. No action taken."}
