@@ -412,3 +412,8 @@ all the things that you see...
 * Fix type for the authenticated parameter (#495)
 ### Bug Fixes
 * Relock the dependencies for fix sqlalchemy-utils (#508)
+
+## Release 0.12.1 (2021-05-10T04:27:12)
+### Features
+* messages are no longer classes (#515)
+* :arrow_up: Automatic update of dependencies by Kebechet (#512)
