@@ -264,9 +264,10 @@ if __name__ == "__main__":
     a = admin.create_admin_client()
     admin.create_all_topics(a)
     sleep(1.0)
-    loop = asyncio.get_event_loop()
     c = consumer.create_consumer()
-    queue = asyncio.Queue(maxsize=Configuration.NUM_WORKERS, loop=loop)  # type: asyncio.Queue
+    loop = asyncio.get_event_loop()
+    asyncio.set_event_loop(loop)
+    queue = asyncio.Queue(maxsize=Configuration.NUM_WORKERS)  # type: asyncio.Queue
 
     tasks = []
     tasks.append(_confluent_consumer_loop(q=queue))
@@ -283,5 +284,4 @@ if __name__ == "__main__":
 
     site = web.TCPSite(runner, port=6066)
     tasks.append(site.start())
-
     loop.run_until_complete(asyncio.gather(*tasks))
