@@ -7,7 +7,6 @@ verify_ssl = true
 thoth-storages = "*"
 prometheus-client = "<0.7.0"
 thoth-python = "*"
-thoth-sourcemanagement = "*"
 prometheus-async = "*"
 confluent-kafka = "*"
 thoth-common = "*"
