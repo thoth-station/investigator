@@ -417,3 +417,12 @@ all the things that you see...
 ### Features
 * messages are no longer classes (#515)
 * :arrow_up: Automatic update of dependencies by Kebechet (#512)
+
+## Release 0.13.0 (2021-06-03T17:35:26)
+### Features
+* :arrow_up: Automatic update of dependencies by Kebechet
+* :arrow_up: Automatic update of dependencies by Kebechet
+* :hatched_chick: update the prow resource limits (#519)
+* loop being deprecated, use asyncio.run instead (#514)
+### Other
+* remove thoth-sourcemanagement from dependencies (#521)
