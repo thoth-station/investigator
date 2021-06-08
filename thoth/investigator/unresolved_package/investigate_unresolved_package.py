@@ -48,7 +48,7 @@ async def parse_unresolved_package_message(
     """Parse unresolved package message."""
     package_name = unresolved_package["package_name"]
     package_version = unresolved_package["package_version"]
-    requested_indexes: Optional[List[str]] = unresolved_package["index_url"]
+    requested_index: Optional[str] = unresolved_package["index_url"]
     solver = unresolved_package["solver"]
 
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER:
@@ -59,14 +59,15 @@ async def parse_unresolved_package_message(
 
         indexes = registered_indexes
 
-        if not requested_indexes:
+        if not requested_index:
             _LOGGER.info("Using Thoth registered indexes...")
         else:
-            if all(index_url in registered_indexes for index_url in requested_indexes):
-                indexes = requested_indexes
+            if requested_index in registered_indexes:
+                indexes = [requested_index]
                 _LOGGER.info("Using requested indexes...")
             else:
-                _LOGGER.info("Using Thoth registered indexes...")
+                error_message = f"Requested index {requested_index} is not registered in Thoth"
+                raise ValueError(error_message)
 
         # Parse package version for each index
         for index_url in indexes:
