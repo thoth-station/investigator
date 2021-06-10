@@ -57,45 +57,34 @@ async def parse_unresolved_package_message(
         # Select indexes
         registered_indexes: List[str] = graph.get_python_package_index_urls_all()
 
-        indexes = registered_indexes
+        if requested_index not in registered_indexes:
+            error_message = f"Requested index {requested_index} is not registered in Thoth"
+            raise ValueError(error_message)
 
-        if not requested_index:
-            _LOGGER.info("Using Thoth registered indexes...")
-        else:
-            if requested_index in registered_indexes:
-                indexes = [requested_index]
-                _LOGGER.info("Using requested indexes...")
-            else:
-                error_message = f"Requested index {requested_index} is not registered in Thoth"
-                raise ValueError(error_message)
+        versions = _check_package_version(
+            package_name=package_name, package_version=package_version, index_url=requested_index
+        )
 
-        # Parse package version for each index
-        for index_url in indexes:
+        # Loop versions from the latest one
+        for version in versions:
 
-            versions = _check_package_version(
-                package_name=package_name, package_version=package_version, index_url=index_url
+            # Check if package version index exists in Thoth Knowledge Graph
+            is_present = graph.python_package_version_exists(
+                package_name=package_name, package_version=version, index_url=requested_index
             )
 
-            # Loop versions from the latest one
-            for version in versions:
+            # Solver logic
+            solver_wfs_scheduled = await common.learn_using_solver(
+                openshift=openshift,
+                graph=graph,
+                is_present=is_present,
+                package_name=package_name,
+                index_url=requested_index,
+                package_version=version,
+                solver=solver,
+            )
 
-                # Check if package version index exists in Thoth Knowledge Graph
-                is_present = graph.python_package_version_exists(
-                    package_name=package_name, package_version=version, index_url=index_url
-                )
-
-                # Solver logic
-                solver_wfs_scheduled = await common.learn_using_solver(
-                    openshift=openshift,
-                    graph=graph,
-                    is_present=is_present,
-                    package_name=package_name,
-                    index_url=index_url,
-                    package_version=version,
-                    solver=solver,
-                )
-
-                total_solver_wfs_scheduled += solver_wfs_scheduled
+            total_solver_wfs_scheduled += solver_wfs_scheduled
 
         scheduled_workflows.labels(message_type=unresolved_package_message.base_name, workflow_type="solver").inc(
             total_solver_wfs_scheduled
