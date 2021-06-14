@@ -426,3 +426,11 @@ all the things that you see...
 * loop being deprecated, use asyncio.run instead (#514)
 ### Other
 * remove thoth-sourcemanagement from dependencies (#521)
+
+## Release 0.13.1 (2021-06-14T19:19:35)
+### Features
+* :arrow_up: Automatic update of dependencies by Kebechet
+* :arrow_up: Automatic update of dependencies by Kebechet
+* remove inner loop which loops over registered indexes
+* :arrow_up: Automatic update of dependencies by Kebechet
+* expect only single index in message contents
