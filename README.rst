@@ -1,6 +1,14 @@
 Welcome to Thoth's investigator documentation
 ---------------------------------------------
 
+.. image:: https://img.shields.io/github/v/tag/thoth-station/investigator?style=plastic
+  :target: https://github.com/thoth-station/investigator/releases
+  :alt: GitHub tag (latest by date)
+
+.. image:: https://quay.io/repository/thoth-station/investigator/status
+  :target: https://quay.io/repository/thoth-station/investigator?tab=tags
+  :alt: Quay - Build
+
 Thoth's investigator is a Kafka based component that consumes all messages produced by Thoth components.
 
 It has monitoring system in places that allow Thoth team to see what is happening in Thoth in terms of Kafka, Openshift, Argo for the different components
