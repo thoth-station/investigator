@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""Set labels for qebhwt_trigger metrics."""
+"""Set labels for provenance_checker_trigger metrics."""
 
 from ..metrics import in_progress, success, exceptions
 
