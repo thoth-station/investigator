@@ -434,3 +434,12 @@ all the things that you see...
 * remove inner loop which loops over registered indexes
 * :arrow_up: Automatic update of dependencies by Kebechet
 * expect only single index in message contents
+
+## Release 0.13.2 (2021-07-01T02:31:48)
+### Features
+* :arrow_up: Automatic update of dependencies by Kebechet
+* :arrow_up: Automatic update of dependencies by Kebechet
+* Deprecate qeb-hwt workflow
+* :arrow_up: Automatic update of dependencies by Kebechet
+* :medal_sports: set badges for easy access to content (#538)
+* mark missing packages and schedule keb admin
