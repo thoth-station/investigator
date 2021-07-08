@@ -67,6 +67,30 @@ Enforcing a workflow limit:
 
 * `ARGO_PENDING_WORKFLOW_LIMIT`: limit to enforce on argo for total number of pending workflows
 
+Retrying and Dealing with Exceptions:
+
+* *THOTH_INVESTIGATOR_MAX_RETRIES*: indicates the number of times that investigator should attempt to consume a message
+before pausing topic consumption or acking a failed message (default = 5)
+
+* *THOTH_INVESTIGATOR_BACKOFF*: how long to wait before trying to consume a failed message again. This backoff strategy
+is linear (default = 0.5)
+
+  * for 0 < i < MAX_RETRIES, wait time before attempting to consume again is i * BACKOFF
+
+* *THOTH_INVESTIGATOR_ACK_ON_FAIL*: if != 0 then if max retries is reached, instead of pausing the topic's consumption
+the message will be acked and consumption will continue
+
+
+Service Paths
+=============
+
+* /metrics : exposes prometheus metrics to be scraped
+
+* /_health : indicates that web server can handle requests
+
+* /resume/{base_topic_name} : if message fails and forces topic to pause consumption then this endpoint can be used to
+manually resume consumption after issues have been addressed
+
 
 Kafka/Argo combination in Project Thoth
 ========================================
