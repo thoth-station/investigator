@@ -66,9 +66,9 @@ scheduled_workflows = Counter(
     registry=registry,
 )
 
-paused_topics = Gauge(
-    "thoth_investigator_paused_topics",
-    "Boolean gauge indicating whether consumption of the topic has been paused.",
+halted_topics = Gauge(
+    "thoth_investigator_halted_topics",
+    "Boolean gauge indicating whether consumption of the topic has been halted.",
     labelnames=["base_topic_name"],
     registry=registry,
 )
