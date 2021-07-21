@@ -88,7 +88,7 @@ Service Paths
 
 * /_health : indicates that web server can handle requests
 
-* /resume/{base_topic_name} : if message fails and forces topic to pause consumption then this endpoint can be used to
+* /resume/{base_topic_name} : if message fails and forces topic to halt consumption then this endpoint can be used to
 manually resume consumption after issues have been addressed
 
 

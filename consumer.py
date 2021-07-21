@@ -45,7 +45,7 @@ from thoth.investigator.common import (
     _get_class_from_base_name,
 )
 from thoth.investigator.metrics import registry
-from thoth.investigator.metrics import failures, paused_topics, schema_revision_metric, missing_handler
+from thoth.investigator.metrics import failures, halted_topics, schema_revision_metric, missing_handler
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -107,7 +107,7 @@ running = True
 
 routes = web.RouteTableDef()
 
-paused_partitions = []  # type: List[TopicPartition]
+halted_partitions = []  # type: List[TopicPartition]
 
 c = None  # type: Optional[Consumer]
 
@@ -120,9 +120,9 @@ def _handler_lookup(topic_name, version, table=investigator_handler_table, defau
         return table[topic_name].get(version, default)
 
 
-def _set_paused_to_zero():
+def _set_halted_to_zero():
     for i in ALL_MESSAGES:
-        paused_topics.labels(i.base_name).set(0)
+        halted_topics.labels(i.base_name).set(0)
 
 
 def _message_failed(msg):
@@ -134,13 +134,13 @@ def _message_failed(msg):
         failures.labels(message_type=message_type).inc()
         c.commit(message=msg)
     else:
-        # pause consumption of a topic
+        # halt consumption of a topic
         for partition in c.assignment():
             if partition.topic == message_class.topic_name:
-                c.pause([partition])
-                paused_partitions.append(partition)
+                c.halt([partition])
+                halted_partitions.append(partition)
 
-        paused_topics.labels(base_topic_name=message_class.base_name).set(1)
+        halted_topics.labels(base_topic_name=message_class.base_name).set(1)
 
 
 @routes.get("/metrics")
@@ -165,11 +165,11 @@ async def sub_to_topic(request):
     if c is None:
         _LOGGER.debug("Consumer has not been created yet, cannot subscribe to topic.")
     if message_class:
-        for partition in paused_partitions:
+        for partition in halted_partitions:
             if partition.topic == message_class.topic_name:
                 c.resume([partition])
-                paused_partitions.remove(partition)
-        paused_topics.labels(base_topic_name).set(0)
+                halted_partitions.remove(partition)
+        halted_topics.labels(base_topic_name).set(0)
         data = {"message": f"Successfully resumed consumption of {message_class.topic_name}."}
         return web.json_response(data)
     else:
@@ -210,7 +210,7 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
     await asyncio.sleep(1.0)  # wait here so that kafka has time to finish creating topics
     try:
         consumer.subscribe_to_all(c)
-        _set_paused_to_zero()
+        _set_halted_to_zero()
         while running:
             msg = c.poll(0)
             if msg is None:
