@@ -21,7 +21,9 @@
 
 import logging
 import os
+import json
 from enum import Enum, auto
+from typing import Union
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,6 +33,16 @@ class ConsumerModeEnum(Enum):
 
     investigator = auto()
     metrics = auto()
+
+
+def _get_ack_on_fail() -> Union[bool, list]:
+    to_ret = json.loads(os.getenv("THOTH_INVESTIGATOR_ACK_ON_FAIL", "0"))
+    if type(to_ret) == int:
+        return bool(to_ret)
+    elif type(to_ret) == list:
+        return to_ret
+    else:
+        raise TypeError("THOTH_INVESTIGATOR_ACK_ON_FAIL envvar must be either a integer or a list")
 
 
 class Configuration:
@@ -58,6 +70,6 @@ class Configuration:
     # Consumer configuration
     MAX_RETRIES = int(os.getenv("THOTH_INVESTIGATOR_MAX_RETRIES", 5))
     BACKOFF = float(os.getenv("THOTH_INVESTIGATOR_BACKOFF", 0.5))  # Linear backoff strategy
-    ACK_ON_FAIL = bool(int(os.getenv("THOTH_INVESTIGATOR_ACK_ON_FAIL", 0)))
+    ACK_ON_FAIL = _get_ack_on_fail()
     NUM_WORKERS = int(os.getenv("THOTH_CONSUMER_WORKERS", 5))
     CONSUMER_MODE = os.getenv("THOTH_CONSUMER_MODE", "investigator")

@@ -128,7 +128,9 @@ def _set_halted_to_zero():
 def _message_failed(msg):
     global c
     message_class = _get_class_from_topic_name(msg.topic())
-    if Configuration.ACK_ON_FAIL:
+    if Configuration.ACK_ON_FAIL is True or (
+        isinstance(Configuration.ACK_ON_FAIL, list) and message_class.base_name in Configuration.ACK_ON_FAIL
+    ):
         message_type = message_class.base_name.rsplit(".", maxsplit=1)[-1]  # type: str
         message_type = message_type.replace("-", "_")  # this is to match the metrics associate with processing
         failures.labels(message_type=message_type).inc()
