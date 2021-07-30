@@ -845,3 +845,15 @@ all the things that you see...
 * :pushpin: Automatic update of dependency thoth-common from 0.13.1 to 0.13.2
 * :pushpin: Automatic update of dependency thoth-messaging from 0.3.2 to 0.3.4
 * :pushpin: Automatic update of dependency thoth-common from 0.10.6 to 0.13.1
+
+## Release 0.14.1 (2021-07-30T10:03:07)
+### Features
+* Exclude docs/
+* Adjust CI prow
+* :arrow_up: Automatic update of dependencies by Kebechet (#562)
+* rename from 'paused' to 'halted'
+* :arrow_up: Automatic update of dependencies by Kebechet
+* add docs for  envvar and  endpoint
+* :arrow_up: Automatic update of dependencies by Kebechet
+### Other
+* remove unusued parameters
