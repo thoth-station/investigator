@@ -25,6 +25,8 @@ presubmits:
             - "/usr/local/bin/mypy"
             - "."
             - "--ignore-missing-imports"
+            - "--exclude"
+            - "docs/"
           resources:
             requests:
               memory: "1Gi"
