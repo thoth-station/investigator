@@ -57,7 +57,9 @@ async def parse_missing_version(version: Dict[str, Any], openshift: OpenShift, g
 
         # We schedule Kebechet Administrator workflow here -
         workflow_id = await schedule_kebechet_administrator(
-            openshift=openshift, message_info=message_info, message_name=missing_version_message.base_name,
+            openshift=openshift,
+            message_info=message_info,
+            message_name=missing_version_message.base_name,
         )
 
         _LOGGER.info(f"Scheduled kebechet administrator workflow {workflow_id}")

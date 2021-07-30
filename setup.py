@@ -28,5 +28,10 @@ setup(
     url="https://github.com/thoth-station/investigator",
     zip_safe=False,
     long_description_content_type="text/x-rst",
-    command_options={"build_sphinx": {"version": ("setup.py", VERSION), "release": ("setup.py", VERSION),}},
+    command_options={
+        "build_sphinx": {
+            "version": ("setup.py", VERSION),
+            "release": ("setup.py", VERSION),
+        }
+    },
 )

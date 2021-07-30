@@ -51,7 +51,9 @@ async def parse_cve_provided(cve_provided: Dict[str, Any], openshift: OpenShift,
 
         # We schedule Kebechet Administrator workflow here -
         workflow_id = await schedule_kebechet_administrator(
-            openshift=openshift, message_info=message_info, message_name=cve_provided_message.base_name,
+            openshift=openshift,
+            message_info=message_info,
+            message_name=cve_provided_message.base_name,
         )
 
         scheduled_workflows.labels(

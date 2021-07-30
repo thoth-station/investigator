@@ -74,7 +74,9 @@ async def parse_solved_package_message(
 
         # We schedule Kebechet Administrator workflow here -
         workflow_id = await common.schedule_kebechet_administrator(
-            openshift=openshift, message_info=message_info, message_name=solved_package_message.base_name,
+            openshift=openshift,
+            message_info=message_info,
+            message_name=solved_package_message.base_name,
         )
         _LOGGER.info(f"Schedule Kebechet Administrator with id = {workflow_id}")
         scheduled_workflows.labels(
