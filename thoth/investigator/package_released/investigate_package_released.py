@@ -62,7 +62,10 @@ async def parse_package_released_message(
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_REVSOLVER:
         # Revsolver logic
         revsolver_wf_scheduled, _ = await common.learn_using_revsolver(
-            openshift=openshift, is_present=False, package_name=package_name, package_version=package_version,
+            openshift=openshift,
+            is_present=False,
+            package_name=package_name,
+            package_version=package_version,
         )
 
         scheduled_workflows.labels(message_type=package_released_message.base_name, workflow_type="revsolver").inc(

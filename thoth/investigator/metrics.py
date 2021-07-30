@@ -27,7 +27,10 @@ registry = CollectorRegistry()
 
 # add the application version info metric
 investigator_info = Gauge(
-    "thoth_investigator_consumer_info", "Investigator Version Info", labelnames=["version"], registry=registry,
+    "thoth_investigator_consumer_info",
+    "Investigator Version Info",
+    labelnames=["version"],
+    registry=registry,
 )
 investigator_info.labels(version=__service_version__).inc()
 

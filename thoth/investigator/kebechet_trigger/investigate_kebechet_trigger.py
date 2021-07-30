@@ -41,7 +41,8 @@ async def parse_kebechet_trigger_message(kebechet_trigger: Dict[str, Any], opens
     """Parse kebechet_trigger message."""
     await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
     workflow_name = openshift.schedule_kebechet_workflow(
-        webhook_payload=kebechet_trigger["webhook_payload"], job_id=kebechet_trigger["job_id"],
+        webhook_payload=kebechet_trigger["webhook_payload"],
+        job_id=kebechet_trigger["job_id"],
     )
     _LOGGER.debug(f"Scheduled kebechet workflow {workflow_name}")
     kebechet_trigger_success.inc()

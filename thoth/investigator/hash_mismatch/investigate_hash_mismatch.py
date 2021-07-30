@@ -73,7 +73,9 @@ async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, gr
 
         # We schedule Kebechet Administrator workflow here -
         workflow_id = await schedule_kebechet_administrator(
-            openshift=openshift, message_info=message_info, message_name=hash_mismatch_message.__name__,
+            openshift=openshift,
+            message_info=message_info,
+            message_name=hash_mismatch_message.__name__,
         )
         scheduled_workflows.labels(
             message_type=hash_mismatch_message.base_name, workflow_type="kebechet-administrator"

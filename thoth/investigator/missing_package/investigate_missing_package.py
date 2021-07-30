@@ -41,12 +41,17 @@ _LOGGER = logging.getLogger(__name__)
 async def parse_missing_package(package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs):
     """Process a missing package message from package-update producer."""
     python_package_versions = graph.get_python_package_versions_all(
-        package_name=package["package_name"], index_url=package["index_url"], count=None,
+        package_name=package["package_name"],
+        index_url=package["index_url"],
+        count=None,
     )
 
     for _, version, _ in python_package_versions:
         graph.update_missing_flag_package_version(
-            package_name=package["package_name"], package_version=version, index_url=package["index_url"], value=True,
+            package_name=package["package_name"],
+            package_version=version,
+            index_url=package["index_url"],
+            value=True,
         )
 
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
@@ -57,7 +62,9 @@ async def parse_missing_package(package: Dict[str, Any], openshift: OpenShift, g
 
         # We schedule Kebechet Administrator workflow here -
         workflow_id = await schedule_kebechet_administrator(
-            openshift=openshift, message_info=message_info, message_name=missing_package_message.base_name,
+            openshift=openshift,
+            message_info=message_info,
+            message_name=missing_package_message.base_name,
         )
 
         _LOGGER.info(f"Scheduled kebechet administrator workflow {workflow_id}")
