@@ -67,8 +67,8 @@ async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, gr
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
         message_info = {
             "PACKAGE_NAME": mismatch["package_name"],
-            "THOTH_PACKAGE_VERSION": mismatch["package_version"],
-            "THOTH_PACKAGE_INDEX": mismatch["index_url"],
+            "PACKAGE_VERSION": mismatch["package_version"],
+            "PACKAGE_INDEX": mismatch["index_url"],
         }
 
         # We schedule Kebechet Administrator workflow here -

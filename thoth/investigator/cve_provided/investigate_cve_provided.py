@@ -45,8 +45,8 @@ async def parse_cve_provided(cve_provided: Dict[str, Any], openshift: OpenShift,
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
         message_info = {
             "PACKAGE_NAME": cve_provided["package_name"],
-            "THOTH_PACKAGE_VERSION": cve_provided["package_version"],
-            "THOTH_PACKAGE_INDEX": cve_provided["index_url"],
+            "PACKAGE_VERSION": cve_provided["package_version"],
+            "PACKAGE_INDEX": cve_provided["index_url"],
         }
 
         # We schedule Kebechet Administrator workflow here -

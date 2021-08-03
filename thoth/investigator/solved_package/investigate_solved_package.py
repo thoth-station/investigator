@@ -67,8 +67,8 @@ async def parse_solved_package_message(
         # Schedule Kebechet Administrator
         message_info = {
             "PACKAGE_NAME": package_name,
-            "THOTH_PACKAGE_VERSION": package_version,
-            "THOTH_PACKAGE_INDEX": index_url,
+            "PACKAGE_VERSION": package_version,
+            "PACKAGE_INDEX": index_url,
             "SOLVER_NAME": solved_package.get("solver"),  # We pass the solver name also.
         }
 

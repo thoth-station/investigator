@@ -57,7 +57,7 @@ async def parse_missing_package(package: Dict[str, Any], openshift: OpenShift, g
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
         message_info = {
             "PACKAGE_NAME": version["package_name"],
-            "THOTH_PACKAGE_INDEX": version["index_url"],
+            "PACKAGE_INDEX": version["index_url"],
         }
 
         # We schedule Kebechet Administrator workflow here -
