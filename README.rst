@@ -77,8 +77,12 @@ is linear (default = 0.5)
 
   * for 0 < i < MAX_RETRIES, wait time before attempting to consume again is i * BACKOFF
 
-* *THOTH_INVESTIGATOR_ACK_ON_FAIL*: if != 0 then if max retries is reached, instead of pausing the topic's consumption
-the message will be acked and consumption will continue
+* *THOTH_INVESTIGATOR_ACK_ON_FAIL*:
+  * **if type is integer**: if != 0 then if max retries is reached, instead of pausing the topic's consumption the
+  message will be acked and consumption will continue
+
+  * **if type is list**: if a list is passed as the envvar then all topics with a base name in that list will be acked
+  on failure
 
 
 Service Paths
