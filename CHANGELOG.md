@@ -1,5 +1,12 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.14.2 (2021-08-09T08:01:14)
+### Features
+* :arrow_up: auto dependencies for the investigator
+* add option to pass list as ack on fail envvar
+### Bug Fixes
+* bug fix: passed message info did not match expected format
+
 ## [0.1.0] - 2019-Sep-11 - goern
 
 ### Added
