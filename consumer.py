@@ -136,10 +136,10 @@ def _message_failed(msg):
         failures.labels(message_type=message_type).inc()
         c.commit(message=msg)
     else:
-        # halt consumption of a topic
+        # pause consumption of a topic
         for partition in c.assignment():
             if partition.topic == message_class.topic_name:
-                c.halt([partition])
+                c.pause([partition])
                 halted_partitions.append(partition)
 
         halted_topics.labels(base_topic_name=message_class.base_name).set(1)
