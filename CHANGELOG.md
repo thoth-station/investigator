@@ -1,5 +1,9 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.14.3 (2021-08-17T12:57:01)
+### Features
+* Fix halt in consumer
+
 ## Release 0.14.2 (2021-08-09T08:01:14)
 ### Features
 * :arrow_up: auto dependencies for the investigator
