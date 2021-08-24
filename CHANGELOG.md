@@ -1,5 +1,9 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.14.4 (2021-08-24T12:26:56)
+### Features
+* Enable v5 of adviser trigger messaging
+
 ## Release 0.14.3 (2021-08-17T12:57:01)
 ### Features
 * Fix halt in consumer
