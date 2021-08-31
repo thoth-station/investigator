@@ -45,7 +45,13 @@ from thoth.investigator.common import (
     _get_class_from_base_name,
 )
 from thoth.investigator.metrics import registry
-from thoth.investigator.metrics import failures, halted_topics, schema_revision_metric, missing_handler
+from thoth.investigator.metrics import (
+    failures,
+    halted_topics,
+    schema_revision_metric,
+    missing_handler,
+    current_consumer_offset,
+)
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -193,6 +199,7 @@ async def _worker(q: asyncio.Queue):
             try:
                 await func(contents, openshift=openshift, graph=graph, msg=msg)
                 c.commit(message=msg)
+                current_consumer_offset.labels(topic_name=msg.topic(), partition=msg.partition()).set(msg.offset())
                 break
             except Exception as e:
                 _LOGGER.warning(e)
