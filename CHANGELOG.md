@@ -1,5 +1,10 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.15.0 (2021-09-14T18:23:33)
+### Features
+* add /halt endpoint for stopping consumption of specific messages manually
+* add consumer offsets as metric to calculate consumer lag
+
 ## Release 0.14.4 (2021-08-24T12:26:56)
 ### Features
 * Enable v5 of adviser trigger messaging
