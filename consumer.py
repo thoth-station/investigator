@@ -136,7 +136,7 @@ def _message_failed(msg):
         failures.labels(message_type=message_type).inc()
         c.commit(message=msg)
     else:
-        # pause consumption of a topic
+        # halt consumption of a topic
         for partition in c.assignment():
             if partition.topic == message_class.topic_name:
                 c.pause([partition])
@@ -177,6 +177,17 @@ async def sub_to_topic(request):
     else:
         data = {"message": "No corresponding message type found in `thoth-messaging`. No action taken."}
         return web.json_response(data=data, status=422)
+
+
+@routes.get("/halt/{base_topic_name}")
+async def manually_halt_topic(request):
+    """Add route to investigator so that message consumption can be manually halted."""
+    global c
+    message_class = _get_class_from_base_name(request.match_info["base_topic_name"])
+    for partition in c.assignment():
+        if partition.topic == message_class.topic_name:
+            c.pause([partition])
+            halted_partitions.append(partition)
 
 
 async def _worker(q: asyncio.Queue):
