@@ -99,3 +99,10 @@ message_version_metric = Counter(
     ["message_type", "message_version"],
     registry=registry,
 )
+
+current_consumer_offset = Gauge(
+    "current_partition_offsets",
+    "Current consumer offset per partition.",
+    ["topic_name", "partition"],
+    registry=registry,
+)
