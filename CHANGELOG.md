@@ -1,5 +1,9 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.15.1 (2021-09-27T20:30:11)
+### Features
+* :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+
 ## Release 0.15.0 (2021-09-14T18:23:33)
 ### Features
 * add /halt endpoint for stopping consumption of specific messages manually
