@@ -110,10 +110,11 @@ async def schedule_kebechet_administrator(openshift: OpenShift, message_info: di
         await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
         workflow_id = openshift.schedule_kebechet_administrator(message_info=message_info, message_type=message_name)
         _LOGGER.info(
-            f"Scheduled Kebechet Administrator worflow for message type {message_name} with workflow id - {workflow_id}"
+            "Scheduled Kebechet Administrator workflow"
+            f" for message type {message_name} with workflow id - {workflow_id}"
         )
     except Exception as e:
-        _LOGGER.exception(f"Failed to schedule Kebechet Administrator worflow for message type {message_name}: {e}")
+        _LOGGER.exception(f"Failed to schedule Kebechet Administrator workflow for message type {message_name}: {e}")
         raise e
     return workflow_id
 
