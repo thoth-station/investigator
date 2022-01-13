@@ -17,8 +17,9 @@
 
 """Set labels for missing_version metrics."""
 
-from ..metrics import in_progress, success, exceptions
+from ..metrics import in_progress, success, exceptions, sent_advise_requests
 
 missing_version_in_progress = in_progress.labels(message_type="missing_version")
 missing_version_success = success.labels(message_type="missing_version")
 missing_version_exceptions = exceptions.labels(message_type="missing_version")
+missing_version_sent_advise_requests = sent_advise_requests.labels(message_type="missing_version")

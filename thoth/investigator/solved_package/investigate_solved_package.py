@@ -17,21 +17,26 @@
 
 """This file contains methods used by Thoth investigator to investigate on solved packages."""
 
+import asyncio
 import logging
+import semver
 from typing import Dict, Any
 
 from thoth.storages.graph import GraphDatabase
 from thoth.messaging import solved_package_message
 from thoth.common import OpenShift
+from thoth.common.enums import InternalTriggerEnum
 
 from ..metrics import scheduled_workflows
 from .. import common
 from ..configuration import Configuration
-from ..common import register_handler
+from ..common import register_handler, send_advise_request_for_installation
+from ..github_service import GithubService
 
 from .metrics_solved_package import solved_package_exceptions
 from .metrics_solved_package import solved_package_success
 from .metrics_solved_package import solved_package_in_progress
+from .metrics_solved_package import solved_package_sent_advise_requests
 from prometheus_async.aio import count_exceptions, track_inprogress
 
 _LOGGER = logging.getLogger(__name__)
@@ -41,7 +46,7 @@ _LOGGER = logging.getLogger(__name__)
 @count_exceptions(solved_package_exceptions)
 @track_inprogress(solved_package_in_progress)
 async def parse_solved_package_message(
-    solved_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs
+    solved_package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, gh_service: GithubService, **kwargs
 ) -> None:
     """Parse solved package message."""
     package_name = solved_package["package_name"]
@@ -64,23 +69,37 @@ async def parse_solved_package_message(
         ).inc(si_wfs_scheduled)
 
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
-        # Schedule Kebechet Administrator
-        message_info = {
-            "PACKAGE_NAME": package_name,
-            "PACKAGE_VERSION": package_version,
-            "PACKAGE_INDEX": index_url,
-            "SOLVER_NAME": solved_package.get("solver"),  # We pass the solver name also.
-        }
-
-        # We schedule Kebechet Administrator workflow here -
-        workflow_id = await common.schedule_kebechet_administrator(
-            openshift=openshift,
-            message_info=message_info,
-            message_name=solved_package_message.base_name,
+        solver_dict = OpenShift.parse_python_solver_name(solved_package.get("solver"))
+        os_name, os_version, python_version = (
+            solver_dict["os_name"],
+            solver_dict["os_version"],
+            solver_dict["python_version"],
         )
-        _LOGGER.info(f"Schedule Kebechet Administrator with id = {workflow_id}")
-        scheduled_workflows.labels(
-            message_type=solved_package_message.base_name, workflow_type="kebechet-administrator"
-        ).inc()
+        installations = graph.get_kebechet_github_installations_info_for_python_package_version(
+            package_name=package_name,
+            index_url=index_url,
+            os_name=os_name,
+            os_version=os_version,
+            python_version=python_version,
+        )
+        keb_meta = {
+            "message_justification": InternalTriggerEnum.NEW_RELEASE.value,
+            "package_name": package_name,
+            "package_version": package_version,
+            "package_index": index_url,
+        }
+        tasks = []
+        for key in installations:
+            if semver.compare(package_version, installations[key]["package_version"]) < 0:  # only request if newer
+                tasks.append(
+                    send_advise_request_for_installation(
+                        slug=key,
+                        environment_name=installations[key]["environment_name"],
+                        keb_meta=keb_meta,
+                        gh_service=gh_service,
+                    )
+                )
+        num_requests_sent = sum(await asyncio.gather(*tasks))
+        solved_package_sent_advise_requests.inc(num_requests_sent)
 
     solved_package_success.inc()

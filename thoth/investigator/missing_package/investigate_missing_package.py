@@ -17,20 +17,22 @@
 
 """Logic for handling missing_package message."""
 
+import asyncio
 from typing import Dict, Any
 import logging
 
 from .metrics_missing_package import missing_package_exceptions
 from .metrics_missing_package import missing_package_success
 from .metrics_missing_package import missing_package_in_progress
-from ..common import register_handler, Configuration, schedule_kebechet_administrator
-
-from ..metrics import scheduled_workflows
+from .metrics_missing_package import missing_package_sent_advise_requests
+from ..common import register_handler, Configuration, send_advise_request_for_installation
+from ..github_service import GithubService
 
 from prometheus_async.aio import track_inprogress, count_exceptions
 from thoth.messaging import missing_package_message
 from thoth.storages import GraphDatabase
 from thoth.common import OpenShift
+from thoth.common.enums import InternalTriggerEnum
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,7 +40,9 @@ _LOGGER = logging.getLogger(__name__)
 @register_handler(missing_package_message.topic_name, ["v1"])
 @count_exceptions(missing_package_exceptions)
 @track_inprogress(missing_package_in_progress)
-async def parse_missing_package(package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs):
+async def parse_missing_package(
+    package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, gh_service: GithubService, **kwargs
+):
     """Process a missing package message from package-update producer."""
     python_package_versions = graph.get_python_package_versions_all(
         package_name=package["package_name"],
@@ -55,22 +59,26 @@ async def parse_missing_package(package: Dict[str, Any], openshift: OpenShift, g
         )
 
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
-        message_info = {
-            "PACKAGE_NAME": package["package_name"],
-            "PACKAGE_INDEX": package["index_url"],
-        }
-
-        # We schedule Kebechet Administrator workflow here -
-        workflow_id = await schedule_kebechet_administrator(
-            openshift=openshift,
-            message_info=message_info,
-            message_name=missing_package_message.base_name,
+        installations = graph.get_kebechet_github_installations_info_for_python_package_version(
+            package_name=package["package_name"],
+            index_url=package["index_url"],
         )
-
-        _LOGGER.info(f"Scheduled kebechet administrator workflow {workflow_id}")
-
-        scheduled_workflows.labels(
-            message_type=missing_package_message.base_name, workflow_type="kebechet-administrator"
-        ).inc()
+        keb_meta = {
+            "message_justification": InternalTriggerEnum.MISSING_PACKAGE.value,
+            "package_name": package["package_name"],
+            "package_index": package["index_url"],
+        }
+        tasks = []
+        for key in installations:
+            tasks.append(
+                send_advise_request_for_installation(
+                    slug=key,
+                    environment_name=installations[key]["environment_name"],
+                    keb_meta=keb_meta,
+                    gh_service=gh_service,
+                )
+            )
+        num_requests_sent = sum(await asyncio.gather(*tasks))
+        missing_package_sent_advise_requests.inc(num_requests_sent)
 
     missing_package_success.inc()

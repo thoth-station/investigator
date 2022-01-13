@@ -22,12 +22,17 @@ import logging
 from math import inf
 from asyncio import sleep
 import json
-
+import os
 from typing import List, Tuple, Optional, Callable
+import yaml
+
+from .github_service import GithubService
 
 from thoth.common import OpenShift
+from thoth.common.enums import ThothAdviserIntegrationEnum
 from thoth.storages import GraphDatabase
 from thoth.messaging import ALL_MESSAGES
+from thamos import lib as thamos_lib
 
 from .configuration import Configuration
 from .metrics import message_version_metric
@@ -101,21 +106,6 @@ async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
         await sleep(Configuration.SLEEP_TIME)
         total_pending = openshift.workflow_manager.get_pending_workflows(workflow_namespace=workflow_namespace)
         _LOGGER.debug("Current number pending = %d", total_pending)
-
-
-async def schedule_kebechet_administrator(openshift: OpenShift, message_info: dict, message_name: str) -> Optional[str]:
-    """Schedule Kebechet Administrator from a particular message."""
-    try:
-        await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
-        workflow_id = openshift.schedule_kebechet_administrator(message_info=message_info, message_type=message_name)
-        _LOGGER.info(
-            "Scheduled Kebechet Administrator workflow"
-            f" for message type {message_name} with workflow id - {workflow_id}"
-        )
-    except Exception as e:
-        _LOGGER.exception(f"Failed to schedule Kebechet Administrator workflow for message type {message_name}: {e}")
-        raise e
-    return workflow_id
 
 
 async def learn_about_security(
@@ -320,3 +310,53 @@ async def _schedule_all_solvers(
         raise e
 
     return are_scheduled
+
+
+async def send_advise_request_for_installation(
+    slug: str, environment_name: str, keb_meta: dict, gh_service: GithubService
+):
+    """Send a request to Thoth user-api for a given runtime environment.
+
+    args:
+        slug (str): '<namespace>/<repo_name>'
+        environment_name (str): runtime environment name as it appears in .thoth.yaml
+        keb_meta (dict): meta data which indicates which internal trigger caused the request
+        gh_service (GithubService): GithubService instance for interacting with Github api
+    returns:
+        bool: returns true if the request was sent and false if it was not sent
+    """
+    namespace, repo = slug.split("/")
+    project = gh_service.get_project(namespace=namespace, repo=repo)
+    thoth_config = await project.get_file(".thoth.yaml")
+    thoth_config = yaml.safe_load(thoth_config)
+    overlay_dir = thoth_config.get("overlays_dir", "")
+    if not overlay_dir and thoth_config["runtime_environments"][0]["name"] != environment_name:
+        return False  # if no overlay present, only the first entry of environments should be acted on
+    for r_e in thoth_config["runtime_environments"]:
+        if r_e["name"] == environment_name:
+            runtime_environment = r_e
+            break
+    else:
+        return False  # runtime environment is no longer present in config file, do not run adviser
+
+    directory = os.path.join(overlay_dir, environment_name) if overlay_dir else ""
+    # TODO: use thoth_config["requirements_format"] to hand other types of requirements files
+    pipfile_path = os.path.join(directory, "Pipfile")
+    pipfile_lock_path = os.path.join(directory, "Pipfile.lock")
+    pipfile = await project.get_file(pipfile_path)
+    pipfile_lock = await project.get_file(pipfile_lock_path)
+
+    # THAMOS_TOKEN env variable must be set because kebechet_metadata is protected
+    thamos_lib.advise(
+        pipfile=pipfile,
+        pipfile_lock=pipfile_lock,
+        recommendation_type=thoth_config.get("recommendation_type"),
+        runtime_environment=runtime_environment,
+        no_static_analysis=True,
+        nowait=True,
+        origin=f"https://github.com/{slug}",
+        source_type=ThothAdviserIntegrationEnum.KEBECHET,
+        kebechet_metadata=keb_meta,
+    )
+    print("SUCCESS")
+    return True

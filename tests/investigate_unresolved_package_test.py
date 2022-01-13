@@ -18,7 +18,7 @@
 """Test investigator."""
 
 from tests.base_test import InvestigatorTestCase
-from thoth.investigator.investigate_unresolved_package import investigate_unresolved_package
+from thoth.investigator.unresolved_package import investigate_unresolved_package
 
 
 class TestProducer(InvestigatorTestCase):

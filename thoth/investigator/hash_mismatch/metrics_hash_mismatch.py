@@ -17,8 +17,9 @@
 
 """Set labels for hash_mismatch metrics."""
 
-from ..metrics import in_progress, success, exceptions
+from ..metrics import in_progress, success, exceptions, sent_advise_requests
 
 hash_mismatch_in_progress = in_progress.labels(message_type="hash_mismatch")
 hash_mismatch_success = success.labels(message_type="hash_mismatch")
 hash_mismatch_exceptions = exceptions.labels(message_type="hash_mismatch")
+hash_mismatch_sent_advise_requests = sent_advise_requests.labels(message_type="hash_mismatch")

@@ -17,8 +17,9 @@
 
 """Set labels for solved_package metrics."""
 
-from ..metrics import in_progress, success, exceptions
+from ..metrics import in_progress, success, exceptions, sent_advise_requests
 
 solved_package_in_progress = in_progress.labels(message_type="solved_package")
 solved_package_success = success.labels(message_type="solved_package")
 solved_package_exceptions = exceptions.labels(message_type="solved_package")
+solved_package_sent_advise_requests = sent_advise_requests.labels(message_type="solved_package")

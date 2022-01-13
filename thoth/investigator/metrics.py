@@ -69,6 +69,13 @@ scheduled_workflows = Counter(
     registry=registry,
 )
 
+sent_advise_requests = Counter(
+    "thoth_investigator_sent_advise_requests",
+    "Requests sent to adviser from investigator.",
+    ["message_type"],
+    registry=registry,
+)
+
 halted_topics = Gauge(
     "thoth_investigator_halted_topics",
     "Boolean gauge indicating whether consumption of the topic has been halted.",

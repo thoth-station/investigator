@@ -52,6 +52,7 @@ from thoth.investigator.metrics import (
     missing_handler,
     current_consumer_offset,
 )
+from thoth.investigator.github_service import GithubService
 
 from thoth.common import OpenShift, init_logging
 from thoth.storages.graph import GraphDatabase
@@ -117,6 +118,9 @@ routes = web.RouteTableDef()
 halted_partitions = []  # type: List[TopicPartition]
 
 c = None  # type: Optional[Consumer]
+gh_service = GithubService(
+    app_id=os.getenv("KEBECHET_APP_ID"), app_private_key_path=os.getenv("KEBECHET_APP_PRIVATE_KEY_PATH")
+)
 
 
 def _handler_lookup(topic_name, version, table=investigator_handler_table, default=None):
@@ -209,7 +213,13 @@ async def _worker(q: asyncio.Queue):
         contents = json.loads(msg.value().decode("utf-8"))
         for i in range(0, Configuration.MAX_RETRIES):
             try:
-                await func(contents, openshift=openshift, graph=graph, msg=msg)
+                await func(
+                    contents,
+                    openshift=openshift,
+                    graph=graph,
+                    gh_service=gh_service,
+                    msg=msg,
+                )
                 c.commit(message=msg)
                 current_consumer_offset.labels(topic_name=msg.topic(), partition=msg.partition()).set(msg.offset())
                 break
