@@ -179,19 +179,19 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:1e72294b042651ab27a3b6a9eea2810fc8faab5be52b0876f9f5b55f5fd9e101",
-                "sha256:4110e8a1790842d1f818363b83c5f72dea4bdd980c46df1540814c4a79d72884"
+                "sha256:42dd9fcb9e033ab19c9dfaeaba745ef9d2db6efe4e9f1e1f547b3e3e0b1f4a82",
+                "sha256:e0247a901ba3b7ec51f232921764b7ad14f458ed91038a71df9da732e12bbbe1"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==1.20.33"
+            "version": "==1.20.35"
         },
         "botocore": {
             "hashes": [
-                "sha256:8faeda0da14a3cb5df8005052527cc0263181adad6bdbfedbe20079c72973c2c",
-                "sha256:9be1ea775e6de420a5873dff42108a1843e9137a52ef98c926dad56a8152ef2f"
+                "sha256:4cbd668a28e489c8d1909f621684f070309b3ae990667094b344e6ea72337795",
+                "sha256:5be6ba6c5ea71c256da8a5023bf9c278847c4b90fdb40f2c4c3bdb21ca11ff28"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==1.23.33"
+            "version": "==1.23.35"
         },
         "cachetools": {
             "hashes": [
@@ -1154,11 +1154,11 @@
         },
         "thoth-common": {
             "hashes": [
-                "sha256:09032ee49cc78e1a18276703f0f0a5f55bff889c33ca51863b3a89c9cb9120e6",
-                "sha256:c19bc2990393181d268a4ed6de350e903f99a779d3822120bda15e0c17e00006"
+                "sha256:4773480d24c72162be72d5777b5f69312f436316da45d83c27080243ffca9129",
+                "sha256:daae81830122b1f35ad5314cd5a7d9d7d86ed5fe77c39d01fc95623dd20248d6"
             ],
             "index": "pypi",
-            "version": "==0.33.1"
+            "version": "==0.34.0"
         },
         "thoth-messaging": {
             "hashes": [
@@ -1506,11 +1506,11 @@
         },
         "identify": {
             "hashes": [
-                "sha256:8d80d877441073e7222ff272da45ca5ca1d901412790544b446e7d363ad5e9f0",
-                "sha256:ac9c919c8ac5b90d03f8e1bce6dedcbd8a3b2a59c46737c04ed852e2d307af29"
+                "sha256:6b4b5031f69c48bf93a646b90de9b381c6b5f560df4cbe0ed3cf7650ae741e4d",
+                "sha256:aa68609c7454dbcaae60a01ff6b8df1de9b39fe6e50b1f6107ec81dcda624aa6"
             ],
             "markers": "python_full_version >= '3.6.1'",
-            "version": "==2.4.3"
+            "version": "==2.4.4"
         },
         "iniconfig": {
             "hashes": [
