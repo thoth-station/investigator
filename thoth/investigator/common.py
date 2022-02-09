@@ -241,6 +241,8 @@ async def learn_using_solver(
     else:
         solvers = [solver]
 
+    dependency_indexes = graph.get_python_package_index_urls_all(enabled=True)
+
     # Check for which solver has not been solved and schedule solver workflow
     are_solvers_scheduled = 0
 
@@ -256,6 +258,7 @@ async def learn_using_solver(
                 package_name=package_name,
                 package_version=package_version,
                 indexes=[index_url],
+                dependency_indexes=dependency_indexes,
                 solver_name=solver_name,
             )
 
@@ -265,14 +268,24 @@ async def learn_using_solver(
 
 
 def _schedule_solver(
-    openshift: OpenShift, package_name: str, package_version: str, indexes: List[str], solver_name: str
+    openshift: OpenShift,
+    package_name: str,
+    package_version: str,
+    dependency_indexes: List[str],
+    indexes: List[str],
+    solver_name: str,
 ) -> int:
     """Schedule solver."""
     packages = f"{package_name}==={package_version}"
 
     try:
         analysis_id = openshift.schedule_solver(
-            solver=solver_name, packages=packages, indexes=indexes, transitive=False, debug=Configuration.LOG_SOLVER
+            solver=solver_name,
+            packages=packages,
+            indexes=indexes,
+            dependency_indexes=dependency_indexes,
+            transitive=False,
+            debug=Configuration.LOG_SOLVER,
         )
         _LOGGER.info(
             "Scheduled solver %r for packages %r from indexes %r, analysis is %r",
