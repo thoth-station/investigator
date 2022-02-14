@@ -1,5 +1,12 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.16.0 (2022-02-14T10:06:59)
+* :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+* :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+* :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+* Pass dependency indexes when running solver
+* :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+
 ## Release 0.15.4 (2022-01-31T21:48:30)
 * :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
 * :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
