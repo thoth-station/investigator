@@ -1,52 +1,46 @@
 ---
 repos:
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.1.10
+    rev: v1.1.13
     hooks:
       - id: remove-tabs
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.1.0
     hooks:
-      - id: trailing-whitespace
-      - id: check-merge-conflict
-      - id: end-of-file-fixer
-      - id: name-tests-test
       - id: check-added-large-files
+      - id: check-ast
       - id: check-byte-order-marker
       - id: check-case-conflict
       - id: check-docstring-first
       - id: check-json
+      - id: check-merge-conflict
       - id: check-symlinks
-      - id: detect-private-key
-      - id: check-ast
+      - id: check-toml
+      - id: check-yaml
       - id: debug-statements
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: name-tests-test
+      - id: trailing-whitespace
 
   - repo: https://github.com/pycqa/pydocstyle.git
-    rev: 6.0.0
+    rev: 6.1.1
     hooks:
       - id: pydocstyle
 
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
-    hooks:
-      - id: check-toml
-      - id: check-yaml
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
-
   - repo: https://github.com/psf/black
-    rev: 21.4b0
+    rev: 22.1.0
     hooks:
       - id: black
 
   - repo: https://github.com/tomcatling/black-nb
-    rev: "0.4.0"
+    rev: "0.7"
     hooks:
       - id: black-nb
 
   - repo: https://gitlab.com/PyCQA/flake8
-    rev: "3.9.1"
+    rev: "3.9.2"
     hooks:
       - id: flake8
         additional_dependencies: ["pep8-naming"]
