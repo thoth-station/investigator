@@ -20,6 +20,8 @@
 import logging
 from typing import Dict, Any
 
+from thoth.investigator.configuration import Configuration
+
 from .metrics_inspection_completed import inspection_completed_exceptions
 from .metrics_inspection_completed import inspection_completed_in_progress
 from .metrics_inspection_completed import inspection_completed_success
@@ -39,7 +41,7 @@ _LOGGER = logging.getLogger(__name__)
 @track_inprogress(inspection_completed_in_progress)
 async def parse_inspection_completed(inspection_completed: Dict[str, Any], openshift: OpenShift, **kwargs):
     """Schedule graph sync for inspection after completion."""
-    wait_for_limit(openshift=openshift, workflow_namespace=openshift.middletier_namespace)
+    await wait_for_limit(openshift=openshift, workflow_namespace=Configuration.THOTH_MIDDLETIER_NAMESPACE)
     workflow_name = openshift.schedule_graph_sync(
         inspection_completed["inspection_id"], force_sync=inspection_completed["force_sync"]
     )

@@ -61,7 +61,7 @@ async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, gr
                 package_name=mismatch["package_name"],
                 package_version=mismatch["package_version"],
                 index_url=mismatch["index_url"],
-                sha256=h,
+                sha256_hash=h,
             )
 
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
@@ -75,7 +75,7 @@ async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, gr
         workflow_id = await schedule_kebechet_administrator(
             openshift=openshift,
             message_info=message_info,
-            message_name=hash_mismatch_message.__name__,
+            message_name=hash_mismatch_message.base_name,
         )
         scheduled_workflows.labels(
             message_type=hash_mismatch_message.base_name, workflow_type="kebechet-administrator"

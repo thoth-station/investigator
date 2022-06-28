@@ -103,9 +103,8 @@ async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):
         _LOGGER.debug("Current number pending = %d", total_pending)
 
 
-async def schedule_kebechet_administrator(openshift: OpenShift, message_info: dict, message_name: str) -> int:
+async def schedule_kebechet_administrator(openshift: OpenShift, message_info: dict, message_name: str) -> Optional[str]:
     """Schedule Kebechet Administrator from a particular message."""
-    workflow_id = 0
     try:
         await wait_for_limit(openshift, workflow_namespace=Configuration.THOTH_BACKEND_NAMESPACE)
         workflow_id = openshift.schedule_kebechet_administrator(message_info=message_info, message_type=message_name)
@@ -279,7 +278,8 @@ def _schedule_solver(
     packages = f"{package_name}==={package_version}"
 
     try:
-        analysis_id = openshift.schedule_solver(
+        # mypy is throwing errors in CI without this ignore
+        analysis_id = openshift.schedule_solver(  # type: ignore
             solver=solver_name,
             packages=packages,
             indexes=indexes,
