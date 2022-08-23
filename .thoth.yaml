@@ -17,13 +17,6 @@ managers:
   - name: info
   - name: version
     configuration:
-      maintainers:
-        - sesheta
-        - fridex
-        - goern
-        - harshad16
-        - pacospace
-        - KPostOffice
       assignees:
         - sesheta
       labels: [bot]
