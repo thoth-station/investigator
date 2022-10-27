@@ -240,7 +240,8 @@ async def learn_using_solver(
     else:
         solvers = [solver]
 
-    dependency_indexes = graph.get_python_package_index_urls_all(enabled=True)
+    if index_url != "https://pypi.org/simple":
+        dependency_indexes = [index_url, "https://pypi.org/simple"]
 
     # Check for which solver has not been solved and schedule solver workflow
     are_solvers_scheduled = 0
