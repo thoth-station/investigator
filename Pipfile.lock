@@ -194,19 +194,19 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:7b6fb7b0346c239b53ad5e5fdf5eeef3c6452186d91239beeb66f106531cb2c3",
-                "sha256:cb4eca34b6e13e4ead46a68f66759feaae6bf5e97362b2c979b7b9f1d203715e"
+                "sha256:2bd7d3e8362f0e0d84fe4c3a06f1bd46fd2dbedbea76ac24e89f28439837a9e7",
+                "sha256:4943faf38979ac445627390b431b0c08a73ccd5ecd46983e1d29cee454d14aaa"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==1.26.5"
+            "version": "==1.26.6"
         },
         "botocore": {
             "hashes": [
-                "sha256:8a1a074bce7567576947869d41026c45d507e00885f3890c1719180a9400ec40",
-                "sha256:94e820994e731568d191373d622507fee6067c9e68b5a121aed46322fd6d3d45"
+                "sha256:574a9dc8b7cf1d866e6255c57af25de1f0da1babc6ce9faf05f227fd28ca905e",
+                "sha256:bb595ed6a42ff85b4d5fb7a2e31b8584b87df46933a6f830fd98f91b1feea279"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==1.29.5"
+            "version": "==1.29.6"
         },
         "cachetools": {
             "hashes": [
@@ -1721,11 +1721,11 @@
         },
         "pytest-mypy": {
             "hashes": [
-                "sha256:83843dce75a7ce055efb264ff40dad2ecf7abd4e7bd5e5eda015261d11616abb",
-                "sha256:e74d632685f15a39c31c551a9d8cec4619e24bd396245a6335c5db0ec6d17b6f"
+                "sha256:7fe68837449334553e224cc86c6dc1b938772399abb64f510a864fb209593a94",
+                "sha256:ecf541a28df9e5f992936a1613bee231957df2d40efa662cd7c52ace2e64f43f"
             ],
             "index": "pypi",
-            "version": "==0.10.0"
+            "version": "==0.10.1"
         },
         "pytest-timeout": {
             "hashes": [
