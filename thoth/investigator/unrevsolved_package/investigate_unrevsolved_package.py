@@ -26,7 +26,7 @@ from thoth.common import OpenShift
 from .. import common
 from ..configuration import Configuration
 from ..metrics import scheduled_workflows
-from ..common import register_handler
+from ..common import register_handler, middletier_handlers
 from .metrics_unrevsolved_package import unrevsolved_package_exceptions
 from .metrics_unrevsolved_package import unrevsolved_package_in_progress
 from .metrics_unrevsolved_package import unrevsolved_package_success
@@ -35,7 +35,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(unrevsolved_package_message.topic_name, ["v1"])
+@register_handler(unrevsolved_package_message.topic_name, ["v1"], middletier_handlers)
 @count_exceptions(unrevsolved_package_exceptions)
 @track_inprogress(unrevsolved_package_in_progress)
 async def parse_revsolved_package_message(unrevsolved_package: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:

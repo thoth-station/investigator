@@ -29,7 +29,7 @@ from thoth.python import Source
 from ..metrics import scheduled_workflows
 from .. import common
 from ..configuration import Configuration
-from ..common import register_handler
+from ..common import register_handler, middletier_handlers
 
 from .metrics_unresolved_package import unresolved_package_exceptions
 from .metrics_unresolved_package import unresolved_package_in_progress
@@ -39,7 +39,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(unresolved_package_message.topic_name, ["v1"])
+@register_handler(unresolved_package_message.topic_name, ["v1"], middletier_handlers)
 @count_exceptions(unresolved_package_exceptions)
 @track_inprogress(unresolved_package_in_progress)
 async def parse_unresolved_package_message(

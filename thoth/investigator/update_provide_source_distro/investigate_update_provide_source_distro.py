@@ -23,7 +23,7 @@ import logging
 from thoth.messaging import update_provides_source_distro_message
 from thoth.storages import GraphDatabase
 
-from ..common import register_handler
+from ..common import register_handler, middletier_handlers
 
 from .metrics_update_provide_source_distro import update_provide_source_distro_exceptions
 from .metrics_update_provide_source_distro import update_provide_source_distro_success
@@ -33,7 +33,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(update_provides_source_distro_message.topic_name, ["v1"])
+@register_handler(update_provides_source_distro_message.topic_name, ["v1"], middletier_handlers)
 @count_exceptions(update_provide_source_distro_exceptions)
 @track_inprogress(update_provide_source_distro_in_progress)
 async def parse_update_provide_source_distro_message(

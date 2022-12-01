@@ -28,22 +28,16 @@ from runpy import run_module
 from aiohttp import web
 from time import sleep
 
-from typing import Optional, List
+from typing import Optional, List, Set
 
 import thoth.messaging.consumer as consumer
 import thoth.messaging.admin_client as admin
 from thoth.messaging import ALL_MESSAGES
 
 from thoth.investigator import __service_version__
-from thoth.investigator.configuration import Configuration, ConsumerModeEnum
+from thoth.investigator.configuration import Configuration
 
-from thoth.investigator.common import (
-    investigator_handler_table,
-    metrics_handler_table,
-    default_metric_handler,
-    _get_class_from_topic_name,
-    _get_class_from_base_name,
-)
+from thoth.investigator.common import _get_class_from_topic_name, _get_class_from_base_name, ConsumerModeEnum
 from thoth.investigator.metrics import registry
 from thoth.investigator.metrics import (
     failures,
@@ -119,7 +113,7 @@ halted_partitions = []  # type: List[TopicPartition]
 c = None  # type: Optional[Consumer]
 
 
-def _handler_lookup(topic_name, version, table=investigator_handler_table, default=None):
+def _handler_lookup(topic_name, version, table, default=None):
     if default is None:
         return table[topic_name][version]
     else:
@@ -205,11 +199,14 @@ async def _worker(q: asyncio.Queue):
         val = await q.get()
         if val is None:
             break
-        func, msg = val
+        functions, msg = val
         contents = json.loads(msg.value().decode("utf-8"))
+        function_index = 0
         for i in range(0, Configuration.MAX_RETRIES):
             try:
-                await func(contents, openshift=openshift, graph=graph, msg=msg)
+                while function_index < len(functions):
+                    await functions[function_index](contents, openshift=openshift, graph=graph, msg=msg)
+                    function_index += 1  # if a function succeeds don't rerun it again
                 c.commit(message=msg)
                 current_consumer_offset.labels(topic_name=msg.topic(), partition=msg.partition()).set(msg.offset())
                 break
@@ -230,7 +227,10 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
         raise Exception
     await asyncio.sleep(1.0)  # wait here so that kafka has time to finish creating topics
     try:
-        consumer.subscribe_to_all(c)
+        topics: Set[str] = set()
+        for mode in Configuration.CONSUMER_MODES:
+            topics = topics.union(ConsumerModeEnum[mode].value.keys())
+        c.subscribe(list(topics))
         _set_halted_to_zero()
         while running:
             msg = c.poll(0)
@@ -238,8 +238,9 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
                 await asyncio.sleep(1.0)
             elif msg.error():
                 if msg.error().code() == KafkaError._PARTITION_EOF:
-                    _LOGGER.warning("%s [%d] reached end at offset %d", msg.topic(), msg.partition(), msg.offset())
+                    _LOGGER.debug("%s [%d] reached end at offset %d", msg.topic(), msg.partition(), msg.offset())
                 else:
+                    _LOGGER.exception(msg.error())
                     raise KafkaException(msg.error())
             else:
                 contents = json.loads(msg.value().decode("utf-8"))  # type: dict
@@ -248,9 +249,11 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
                 ############################################################
                 # Choose which handler table to use based on env variables #
                 ############################################################
-                if ConsumerModeEnum[Configuration.CONSUMER_MODE] == ConsumerModeEnum.investigator:
+                functions = []
+                for mode in Configuration.CONSUMER_MODES:
+                    table = ConsumerModeEnum[mode].value
                     try:
-                        func = _handler_lookup(msg.topic(), v)
+                        functions.append(_handler_lookup(msg.topic(), v, table))
                     except KeyError:
                         _LOGGER.warning(
                             "No handler for version %s of %s", v, _get_class_from_topic_name(msg.topic_name())
@@ -258,16 +261,7 @@ async def _confluent_consumer_loop(q: asyncio.Queue):
                         message_class = _get_class_from_topic_name(msg.topic())
                         missing_handler.labels(base_topic_name=message_class.base_name, message_version=v).set(1)
                         _message_failed(msg)
-                elif ConsumerModeEnum[Configuration.CONSUMER_MODE] == ConsumerModeEnum.metrics:
-                    try:
-                        func = _handler_lookup(
-                            msg.topic(), v, table=metrics_handler_table, default=default_metric_handler
-                        )
-                    except KeyError:
-                        _LOGGER.warning("Could not find entry in metrics handler table for %s.", msg.topic_name())
-                #############################################################
-
-                await q.put((func, msg))
+                await q.put((functions, msg))
             await asyncio.sleep(0)
     finally:
         c.close()

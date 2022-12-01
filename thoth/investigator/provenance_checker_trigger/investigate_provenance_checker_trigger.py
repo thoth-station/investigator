@@ -23,7 +23,7 @@ from typing import Dict, Any
 from thoth.messaging import provenance_checker_trigger_message
 from thoth.common import OpenShift
 
-from ..common import wait_for_limit, register_handler
+from ..common import wait_for_limit, register_handler, backend_handlers
 from ..configuration import Configuration
 
 from .metrics_provenance_checker_trigger import provenance_checker_trigger_exceptions
@@ -34,7 +34,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(provenance_checker_trigger_message.topic_name, ["v1", "v2", "v3", "v4"])
+@register_handler(provenance_checker_trigger_message.topic_name, ["v1", "v2", "v3", "v4"], backend_handlers)
 @count_exceptions(provenance_checker_trigger_exceptions)
 @track_inprogress(provenance_checker_trigger_in_progress)
 async def parse_provenance_checker_trigger_message(

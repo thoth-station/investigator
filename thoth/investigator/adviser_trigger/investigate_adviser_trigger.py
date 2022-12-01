@@ -23,7 +23,7 @@ from typing import Dict, Any
 from thoth.messaging import adviser_trigger_message
 from thoth.common import OpenShift
 
-from ..common import wait_for_limit, register_handler
+from ..common import wait_for_limit, register_handler, backend_handlers
 from ..configuration import Configuration
 
 from .metrics_adviser_trigger import adviser_trigger_exceptions
@@ -34,7 +34,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(adviser_trigger_message.topic_name, ["v1", "v2", "v3", "v4", "v5"])
+@register_handler(adviser_trigger_message.topic_name, ["v1", "v2", "v3", "v4", "v5"], backend_handlers)
 @count_exceptions(adviser_trigger_exceptions)
 @track_inprogress(adviser_trigger_in_progress)
 async def parse_adviser_trigger_message(adviser_trigger: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:

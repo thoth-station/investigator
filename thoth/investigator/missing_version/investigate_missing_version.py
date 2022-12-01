@@ -20,7 +20,7 @@
 import logging
 from typing import Dict, Any
 
-from ..common import schedule_kebechet_administrator, register_handler
+from ..common import schedule_kebechet_administrator, register_handler, backend_handlers
 from ..metrics import scheduled_workflows
 
 from .metrics_missing_version import missing_version_exceptions
@@ -36,7 +36,7 @@ from ..configuration import Configuration
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(missing_version_message.topic_name, ["v1"])
+@register_handler(missing_version_message.topic_name, ["v1"], backend_handlers)
 @count_exceptions(missing_version_exceptions)
 @track_inprogress(missing_version_in_progress)
 async def parse_missing_version(version: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs):

@@ -25,7 +25,7 @@ from thoth.investigator.configuration import Configuration
 from .metrics_inspection_completed import inspection_completed_exceptions
 from .metrics_inspection_completed import inspection_completed_in_progress
 from .metrics_inspection_completed import inspection_completed_success
-from ..common import register_handler, wait_for_limit
+from ..common import register_handler, wait_for_limit, middletier_handlers
 
 from thoth.common import OpenShift
 
@@ -36,7 +36,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(inspection_completed_message.topic_name, ["v1"])
+@register_handler(inspection_completed_message.topic_name, ["v1"], middletier_handlers)
 @count_exceptions(inspection_completed_exceptions)
 @track_inprogress(inspection_completed_in_progress)
 async def parse_inspection_completed(inspection_completed: Dict[str, Any], openshift: OpenShift, **kwargs):

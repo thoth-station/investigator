@@ -17,6 +17,6 @@
 
 """The important parts for parsing hash_mismatch messages."""
 
-from .investigate_hash_mismatch import parse_hash_mismatch
+from .investigate_hash_mismatch import parse_hash_mismatch_backend, parse_hash_mismatch_middletier
 
-__all__ = ["parse_hash_mismatch"]
+__all__ = ["parse_hash_mismatch_middletier", "parse_hash_mismatch_backend"]

@@ -20,7 +20,13 @@
 import logging
 from typing import Dict, Any
 
-from ..common import schedule_kebechet_administrator, learn_using_solver, register_handler
+from ..common import (
+    schedule_kebechet_administrator,
+    learn_using_solver,
+    register_handler,
+    backend_handlers,
+    middletier_handlers,
+)
 from ..configuration import Configuration
 from ..metrics import scheduled_workflows
 
@@ -35,11 +41,16 @@ from thoth.storages import GraphDatabase
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(hash_mismatch_message.topic_name, ["v1"])
+# TODO: Two different functions, one for middletier scheduling and one for backend scheduling
+
+
+@register_handler(hash_mismatch_message.topic_name, ["v1"], middletier_handlers)
 @count_exceptions(hash_mismatch_exceptions)
 @track_inprogress(hash_mismatch_in_progress)
-async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs):
-    """Process a hash mismatch message from package-update producer."""
+async def parse_hash_mismatch_middletier(
+    mismatch: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs
+):
+    """Process a hash mismatch message from package-update producer. Schedules WFs in middletier namespace."""
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_SOLVER:
         # Solver logic
         solver_wf_scheduled = await learn_using_solver(
@@ -64,6 +75,12 @@ async def parse_hash_mismatch(mismatch: Dict[str, Any], openshift: OpenShift, gr
                 sha256_hash=h,
             )
 
+
+@register_handler(hash_mismatch_message.topic_name, ["v1"], backend_handlers)
+@count_exceptions(hash_mismatch_exceptions)
+@track_inprogress(hash_mismatch_in_progress)
+async def parse_hash_mismatch_backend(mismatch: Dict[str, Any], openshift: OpenShift, **kwargs):
+    """Process a hash mismatch message from package-update producer. Schedules WFs in backend namespace."""
     if Configuration.THOTH_INVESTIGATOR_SCHEDULE_KEBECHET_ADMIN:
         message_info = {
             "PACKAGE_NAME": mismatch["package_name"],
