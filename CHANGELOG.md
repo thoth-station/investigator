@@ -1,5 +1,16 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.16.5 (2023-01-18T21:37:29)
+* 97b2651 ':arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment'
+* 9f56e29 ':arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment' (#681)
+* d0e7b48 ':arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment' (#679)
+* a900b61 :ship: Bump up base image initialized in CI. (#678)
+* ee39345 git ls-files -z -- .pre-commit-config.yaml | xargs -0 sed -i 's#https://gitlab.com/PyCQA/flake8#https://github.com/PyCQA/flake8#' (#677)
+* 586d43a :ship: Bump up base image initialized in CI.
+* dde2b9e :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+* 65b34c4 :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+* edd4d4b :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+
 ## Release 0.16.4 (2022-10-03T18:54:55)
 * e98f7e5 :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
 * 0264d07 :ship: Bump up base image initialized in CI.
