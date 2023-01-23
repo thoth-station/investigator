@@ -23,7 +23,7 @@ import logging
 from .metrics_missing_package import missing_package_exceptions
 from .metrics_missing_package import missing_package_success
 from .metrics_missing_package import missing_package_in_progress
-from ..common import register_handler, Configuration, schedule_kebechet_administrator
+from ..common import register_handler, Configuration, schedule_kebechet_administrator, backend_handlers
 
 from ..metrics import scheduled_workflows
 
@@ -35,7 +35,7 @@ from thoth.common import OpenShift
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(missing_package_message.topic_name, ["v1"])
+@register_handler(missing_package_message.topic_name, ["v1"], backend_handlers)
 @count_exceptions(missing_package_exceptions)
 @track_inprogress(missing_package_in_progress)
 async def parse_missing_package(package: Dict[str, Any], openshift: OpenShift, graph: GraphDatabase, **kwargs):

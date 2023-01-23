@@ -11,6 +11,7 @@ prometheus-async = "*"
 confluent-kafka = "*"
 thoth-common = "*"
 thoth-messaging = "*"
+aenum = "*"
 
 [dev-packages]
 pytest = "*"

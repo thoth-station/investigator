@@ -23,7 +23,7 @@ from typing import Dict, Any
 from thoth.messaging import kebechet_run_url_trigger_message
 from thoth.common import OpenShift
 
-from ..common import wait_for_limit, register_handler
+from ..common import wait_for_limit, register_handler, backend_handlers
 from ..configuration import Configuration
 
 from .metrics_kebechet_run_url_trigger import kebechet_run_url_trigger_success
@@ -34,7 +34,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(kebechet_run_url_trigger_message.topic_name, ["v1", "v2"])
+@register_handler(kebechet_run_url_trigger_message.topic_name, ["v1", "v2"], backend_handlers)
 @count_exceptions(kebechet_run_url_trigger_exceptions)
 @track_inprogress(kebechet_run_url_trigger_in_progress)
 async def parse_kebechet_run_url_trigger_message(

@@ -25,7 +25,7 @@ from thoth.common import OpenShift
 
 from ..metrics import scheduled_workflows
 from .. import common
-from ..common import register_handler
+from ..common import register_handler, middletier_handlers
 from ..configuration import Configuration
 from .metrics_package_released import package_released_exceptions
 from .metrics_package_released import package_released_in_progress
@@ -33,7 +33,7 @@ from .metrics_package_released import package_released_success
 from prometheus_async.aio import track_inprogress, count_exceptions
 
 
-@register_handler(package_released_message.topic_name, ["v1"])
+@register_handler(package_released_message.topic_name, ["v1"], middletier_handlers)
 @count_exceptions(package_released_exceptions)
 @track_inprogress(package_released_in_progress)
 async def parse_package_released_message(

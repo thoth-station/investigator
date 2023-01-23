@@ -22,8 +22,10 @@ import logging
 from math import inf
 from asyncio import sleep
 import json
+from aenum import Enum, NoAlias
+from collections import defaultdict
 
-from typing import List, Tuple, Optional, Callable
+from typing import List, Tuple, Optional, Callable, Dict, DefaultDict
 
 from thoth.common import OpenShift
 from thoth.storages import GraphDatabase
@@ -35,10 +37,13 @@ from .metrics import message_version_metric
 _LOGGER = logging.getLogger(__name__)
 
 
-def _create_base_handler_table():
-    table = dict()
+def _crt_hndlr_tbl_w_dflt_func(f: Callable) -> Dict[str, DefaultDict[str, Callable]]:
+    def ret_func():  # defaultdict requires a generator function
+        return f
+
+    table: Dict[str, DefaultDict[str, Callable]] = dict()
     for i in ALL_MESSAGES:
-        table[i.topic_name] = dict()
+        table[i.topic_name] = defaultdict(ret_func)
     return table
 
 
@@ -60,14 +65,38 @@ def _message_type_from_message_class(message_class):
     return message_type
 
 
-investigator_handler_table = _create_base_handler_table()
-metrics_handler_table = _create_base_handler_table()
+async def default_metric_handler(contents, msg, **kwargs):
+    """Increments counter specific to message type and version that was encountered."""
+    metric = message_version_metric.labels(
+        message_type=_message_type_from_message_class(_get_class_from_topic_name(msg.topic())),
+        message_version=json.loads(msg.value().decode("utf-8")).get("version", "None"),
+    )
+    metric.inc()
 
 
-def register_handler(topic_name: str, version_strings: List[str], handler_table: dict = investigator_handler_table):
+# these are populated as modules are loaded
+backend_handlers: Dict[str, Dict[str, Callable]] = dict()
+middletier_handlers: Dict[str, Dict[str, Callable]] = dict()
+# investigator_handler_table = dict()
+metrics_handlers: Dict[str, DefaultDict[str, Callable]] = _crt_hndlr_tbl_w_dflt_func(default_metric_handler)
+
+
+class ConsumerModeEnum(Enum):
+    """Class representing the different modes the consumer can use which correspond to different handler tables."""
+
+    _settings_ = NoAlias  # without this middletier becomes an alias for backend
+
+    backend = backend_handlers
+    middletier = middletier_handlers
+    metrics = metrics_handlers
+
+
+def register_handler(topic_name: str, version_strings: List[str], handler_table: dict):
     """Register function to specific message versions."""
 
     def wrapper_func(func: Callable):
+        if topic_name not in handler_table:
+            handler_table[topic_name] = dict()
         for v in version_strings:
             handler_table[topic_name][v] = func
             _LOGGER.debug("Registering handler for %s==%s", topic_name, v)
@@ -78,15 +107,6 @@ def register_handler(topic_name: str, version_strings: List[str], handler_table:
         return innner_func
 
     return wrapper_func
-
-
-async def default_metric_handler(contents, msg, **kwargs):
-    """Increments counter specific to message type and version that was encountered."""
-    metric = message_version_metric.labels(
-        message_type=_message_type_from_message_class(_get_class_from_topic_name(msg.topic())),
-        message_version=json.loads(msg.value().decode("utf-8")).get("version", "None"),
-    )
-    metric.inc()
 
 
 async def wait_for_limit(openshift: OpenShift, workflow_namespace: str):

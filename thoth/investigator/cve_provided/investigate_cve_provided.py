@@ -20,7 +20,7 @@
 import logging
 from typing import Dict, Any
 
-from ..common import schedule_kebechet_administrator, register_handler
+from ..common import schedule_kebechet_administrator, register_handler, backend_handlers
 from ..configuration import Configuration
 from ..metrics import scheduled_workflows
 
@@ -34,7 +34,7 @@ from thoth.common import OpenShift
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(cve_provided_message.topic_name, ["v1"])
+@register_handler(cve_provided_message.topic_name, ["v1"], backend_handlers)
 @count_exceptions(cve_provided_exceptions)
 @track_inprogress(cve_provided_in_progress)
 async def parse_cve_provided(cve_provided: Dict[str, Any], openshift: OpenShift, **kwargs):

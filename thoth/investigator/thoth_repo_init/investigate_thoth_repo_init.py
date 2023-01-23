@@ -23,7 +23,7 @@ from typing import Dict, Any
 from thoth.messaging import thoth_repo_init_message
 from thoth.common import OpenShift
 
-from ..common import wait_for_limit, register_handler
+from ..common import wait_for_limit, register_handler, backend_handlers
 from ..configuration import Configuration
 
 from .metrics_thoth_repo_init import thoth_repo_init_exceptions, thoth_repo_init_in_progress, thoth_repo_init_success
@@ -32,7 +32,7 @@ from prometheus_async.aio import track_inprogress, count_exceptions
 _LOGGER = logging.getLogger(__name__)
 
 
-@register_handler(thoth_repo_init_message.topic_name, ["v1"])
+@register_handler(thoth_repo_init_message.topic_name, ["v1"], backend_handlers)
 @count_exceptions(thoth_repo_init_exceptions)
 @track_inprogress(thoth_repo_init_in_progress)
 async def parse_thoth_repo_init_message(repo_init: Dict[str, Any], openshift: OpenShift, **kwargs) -> None:

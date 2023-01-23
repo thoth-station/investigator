@@ -22,17 +22,9 @@
 import logging
 import os
 import json
-from enum import Enum, auto
 from typing import Union
 
 _LOGGER = logging.getLogger(__name__)
-
-
-class ConsumerModeEnum(Enum):
-    """Class representing the different modes the consumer can use which correspond to different handler tables."""
-
-    investigator = auto()
-    metrics = auto()
 
 
 def _get_ack_on_fail() -> Union[bool, list]:
@@ -43,6 +35,13 @@ def _get_ack_on_fail() -> Union[bool, list]:
         return to_ret
     else:
         raise TypeError("THOTH_INVESTIGATOR_ACK_ON_FAIL envvar must be either a integer or a list")
+
+
+def _str_to_list(s: str):
+    try:
+        return json.loads(s)
+    except ValueError:  # string is not json => represents single value
+        return [s]
 
 
 class Configuration:
@@ -72,4 +71,4 @@ class Configuration:
     BACKOFF = float(os.getenv("THOTH_INVESTIGATOR_BACKOFF", 0.5))  # Linear backoff strategy
     ACK_ON_FAIL = _get_ack_on_fail()
     NUM_WORKERS = int(os.getenv("THOTH_CONSUMER_WORKERS", 5))
-    CONSUMER_MODE = os.getenv("THOTH_CONSUMER_MODE", "investigator")
+    CONSUMER_MODES = _str_to_list(os.getenv("THOTH_CONSUMER_MODE", '["middletier", "backend"]'))
