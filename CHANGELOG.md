@@ -1,5 +1,9 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.17.0 (2023-01-23T20:48:33)
+* f53fe81 ':arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment'
+* 5ad070d break handler tablers based on namespace
+
 ## Release 0.16.5 (2023-01-18T21:37:29)
 * 97b2651 ':arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment'
 * 9f56e29 ':arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment' (#681)
